@@ -1,0 +1,22 @@
+From 590d1b264850fc4e14ec4047bb1da14769b83aaa Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Thu, 1 Jul 2021 22:01:14 -0700
+Subject: [PATCH] Use 2 spaces for indentation in FernFlower decompiler
+
+
+diff --git a/src/main/java/net/fabricmc/loom/decompilers/fernflower/AbstractFernFlowerDecompiler.java b/src/main/java/net/fabricmc/loom/decompilers/fernflower/AbstractFernFlowerDecompiler.java
+index a166d57..3a5fb8f 100644
+--- a/src/main/java/net/fabricmc/loom/decompilers/fernflower/AbstractFernFlowerDecompiler.java
++++ b/src/main/java/net/fabricmc/loom/decompilers/fernflower/AbstractFernFlowerDecompiler.java
+@@ -71,7 +71,7 @@ public abstract class AbstractFernFlowerDecompiler implements LoomDecompiler {
+ 				put(IFernflowerPreferences.REMOVE_SYNTHETIC, "1");
+ 				put(IFernflowerPreferences.LOG_LEVEL, "trace");
+ 				put(IFernflowerPreferences.THREADS, metaData.numberOfThreads());
+-				put(IFernflowerPreferences.INDENT_STRING, "\t");
++				put(IFernflowerPreferences.INDENT_STRING, "  "); // quiet
+ 			}};
+ 
+ 		List<String> args = new ArrayList<>();
+-- 
+2.32.0
+
