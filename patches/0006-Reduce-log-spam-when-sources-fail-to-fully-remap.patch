@@ -1,11 +1,11 @@
-From 9ae34da2ce0d63702f81ac33afac957d01934afd Mon Sep 17 00:00:00 2001
+From 41e84c86721199c3e0b54ad6f00d483b0c9f88ae Mon Sep 17 00:00:00 2001
 From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
 Date: Thu, 1 Jul 2021 22:34:03 -0700
 Subject: [PATCH] Reduce log spam when sources fail to fully remap
 
 
 diff --git a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
-index 1e3eb80..7c7aa36 100644
+index ed4957a..07b6cb8 100644
 --- a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
 +++ b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
 @@ -143,7 +143,7 @@ public class SourceRemapper {
