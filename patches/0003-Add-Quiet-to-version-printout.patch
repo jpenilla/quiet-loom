@@ -1,0 +1,22 @@
+From 4bc560855075673b3b84f26e37f71f7da663a8ef Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Thu, 1 Jul 2021 21:51:52 -0700
+Subject: [PATCH] Add "Quiet" to version printout
+
+
+diff --git a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
+index 3d32c4b..5a50035 100644
+--- a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
++++ b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
+@@ -56,7 +56,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
+ 	}
+ 
+ 	public void apply(Project project) {
+-		project.getLogger().lifecycle("Fabric Loom: " + LoomGradlePlugin.class.getPackage().getImplementationVersion());
++		project.getLogger().lifecycle("Quiet Fabric Loom: " + LoomGradlePlugin.class.getPackage().getImplementationVersion());
+ 
+ 		refreshDeps = project.getGradle().getStartParameter().isRefreshDependencies();
+ 
+-- 
+2.32.0
+
