@@ -1,0 +1,55 @@
+From 96db8fda00a1a36296c66d8aeaeda970ea0b265d Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Thu, 1 Jul 2021 20:46:20 -0700
+Subject: [PATCH] Remove annoying warning
+
+
+diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
+index 31b5b88..0bcc2a8 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
++++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
+@@ -30,7 +30,6 @@ import java.io.IOException;
+ import java.net.URL;
+ import java.nio.charset.StandardCharsets;
+ import java.nio.file.Files;
+-import java.nio.file.Path;
+ import java.util.List;
+ 
+ import org.gradle.api.logging.Logger;
+@@ -55,8 +54,6 @@ public record MojangMappingLayer(MinecraftVersionMeta.Download clientDownload,
+ 
+ 		download(clientMappings, serverMappings);
+ 
+-		printMappingsLicense(clientMappings.toPath());
+-
+ 		// Make official the source namespace
+ 		MappingSourceNsSwitch nsSwitch = new MappingSourceNsSwitch(mappingVisitor, MappingNamespace.OFFICIAL.stringValue());
+ 
+@@ -72,24 +69,6 @@ public record MojangMappingLayer(MinecraftVersionMeta.Download clientDownload,
+ 		HashedDownloadUtil.downloadIfInvalid(new URL(serverDownload().url()), serverMappings, serverDownload().sha1(), logger(), false);
+ 	}
+ 
+-	private void printMappingsLicense(Path clientMappings) {
+-		try (BufferedReader clientBufferedReader = Files.newBufferedReader(clientMappings, StandardCharsets.UTF_8)) {
+-			logger().warn("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+-			logger().warn("Using of the official minecraft mappings is at your own risk!");
+-			logger().warn("Please make sure to read and understand the following license:");
+-			logger().warn("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+-			String line;
+-
+-			while ((line = clientBufferedReader.readLine()).startsWith("#")) {
+-				logger().warn(line);
+-			}
+-
+-			logger().warn("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+-		} catch (IOException e) {
+-			throw new RuntimeException("Failed to read client mappings", e);
+-		}
+-	}
+-
+ 	@Override
+ 	public MappingNamespace getSourceNamespace() {
+ 		return MappingNamespace.OFFICIAL;
+-- 
+2.32.0
+
