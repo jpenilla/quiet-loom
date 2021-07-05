@@ -1,19 +1,24 @@
-From 41e84c86721199c3e0b54ad6f00d483b0c9f88ae Mon Sep 17 00:00:00 2001
+From eda88a1fef475a20b1be4d95badb39467d268bae Mon Sep 17 00:00:00 2001
 From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
 Date: Thu, 1 Jul 2021 22:34:03 -0700
 Subject: [PATCH] Reduce log spam when sources fail to fully remap
 
 
 diff --git a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
-index ed4957a..07b6cb8 100644
+index ed4957a..204d6a9 100644
 --- a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
 +++ b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
-@@ -143,7 +143,7 @@ public class SourceRemapper {
+@@ -143,7 +143,13 @@ public class SourceRemapper {
  		try {
  			mercury.rewrite(srcPath, dstPath);
  		} catch (Exception e) {
--			project.getLogger().warn("Could not remap " + source.getName() + " fully!", e);
-+			project.getLogger().warn("Could not remap " + source.getName() + " fully! {}", e.getMessage()); // quiet
++			// quiet start
++			if (project.hasProperty("verbose")) {
+ 			project.getLogger().warn("Could not remap " + source.getName() + " fully!", e);
++			} else {
++				project.getLogger().warn("Could not remap {} fully!\nMessage: '{}'.\nBuild with the 'verbose' property set to print the full stacktrace.", source.getName(), e.getMessage());
++			}
++			// quiet end
  		}
  
  		copyNonJavaFiles(srcPath, dstPath, project, source);
