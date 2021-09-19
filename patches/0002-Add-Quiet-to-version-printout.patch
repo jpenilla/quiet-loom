@@ -1,11 +1,11 @@
-From 29e6251094682aa0518f759d8b96f00b1c497c6e Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
 Date: Thu, 1 Jul 2021 21:51:52 -0700
 Subject: [PATCH] Add "Quiet" to version printout
 
 
 diff --git a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
-index 3d32c4b..5a50035 100644
+index 3d32c4bc9772dc8c49608899da885708a419db30..5a50035d75278857ba51e02bc767d80bec15e060 100644
 --- a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
 +++ b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
 @@ -56,7 +56,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
@@ -17,6 +17,3 @@ index 3d32c4b..5a50035 100644
  
  		refreshDeps = project.getGradle().getStartParameter().isRefreshDependencies();
  
--- 
-2.32.0
-

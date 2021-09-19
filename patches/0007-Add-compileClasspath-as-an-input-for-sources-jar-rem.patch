@@ -1,11 +1,11 @@
-From f7fd0ef2fd40a26d050003a9a73b7af05fa43c91 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
 Date: Sun, 4 Jul 2021 18:40:04 -0700
 Subject: [PATCH] Add compileClasspath as an input for sources jar remap task
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/RemapConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/RemapConfiguration.java
-index 3a19e70..0133c7d 100644
+index 3a19e70a163020c2a8e20ab5d8b6f4bd8dad5e2d..0133c7d04a9c757b8bed894d4776b0fd6c62de12 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/RemapConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/RemapConfiguration.java
 @@ -143,6 +143,11 @@ public class RemapConfiguration {
@@ -20,6 +20,3 @@ index 3a19e70..0133c7d 100644
  
  			if (isDefaultRemap) {
  				// Do not use lambda here, see: https://github.com/gradle/gradle/pull/17087
--- 
-2.32.0
-

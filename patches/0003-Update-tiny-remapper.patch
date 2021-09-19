@@ -1,11 +1,11 @@
-From 121d489b24c03268d45f7847fe802e06f82c53a7 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
 Date: Thu, 1 Jul 2021 21:13:44 -0700
 Subject: [PATCH] Update tiny-remapper
 
 
 diff --git a/build.gradle b/build.gradle
-index fa1a808..4c817c4 100644
+index fa1a808900ca6cbce58dab551da49096e897503c..4c817c453cad2ff3a5d7df640d06cfe110cd8218 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -78,7 +78,7 @@ dependencies {
@@ -17,6 +17,3 @@ index fa1a808..4c817c4 100644
  	implementation ('net.fabricmc:tiny-mappings-parser:0.3.0+build.17')
  
  	implementation 'net.fabricmc:access-widener:1.0.0'
--- 
-2.32.0
-

@@ -1,11 +1,11 @@
-From 2fba44373bae71b5813e36f990bfd38e7305bc14 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
 Date: Thu, 1 Jul 2021 22:34:03 -0700
 Subject: [PATCH] Reduce log spam when sources fail to fully remap
 
 
 diff --git a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
-index ed4957a..b690cdd 100644
+index ed4957a5155174d08f8bd87c6f7fec093068c922..b690cdd16541d90577fecc0af9da2d9b41cf3214 100644
 --- a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
 +++ b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
 @@ -38,6 +38,7 @@ import org.cadixdev.mercury.Mercury;
@@ -31,6 +31,3 @@ index ed4957a..b690cdd 100644
  		}
  
  		copyNonJavaFiles(srcPath, dstPath, project, source);
--- 
-2.32.0
-

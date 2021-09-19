@@ -1,11 +1,11 @@
-From d3b9b6bd14c03b4a189b302b6208c7d4c4f57bc2 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
 Date: Thu, 1 Jul 2021 20:46:20 -0700
 Subject: [PATCH] Remove annoying warning
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MojangMappingsDependency.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MojangMappingsDependency.java
-index 1cd80a4..b0cdb72 100644
+index 1cd80a454ada9cd65f186ae6ea690b088199638b..b0cdb7262e4446c89707a0f650dc119e3ac92c84 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MojangMappingsDependency.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MojangMappingsDependency.java
 @@ -101,22 +101,6 @@ public class MojangMappingsDependency implements SelfResolvingDependency {
@@ -31,6 +31,3 @@ index 1cd80a4..b0cdb72 100644
  		return Collections.singleton(mappingsFile.toFile());
  	}
  
--- 
-2.32.0
-
