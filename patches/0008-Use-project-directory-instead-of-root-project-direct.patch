@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Sat, 9 Oct 2021 13:47:46 -0700
+Subject: [PATCH] Use project directory instead of root project directory for
+ runs
+
+
+diff --git a/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java b/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
+index c7fca51387e8ee612c794901cdf44ba3125f4616..5827646da3e6ece8369bb07becbd2da3103abfe8 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
++++ b/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
+@@ -27,6 +27,7 @@ package net.fabricmc.loom.configuration.ide;
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.nio.charset.StandardCharsets;
++import java.nio.file.Path; // quiet
+ import java.util.List;
+ import java.util.Map;
+ import java.util.Objects;
+@@ -195,7 +196,10 @@ public class RunConfig {
+ 		runConfig.configName = configName;
+ 		populate(project, extension, runConfig, environment);
+ 		runConfig.ideaModuleName = getIdeaModuleName(project, sourceSet);
+-		runConfig.runDirIdeaUrl = "file://$PROJECT_DIR$/" + runDir;
++		// quiet start
++		final Path relativeProjectPath = project.getRootDir().toPath().relativize(project.getProjectDir().toPath());
++		runConfig.runDirIdeaUrl = "file://$PROJECT_DIR$/" + relativeProjectPath + runDir;
++		// quiet end
+ 		runConfig.runDir = runDir;
+ 		runConfig.sourceSet = sourceSet;
+ 
+diff --git a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
+index 8df8e808971ece3041e28afd4a14cda3b539ffb7..6e559972874204c5aaef9c6f54c8dc9b1087a90b 100644
+--- a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
++++ b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
+@@ -78,7 +78,7 @@ public abstract class AbstractRunTask extends JavaExec {
+ 		}
+ 
+ 		args(argsSplit);
+-		setWorkingDir(new File(getProject().getRootDir(), config.runDir));
++		setWorkingDir(new File(getProject().getProjectDir(), config.runDir)); // quiet
+ 
+ 		super.exec();
+ 	}
