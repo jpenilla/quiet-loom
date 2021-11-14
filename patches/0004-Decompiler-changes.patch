@@ -1,0 +1,73 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Thu, 1 Jul 2021 22:01:14 -0700
+Subject: [PATCH] Decompiler changes
+
+
+diff --git a/build.gradle b/build.gradle
+index 6fac8a1b3befef2179dc874856085f362cf473b4..adcb7e131c0a2847a36f147d5196f9d1090b9a49 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -38,6 +38,14 @@ repositories {
+ 		name = 'Fabric'
+ 		url = 'https://maven.fabricmc.net/'
+ 	}
++	// quiet start
++	maven {
++		url = "https://maven.quiltmc.org/repository/release/"
++		content {
++			includeGroup("org.quiltmc")
++		}
++	}
++	// quiet end
+ 	mavenCentral()
+ 	mavenLocal()
+ }
+@@ -88,7 +96,11 @@ dependencies {
+ 	}
+ 
+ 	// decompilers
+-	implementation ('net.fabricmc:fabric-fernflower:1.4.1')
++	// quiet start
++	implementation("org.quiltmc:quiltflower:1.6.0") {
++		transitive = false
++	}
++	// quiet end
+ 	implementation ('net.fabricmc:cfr:0.0.9')
+ 
+ 	// source code remapping
+diff --git a/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java b/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java
+index 9ad8111eae24dbdb94f778439bcd78b9b46bc5c0..4f16c7bdb7f5e97251b3ce45754ad81c861a4025 100644
+--- a/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java
++++ b/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java
+@@ -39,7 +39,7 @@ import net.fabricmc.loom.api.decompilers.LoomDecompiler;
+ public final class FabricFernFlowerDecompiler implements LoomDecompiler {
+ 	@Override
+ 	public String name() {
+-		return "FernFlower";
++		return "Quiltflower"; // quiet
+ 	}
+ 
+ 	@Override
+@@ -51,7 +51,7 @@ public final class FabricFernFlowerDecompiler implements LoomDecompiler {
+ 					IFernflowerPreferences.REMOVE_SYNTHETIC, "1",
+ 					IFernflowerPreferences.LOG_LEVEL, "trace",
+ 					IFernflowerPreferences.THREADS, String.valueOf(metaData.numberOfThreads()),
+-					IFernflowerPreferences.INDENT_STRING, "\t",
++					IFernflowerPreferences.INDENT_STRING, "  ", // quiet
+ 					IFabricJavadocProvider.PROPERTY_NAME, new TinyJavadocProvider(metaData.javaDocs().toFile())
+ 				)
+ 		);
+diff --git a/src/main/java/net/fabricmc/loom/task/LoomTasks.java b/src/main/java/net/fabricmc/loom/task/LoomTasks.java
+index e914046fbe341d8e81914d87e6809e113b418440..32e07b512b9e774a87487e4a1e7e0e800ba29e49 100644
+--- a/src/main/java/net/fabricmc/loom/task/LoomTasks.java
++++ b/src/main/java/net/fabricmc/loom/task/LoomTasks.java
+@@ -164,7 +164,7 @@ public final class LoomTasks {
+ 				task.setDescription("Decompile minecraft using the default decompiler.");
+ 				task.setGroup(Constants.TaskGroup.FABRIC);
+ 
+-				task.dependsOn(project.getTasks().getByName("genSourcesWithCfr"));
++				task.dependsOn(project.getTasks().getByName("genSourcesWithQuiltflower")); // quiet
+ 			});
+ 		});
+ 	}

@@ -6,18 +6,10 @@ Subject: [PATCH] Use project directory instead of root project directory for
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java b/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
-index c7fca51387e8ee612c794901cdf44ba3125f4616..5827646da3e6ece8369bb07becbd2da3103abfe8 100644
+index 3e23dec311955650c60b12888113709e9d011b3d..67ba3fc4ea3ad9fde84b7145b98abb8876c0047b 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
-@@ -27,6 +27,7 @@ package net.fabricmc.loom.configuration.ide;
- import java.io.IOException;
- import java.io.InputStream;
- import java.nio.charset.StandardCharsets;
-+import java.nio.file.Path; // quiet
- import java.util.List;
- import java.util.Map;
- import java.util.Objects;
-@@ -195,7 +196,10 @@ public class RunConfig {
+@@ -159,7 +159,10 @@ public class RunConfig {
  		runConfig.configName = configName;
  		populate(project, extension, runConfig, environment);
  		runConfig.ideaModuleName = getIdeaModuleName(project, sourceSet);
@@ -30,13 +22,13 @@ index c7fca51387e8ee612c794901cdf44ba3125f4616..5827646da3e6ece8369bb07becbd2da3
  		runConfig.sourceSet = sourceSet;
  
 diff --git a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
-index 8df8e808971ece3041e28afd4a14cda3b539ffb7..6e559972874204c5aaef9c6f54c8dc9b1087a90b 100644
+index 6bb63e533bc527df27bebe1600095729cfc97d04..5c99ef231cdd842010270d439ce08a8f9c0e5019 100644
 --- a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
-@@ -78,7 +78,7 @@ public abstract class AbstractRunTask extends JavaExec {
- 		}
+@@ -50,7 +50,7 @@ public abstract class AbstractRunTask extends JavaExec {
  
- 		args(argsSplit);
+ 	@Override
+ 	public void exec() {
 -		setWorkingDir(new File(getProject().getRootDir(), config.runDir));
 +		setWorkingDir(new File(getProject().getProjectDir(), config.runDir)); // quiet
  
