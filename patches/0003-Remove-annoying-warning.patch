@@ -5,19 +5,19 @@ Subject: [PATCH] Remove annoying warning
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
-index dacfbaf7fd452245ebab89653c483c8c49abeef4..996a164d28ceb1d2b9454f9499b15aef0e9ba25d 100644
+index 541fd489e57c300ae8d7e8ade033d9b607fc3467..12c0fbedd6c83a9ec6f8643afff3a660a4d109a6 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
-@@ -54,8 +54,6 @@ public record MojangMappingLayer(MinecraftVersionMeta.Download clientDownload,
+@@ -58,8 +58,6 @@ public record MojangMappingLayer(MinecraftVersionMeta.Download clientDownload,
  
  		download(clientMappings, serverMappings);
  
 -		printMappingsLicense(clientMappings);
 -
- 		// Make official the source namespace
- 		MappingSourceNsSwitch nsSwitch = new MappingSourceNsSwitch(mappingVisitor, MappingsNamespace.OFFICIAL.toString());
+ 		// Filter out field names matching the pattern
+ 		DstNameFilterMappingVisitor nameFilter = new DstNameFilterMappingVisitor(mappingVisitor, SYNTHETIC_NAME_PATTERN);
  
-@@ -71,24 +69,6 @@ public record MojangMappingLayer(MinecraftVersionMeta.Download clientDownload,
+@@ -78,24 +76,6 @@ public record MojangMappingLayer(MinecraftVersionMeta.Download clientDownload,
  		HashedDownloadUtil.downloadIfInvalid(new URL(serverDownload().url()), serverMappings.toFile(), serverDownload().sha1(), logger(), false);
  	}
  
