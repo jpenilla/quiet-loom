@@ -5,7 +5,7 @@ Subject: [PATCH] Update Jackson
 
 
 diff --git a/build.gradle b/build.gradle
-index cd298eaa8b6446273d194c65cb4395385428c808..0604bde39f3b6c8beee8ce3149e5473df972c59f 100644
+index 83b6f174c1f220c88350c6e887fa85dabf6cadc9..8ccbfc5a33abcbd9bc343cdc09cda60f14b3eff8 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -73,7 +73,7 @@ dependencies {
