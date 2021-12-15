@@ -1,16 +1,8 @@
 import net.minecrell.gitpatcher.PatchExtension
 
-buildscript {
-  dependencies {
-    classpath("net.minecraftforge:gitpatcher") {
-      version {
-        branch = "master"
-      }
-    }
-  }
+plugins {
+  id("net.minecraftforge.gitpatcher") version "0.10.+"
 }
-
-apply(plugin = "net.minecraftforge.gitpatcher")
 
 configure<PatchExtension> {
   submodule = "fabric-loom"

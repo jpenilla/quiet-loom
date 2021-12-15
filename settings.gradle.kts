@@ -1,6 +1,7 @@
-sourceControl {
-  gitRepository(uri("https://github.com/MinecraftForge/gitpatcher.git")) {
-    producesModule("net.minecraftforge:gitpatcher")
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    maven("https://files.minecraftforge.net/maven/")
   }
 }
 
