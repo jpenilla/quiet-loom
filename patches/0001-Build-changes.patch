@@ -5,11 +5,11 @@ Subject: [PATCH] Build changes
 
 
 diff --git a/build.gradle b/build.gradle
-index 8ed0627a4e1659c132d30083f6da73cdbdba9900..6da019c03c0c5d42af29a07f82a3b9961ca07421 100644
+index 0d4b566748d9b7721175fb285c296fa29ded56f7..ef699580f9ee730f6a7b34b6eb29fbeb17f0ae34 100644
 --- a/build.gradle
 +++ b/build.gradle
-@@ -25,8 +25,10 @@ archivesBaseName = project.name
- def baseVersion = '0.10'
+@@ -31,8 +31,10 @@ archivesBaseName = project.name
+ def baseVersion = '0.11'
  
  def ENV = System.getenv()
 -if (ENV.BUILD_NUMBER) {
@@ -21,7 +21,7 @@ index 8ed0627a4e1659c132d30083f6da73cdbdba9900..6da019c03c0c5d42af29a07f82a3b996
  } else {
  	version = baseVersion + '.local'
  }
-@@ -148,7 +150,7 @@ codenarc {
+@@ -163,7 +165,7 @@ codenarc {
  gradlePlugin {
  	plugins {
  		fabricLoom {
@@ -30,7 +30,7 @@ index 8ed0627a4e1659c132d30083f6da73cdbdba9900..6da019c03c0c5d42af29a07f82a3b996
  			implementationClass = 'net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap'
  		}
  	}
-@@ -224,8 +226,10 @@ publishing {
+@@ -214,8 +216,10 @@ publishing {
  
  		// Manually crate the plugin marker for snapshot versions
  		snapshotPlugin(MavenPublication) { publication ->
@@ -43,7 +43,7 @@ index 8ed0627a4e1659c132d30083f6da73cdbdba9900..6da019c03c0c5d42af29a07f82a3b996
  			version baseVersion + '-SNAPSHOT'
  
  			pom.withXml({
-@@ -237,7 +241,7 @@ publishing {
+@@ -227,7 +231,7 @@ publishing {
  				Node groupId = dependency.appendChild(document.createElement('groupId'))
  				groupId.setTextContent('net.fabricmc')
  				Node artifactId = dependency.appendChild(document.createElement('artifactId'))
@@ -52,7 +52,7 @@ index 8ed0627a4e1659c132d30083f6da73cdbdba9900..6da019c03c0c5d42af29a07f82a3b996
  				Node version = dependency.appendChild(document.createElement('version'))
  				version.setTextContent(baseVersion + '-SNAPSHOT')
  			})
-@@ -245,13 +249,13 @@ publishing {
+@@ -235,13 +239,13 @@ publishing {
  	}
  	repositories {
  		maven {

@@ -6,10 +6,10 @@ Subject: [PATCH] Use project directory instead of root project directory for
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java b/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
-index 3e23dec311955650c60b12888113709e9d011b3d..00c30155936824cb626d5f49a5625aa2f01761f7 100644
+index 7979b1b2546a6cfbae09a930307b89c75967d7e9..9ead9b8128fb8035c292f48ad0ff46670f5db403 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
-@@ -159,7 +159,10 @@ public class RunConfig {
+@@ -167,7 +167,10 @@ public class RunConfig {
  		runConfig.configName = configName;
  		populate(project, extension, runConfig, environment);
  		runConfig.ideaModuleName = getIdeaModuleName(project, sourceSet);
@@ -20,12 +20,12 @@ index 3e23dec311955650c60b12888113709e9d011b3d..00c30155936824cb626d5f49a5625aa2
 +		// quiet end
  		runConfig.runDir = runDir;
  		runConfig.sourceSet = sourceSet;
- 
+ 		runConfig.environment = environment;
 diff --git a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
-index 6bb63e533bc527df27bebe1600095729cfc97d04..5c99ef231cdd842010270d439ce08a8f9c0e5019 100644
+index d88633f5090e0768adade45a404cf8e16c8d0fc0..11033114f04328b0cd06a612e553b3ec14b25fe3 100644
 --- a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
-@@ -50,7 +50,7 @@ public abstract class AbstractRunTask extends JavaExec {
+@@ -52,7 +52,7 @@ public abstract class AbstractRunTask extends JavaExec {
  
  	@Override
  	public void exec() {

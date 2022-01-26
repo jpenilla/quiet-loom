@@ -4,19 +4,20 @@ Date: Sun, 4 Jul 2021 18:40:04 -0700
 Subject: [PATCH] Add compileClasspath as an input for sources jar remap task
 
 
-diff --git a/src/main/java/net/fabricmc/loom/configuration/RemapConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/RemapConfiguration.java
-index efbf5a1de4c2c39a7d8fa5f18b9ca1f65965340e..eca0b323301726740011fcabf7ed6a05ede716ea 100644
---- a/src/main/java/net/fabricmc/loom/configuration/RemapConfiguration.java
-+++ b/src/main/java/net/fabricmc/loom/configuration/RemapConfiguration.java
-@@ -182,6 +182,11 @@ public class RemapConfiguration {
- 			remapSourcesJarTask.getInput().convention(sourcesTask.getArchiveFile());
- 			remapSourcesJarTask.getOutput().convention(sourcesTask.getArchiveFile());
- 			remapSourcesJarTask.dependsOn(project.getTasks().getByName(sourcesJarTaskName));
+diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+index d1cfc0f27d17049e41a34c42edb6d836a4a8d319..a3eb7eb0afbfd08cb7038bb76bb0ca5eb3e76fa2 100644
+--- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
++++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+@@ -124,6 +124,12 @@ public class RemapTaskConfiguration {
+ 			task.dependsOn(sourcesJarTask);
+ 			task.getInputFile().convention(sourcesJarTask.getArchiveFile());
+ 
 +			// quiet start
-+			remapSourcesJarTask.getInputs().files(project.getConfigurations().named("compileClasspath"))
++			task.getInputs().files(project.getConfigurations().named("compileClasspath"))
 +					.ignoreEmptyDirectories()
 +					.withPropertyName("remap-classpath");
 +			// quiet end
++
+ 			if (extension.getSetupRemappedVariants().get()) {
+ 				project.getArtifacts().add(JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME, task);
  
- 			if (isDefaultRemap) {
- 				// Do not use lambda here, see: https://github.com/gradle/gradle/pull/17087
