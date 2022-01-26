@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Tue, 25 Jan 2022 23:07:38 -0700
+Subject: [PATCH] Use set instead of convention in some cases
+
+
+diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+index 84a9d5e882ec4bb874a0886d143cc9d77c7e874e..3b2c1e198ad02cafcc8fb5a2a1111b4ddc0d5daf 100644
+--- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
++++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+@@ -84,7 +84,7 @@ public class RemapTaskConfiguration {
+ 				shadowJar.configure(new org.gradle.api.Action<AbstractArchiveTask>() {
+ 					@Override
+ 					public void execute(final AbstractArchiveTask shadowJarTask) {
+-						shadowJarTask.getArchiveClassifier().convention("dev-all");
++						shadowJarTask.getArchiveClassifier().set("dev-all");
+ 					}
+ 				});
+ 				remapJarTask.getInputFile().convention(shadowJar.flatMap(AbstractArchiveTask::getArchiveFile));
+@@ -133,7 +133,7 @@ public class RemapTaskConfiguration {
+ 				return;
+ 			}
+ 
+-			sourcesJarTask.getArchiveClassifier().convention("dev-sources");
++			sourcesJarTask.getArchiveClassifier().set("dev-sources"); // quiet
+ 			// sourcesJarTask.getDestinationDirectory().set(new File(project.getBuildDir(), "devlibs")); // quiet - no
+ 			task.getArchiveClassifier().convention("sources");
+ 
