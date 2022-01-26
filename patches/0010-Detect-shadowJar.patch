@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Tue, 25 Jan 2022 22:47:45 -0700
+Subject: [PATCH] Detect shadowJar
+
+
+diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+index 58f78e3860377b1e13f313ed4ae80277ae8a9e44..84a9d5e882ec4bb874a0886d143cc9d77c7e874e 100644
+--- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
++++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+@@ -76,6 +76,22 @@ public class RemapTaskConfiguration {
+ 			// task.getDestinationDirectory().set(new File(project.getBuildDir(), "devlibs")); // quiet - no
+ 		});
+ 
++		// quiet start
++		project.getPlugins().withId("com.github.johnrengelman.shadow", new org.gradle.api.Action<org.gradle.api.Plugin>() {
++			@Override
++			public void execute(final org.gradle.api.Plugin shadowPlugin) {
++				final TaskProvider<AbstractArchiveTask> shadowJar = tasks.named("shadowJar", AbstractArchiveTask.class);
++				shadowJar.configure(new org.gradle.api.Action<AbstractArchiveTask>() {
++					@Override
++					public void execute(final AbstractArchiveTask shadowJarTask) {
++						shadowJarTask.getArchiveClassifier().convention("dev-all");
++					}
++				});
++				remapJarTask.getInputFile().convention(shadowJar.flatMap(AbstractArchiveTask::getArchiveFile));
++			}
++		});
++		// quiet end
++
+ 		tasks.named(BasePlugin.ASSEMBLE_TASK_NAME).configure(task -> task.dependsOn(remapJarTask));
+ 
+ 		trySetupSourceRemapping(project);
