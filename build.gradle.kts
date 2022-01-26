@@ -11,5 +11,5 @@ configure<PatchExtension> {
 }
 
 tasks.register("rebuildPatches") {
-  dependsOn(tasks.named("makePatches"))
+  dependsOn(tasks.makePatches)
 }

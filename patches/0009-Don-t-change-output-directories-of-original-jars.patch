@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Tue, 25 Jan 2022 21:57:36 -0700
+Subject: [PATCH] Don't change output directories of original jars
+
+
+diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+index a3eb7eb0afbfd08cb7038bb76bb0ca5eb3e76fa2..58f78e3860377b1e13f313ed4ae80277ae8a9e44 100644
+--- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
++++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+@@ -73,7 +73,7 @@ public class RemapTaskConfiguration {
+ 		// Configure the default jar task
+ 		tasks.named(JavaPlugin.JAR_TASK_NAME, AbstractArchiveTask.class).configure(task -> {
+ 			task.getArchiveClassifier().convention("dev");
+-			task.getDestinationDirectory().set(new File(project.getBuildDir(), "devlibs"));
++			// task.getDestinationDirectory().set(new File(project.getBuildDir(), "devlibs")); // quiet - no
+ 		});
+ 
+ 		tasks.named(BasePlugin.ASSEMBLE_TASK_NAME).configure(task -> task.dependsOn(remapJarTask));
+@@ -118,7 +118,7 @@ public class RemapTaskConfiguration {
+ 			}
+ 
+ 			sourcesJarTask.getArchiveClassifier().convention("dev-sources");
+-			sourcesJarTask.getDestinationDirectory().set(new File(project.getBuildDir(), "devlibs"));
++			// sourcesJarTask.getDestinationDirectory().set(new File(project.getBuildDir(), "devlibs")); // quiet - no
+ 			task.getArchiveClassifier().convention("sources");
+ 
+ 			task.dependsOn(sourcesJarTask);
