@@ -5,19 +5,19 @@ Subject: [PATCH] Add compileClasspath as an input for sources jar remap task
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index d1cfc0f27d17049e41a34c42edb6d836a4a8d319..a3eb7eb0afbfd08cb7038bb76bb0ca5eb3e76fa2 100644
+index bedd5c5225b05336be216da84b0b8f02c492e388..39b78afd4016d2a891ba2be0c2195bad1b3727d6 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -124,6 +124,12 @@ public class RemapTaskConfiguration {
+@@ -127,6 +127,12 @@ public class RemapTaskConfiguration {
+ 
  			task.dependsOn(sourcesJarTask);
  			task.getInputFile().convention(sourcesJarTask.getArchiveFile());
- 
++
 +			// quiet start
 +			task.getInputs().files(project.getConfigurations().named("compileClasspath"))
 +					.ignoreEmptyDirectories()
 +					.withPropertyName("remap-classpath");
 +			// quiet end
-+
- 			if (extension.getSetupRemappedVariants().get()) {
- 				project.getArtifacts().add(JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME, task);
+ 		});
  
+ 		tasks.named(BasePlugin.ASSEMBLE_TASK_NAME).configure(task -> task.dependsOn(remapSourcesTask));
