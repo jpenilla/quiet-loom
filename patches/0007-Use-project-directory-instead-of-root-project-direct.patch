@@ -22,7 +22,7 @@ index 7979b1b2546a6cfbae09a930307b89c75967d7e9..9ead9b8128fb8035c292f48ad0ff4667
  		runConfig.sourceSet = sourceSet;
  		runConfig.environment = environment;
 diff --git a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
-index d88633f5090e0768adade45a404cf8e16c8d0fc0..11033114f04328b0cd06a612e553b3ec14b25fe3 100644
+index e52f3a3164591980d1f718bb893305460915c7ea..2ebb6428189a0f9b395fc81b27e9e503f9de33ae 100644
 --- a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
 @@ -52,7 +52,7 @@ public abstract class AbstractRunTask extends JavaExec {
