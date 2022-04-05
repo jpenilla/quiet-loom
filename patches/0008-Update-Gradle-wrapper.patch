@@ -791,14 +791,14 @@ zolHn2p%Vcz;l+XBb}+e15cI$!frVazhyYs#{yQM!co;x70Pf+PfQdoSVpSd#nScuZ
 w|E&DqkiEp6nWHb}B;da$<=?F+{O4J~(cC2_GD0yC1R_ni)(HQ!%J47kKb!F!p8x;=
 
 diff --git a/gradle/wrapper/gradle-wrapper.properties b/gradle/wrapper/gradle-wrapper.properties
-index ac0b842f1984b8075975bd2ede50915c1a9ad83b..b1159fc54f39b3b208f767fd65a460b6016e04ad 100644
+index ac0b842f1984b8075975bd2ede50915c1a9ad83b..92f06b50fd65b47b5578f5427b9fee66dcaae5ae 100644
 --- a/gradle/wrapper/gradle-wrapper.properties
 +++ b/gradle/wrapper/gradle-wrapper.properties
 @@ -1,5 +1,5 @@
  distributionBase=GRADLE_USER_HOME
  distributionPath=wrapper/dists
 -distributionUrl=https\://services.gradle.org/distributions/gradle-7.3.2-all.zip
-+distributionUrl=https\://services.gradle.org/distributions/gradle-7.4-all.zip
++distributionUrl=https\://services.gradle.org/distributions/gradle-7.4.2-all.zip
  zipStoreBase=GRADLE_USER_HOME
  zipStorePath=wrapper/dists
 diff --git a/gradlew b/gradlew
