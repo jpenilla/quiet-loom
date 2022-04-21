@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes
 
 
 diff --git a/build.gradle b/build.gradle
-index 0d4b566748d9b7721175fb285c296fa29ded56f7..ef699580f9ee730f6a7b34b6eb29fbeb17f0ae34 100644
+index 2db6d937608db52aff52a989015257b52e1d0a86..8f525e512419449a5f8836cab47f4a700bcdb7e7 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -31,8 +31,10 @@ archivesBaseName = project.name
