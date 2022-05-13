@@ -5,7 +5,7 @@ Subject: [PATCH] Decompiler changes
 
 
 diff --git a/build.gradle b/build.gradle
-index 8f525e512419449a5f8836cab47f4a700bcdb7e7..7acd501000de4bd5230ffa8ef8e0ccbc0b43ddb8 100644
+index 8f525e512419449a5f8836cab47f4a700bcdb7e7..9997b20804ef8180e93a46c8b6596c191c599632 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -44,6 +44,14 @@ repositories {
@@ -29,7 +29,7 @@ index 8f525e512419449a5f8836cab47f4a700bcdb7e7..7acd501000de4bd5230ffa8ef8e0ccbc
  	// decompilers
 -	implementation ('net.fabricmc:fabric-fernflower:1.4.1')
 +	// quiet start
-+	implementation("org.quiltmc:quiltflower:1.8.0") {
++	implementation("org.quiltmc:quiltflower:1.8.1") {
 +		transitive = false
 +	}
 +	// quiet end
