@@ -99,3 +99,16 @@ index fa5d783b912661a25cc0ce7060ac78e5c14a98fc..36c7f29ca59750a5d28533158c5bb321
  
  			def server = ServerRunner.create(gradle.projectDir, "1.17.1")
  										.withMod(gradle.getOutputFile("fabric-api-${API_VERSION}.jar"))
+diff --git a/src/test/resources/projects/decompile/build.gradle b/src/test/resources/projects/decompile/build.gradle
+index b38fc44fb5f10c691e2d01b6d1b1e97575ec5f38..2de0b93e0fa87011db4322cd849115e317cc54ab 100644
+--- a/src/test/resources/projects/decompile/build.gradle
++++ b/src/test/resources/projects/decompile/build.gradle
+@@ -13,7 +13,7 @@ loom {
+ 		cfr {
+ 			options.put("test", "value")
+ 		}
+-		fernflower {
++		quiltflower { // quiet
+ 			options.put("test", "value")
+ 		}
+ 	}
