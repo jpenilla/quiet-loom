@@ -5,25 +5,23 @@ Subject: [PATCH] Decompiler changes
 
 
 diff --git a/build.gradle b/build.gradle
-index 8f525e512419449a5f8836cab47f4a700bcdb7e7..9997b20804ef8180e93a46c8b6596c191c599632 100644
+index 626eb8cd06b79432f542e9cd9f66d129318a259c..d9b06a1ace42ed9166002ffd8f84eb54ddc91d56 100644
 --- a/build.gradle
 +++ b/build.gradle
-@@ -44,6 +44,14 @@ repositories {
+@@ -45,6 +45,12 @@ repositories {
  		name = 'Fabric'
  		url = 'https://maven.fabricmc.net/'
  	}
 +	// quiet start
 +	maven {
 +		url = "https://maven.quiltmc.org/repository/release/"
-+		content {
-+			includeGroup("org.quiltmc")
-+		}
++		mavenContent { includeGroup("org.quiltmc") }
 +	}
 +	// quiet end
  	mavenCentral()
  	mavenLocal()
  }
-@@ -94,7 +102,11 @@ dependencies {
+@@ -95,7 +101,11 @@ dependencies {
  	}
  
  	// decompilers
@@ -75,3 +73,16 @@ index 18d55451da32a6bae3dcc33e69ba6e661de8a1bc..57f70d762d19699ee9b9503394632626
  					IFabricJavadocProvider.PROPERTY_NAME, new TinyJavadocProvider(metaData.javaDocs().toFile())
  				)
  		);
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
+index 9e93097acaffa47a609eefe8d12a6641ab5c32af..745ab836c58aacda2bea7ae7f25b589a2786d867 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
+@@ -45,7 +45,7 @@ class DecompileTest extends Specification implements GradleProjectTestTrait {
+ 
+ 		where:
+ 			decompiler 		| task								| version
+-			'fernflower'	| "genSourcesWithFernFlower"		| PRE_RELEASE_GRADLE
++			'quiltflower'	| "genSourcesWithQuiltflower"		| PRE_RELEASE_GRADLE // quiet
+ 			'cfr' 			| "genSourcesWithCfr"				| PRE_RELEASE_GRADLE
+ 	}
+ 

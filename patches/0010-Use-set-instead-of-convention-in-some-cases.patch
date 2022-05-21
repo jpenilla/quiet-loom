@@ -5,11 +5,11 @@ Subject: [PATCH] Use set instead of convention in some cases
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 5d2427f89fd37139a8f29dd846eacb09b088adad..3ed81f88ab4a4e07479c95a9736080452adac2e2 100644
+index 0a9f4207d8b200e4840e88a459e5a9eabc2a2054..0a496f52c80891c3f2ceb732fadbf8ce64a8c50a 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 @@ -84,7 +84,7 @@ public class RemapTaskConfiguration {
- 				shadowJar.configure(new org.gradle.api.Action<AbstractArchiveTask>() {
+ 				shadowJar.configure(new org.gradle.api.Action<>() {
  					@Override
  					public void execute(final AbstractArchiveTask shadowJarTask) {
 -						shadowJarTask.getArchiveClassifier().convention("dev-all");

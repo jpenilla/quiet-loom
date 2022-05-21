@@ -27,10 +27,10 @@ jobs:
       - name: "apply patches"
         run: "git submodule update --init && ./gradlew applyPatches"
       - name: "build"
-        run: "cd patched-loom && ./gradlew build"
+        run: "cd patched-loom && ./gradlew build -x test"
       - name: "publish"
         if: ${{ github.ref == 'refs/heads/master' }}
-        run: "cd patched-loom && ./gradlew publish"
+        run: "cd patched-loom && ./gradlew publish -x test"
         env:
           JMP_REPO_USER: ${{ secrets.JMP_REPO_USER }}
           JMP_REPO_PASSWORD: ${{ secrets.JMP_REPO_PASSWORD }}
