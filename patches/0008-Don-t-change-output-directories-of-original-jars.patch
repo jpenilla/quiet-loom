@@ -26,3 +26,16 @@ index 39b78afd4016d2a891ba2be0c2195bad1b3727d6..c0920a666e631920214d3a44b630e91f
  			task.getArchiveClassifier().convention("sources");
  
  			task.dependsOn(sourcesJarTask);
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/MixinApSimpleTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/MixinApSimpleTest.groovy
+index 123a831ee47d19046498b523c81a80b3ade62aa8..2bd4b3967c303c97e277b81e0b9dfb3dbbadf7f8 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/integration/MixinApSimpleTest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/MixinApSimpleTest.groovy
+@@ -47,7 +47,7 @@ class MixinApSimpleTest extends Specification implements GradleProjectTestTrait
+             result.task(":build").outcome == SUCCESS
+ 
+             // verify the ref-map name is correctly generated
+-            def main = new JarFile(new File(gradle.projectDir, "build/devlibs/fabric-example-mod-1.0.0-dev.jar").absoluteFile)
++            def main = new JarFile(gradle.getOutputFile("fabric-example-mod-1.0.0-dev.jar").absoluteFile) // quiet - remove devlibs
+             main.getEntry("main-refmap0000.json") != null
+             def mixin = new JarFile(gradle.getOutputFile("fabric-example-mod-1.0.0-mixin.jar").absoluteFile)
+             mixin.getEntry("default-refmap0000.json") != null
