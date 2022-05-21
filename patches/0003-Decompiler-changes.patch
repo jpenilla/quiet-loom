@@ -86,3 +86,16 @@ index 9e93097acaffa47a609eefe8d12a6641ab5c32af..745ab836c58aacda2bea7ae7f25b589a
  			'cfr' 			| "genSourcesWithCfr"				| PRE_RELEASE_GRADLE
  	}
  
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
+index fa5d783b912661a25cc0ce7060ac78e5c14a98fc..36c7f29ca59750a5d28533158c5bb32199942033 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
+@@ -51,7 +51,7 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
+ 
+ 			// Set the version to something constant
+ 			gradle.buildGradle.text = gradle.buildGradle.text.replace('project.version + "+" + (ENV.GITHUB_RUN_NUMBER ? "" : "local-") + getBranch()', "\"$API_VERSION\"")
+-					.replace("fabric-loom", "quiet-fabric-loom") // quiet
++					.replace("fabric-loom", "quiet-fabric-loom").replace("FernFlower", "Quiltflower") // quiet
+ 
+ 			def server = ServerRunner.create(gradle.projectDir, "1.17.1")
+ 										.withMod(gradle.getOutputFile("fabric-api-${API_VERSION}.jar"))
