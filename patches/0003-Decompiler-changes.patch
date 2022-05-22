@@ -5,10 +5,10 @@ Subject: [PATCH] Decompiler changes
 
 
 diff --git a/build.gradle b/build.gradle
-index 626eb8cd06b79432f542e9cd9f66d129318a259c..d9b06a1ace42ed9166002ffd8f84eb54ddc91d56 100644
+index 19ca4926f478bafac8ddd3c352a2fbd90b1512e9..89834e515bc9a30c43db901d20cd5a62902b86a9 100644
 --- a/build.gradle
 +++ b/build.gradle
-@@ -45,6 +45,12 @@ repositories {
+@@ -47,6 +47,12 @@ repositories {
  		name = 'Fabric'
  		url = 'https://maven.fabricmc.net/'
  	}
@@ -21,17 +21,17 @@ index 626eb8cd06b79432f542e9cd9f66d129318a259c..d9b06a1ace42ed9166002ffd8f84eb54
  	mavenCentral()
  	mavenLocal()
  }
-@@ -95,7 +101,11 @@ dependencies {
+@@ -97,7 +103,11 @@ dependencies {
  	}
  
  	// decompilers
--	implementation ('net.fabricmc:fabric-fernflower:1.4.1')
+-	implementation ('net.fabricmc:fabric-fernflower:1.5.0')
 +	// quiet start
 +	implementation("org.quiltmc:quiltflower:1.8.1") {
 +		transitive = false
 +	}
 +	// quiet end
- 	implementation ('net.fabricmc:cfr:0.0.9')
+ 	implementation ('net.fabricmc:cfr:0.1.1')
  
  	// source code remapping
 diff --git a/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
