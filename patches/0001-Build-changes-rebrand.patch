@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index d67a8ca13c127d7eb9cf1efaac6ee3d2b5cc4295..19ca4926f478bafac8ddd3c352a2fbd90b1512e9 100644
+index e697facd0e3e0bfd2d7dfd7e319c5dec378ffb48..1c76577a532bf634e369846e2dcfc15644aa4ccc 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,11 +5,12 @@ plugins {
@@ -425,7 +425,7 @@ index 5ce232ea8a8d7975252e63da3bb7a471e22c39b3..da085453d98704b87a0533934bb7fe56
  }
  
 diff --git a/src/test/resources/projects/splitSources/build.gradle b/src/test/resources/projects/splitSources/build.gradle
-index ea40b50207f0cfa8fe22441524d26b3cb75d2bd5..99e0228cb87f812536bccfbcf2f2e6b55e82cc39 100644
+index c4d5174f802499c7e6a6bddd3b1c7f45ea542fc7..e7047864a131cf1a53e09a6e1c3e137bfdde1c73 100644
 --- a/src/test/resources/projects/splitSources/build.gradle
 +++ b/src/test/resources/projects/splitSources/build.gradle
 @@ -1,5 +1,5 @@
