@@ -5,10 +5,10 @@ Subject: [PATCH] Use set instead of convention in some cases
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 0a9f4207d8b200e4840e88a459e5a9eabc2a2054..0a496f52c80891c3f2ceb732fadbf8ce64a8c50a 100644
+index 4c2578ff39a84ad7a7039fce22aa51f65486dc1c..64bdc7858a9d24fdc4ad7be65784bc89e774a33e 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -84,7 +84,7 @@ public class RemapTaskConfiguration {
+@@ -85,7 +85,7 @@ public class RemapTaskConfiguration {
  				shadowJar.configure(new org.gradle.api.Action<>() {
  					@Override
  					public void execute(final AbstractArchiveTask shadowJarTask) {
@@ -17,7 +17,7 @@ index 0a9f4207d8b200e4840e88a459e5a9eabc2a2054..0a496f52c80891c3f2ceb732fadbf8ce
  					}
  				});
  				remapJarTask.getInputFile().convention(shadowJar.flatMap(AbstractArchiveTask::getArchiveFile));
-@@ -137,7 +137,7 @@ public class RemapTaskConfiguration {
+@@ -138,7 +138,7 @@ public class RemapTaskConfiguration {
  				return;
  			}
  

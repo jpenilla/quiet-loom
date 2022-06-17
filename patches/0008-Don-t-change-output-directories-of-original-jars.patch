@@ -5,10 +5,10 @@ Subject: [PATCH] Don't change output directories of original jars
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 39b78afd4016d2a891ba2be0c2195bad1b3727d6..c0920a666e631920214d3a44b630e91fde151125 100644
+index 3f78fe3b952bbcf02b33d86549656190743e8791..74dffb34a9cc0bd7d6aee468e996040207e1f7f4 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -73,7 +73,7 @@ public class RemapTaskConfiguration {
+@@ -74,7 +74,7 @@ public class RemapTaskConfiguration {
  		// Configure the default jar task
  		tasks.named(JavaPlugin.JAR_TASK_NAME, AbstractArchiveTask.class).configure(task -> {
  			task.getArchiveClassifier().convention("dev");
@@ -17,7 +17,7 @@ index 39b78afd4016d2a891ba2be0c2195bad1b3727d6..c0920a666e631920214d3a44b630e91f
  		});
  
  		tasks.named(BasePlugin.ASSEMBLE_TASK_NAME).configure(task -> task.dependsOn(remapJarTask));
-@@ -122,7 +122,7 @@ public class RemapTaskConfiguration {
+@@ -123,7 +123,7 @@ public class RemapTaskConfiguration {
  			}
  
  			sourcesJarTask.getArchiveClassifier().convention("dev-sources");

@@ -5,15 +5,21 @@ Subject: [PATCH] Update testing Gradle nightly
 
 
 diff --git a/src/test/groovy/net/fabricmc/loom/test/LoomTestConstants.groovy b/src/test/groovy/net/fabricmc/loom/test/LoomTestConstants.groovy
-index 6f852317d743fe1328c1c8848ee98c5b6dcf4f5a..4374b5996906efe930436804e0b34bd151132ace 100644
+index ea5c33ec266bbece28d51a20380c494f0373d01f..fdb0a0b432007b2378487b84fd5293573cac8290 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/LoomTestConstants.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/LoomTestConstants.groovy
-@@ -28,7 +28,7 @@ import org.gradle.util.GradleVersion
+@@ -27,12 +27,12 @@ package net.fabricmc.loom.test
+ import org.gradle.util.GradleVersion
  
  class LoomTestConstants {
-     public final static String DEFAULT_GRADLE = GradleVersion.current().getVersion()
--    public final static String PRE_RELEASE_GRADLE = "7.5-20220129032445+0000"
-+    public final static String PRE_RELEASE_GRADLE = "7.6-20220520225140+0000" // quiet
+-    private final static String NIGHTLY_VERSION = "7.6-20220519002827+0000"
++    private final static String NIGHTLY_VERSION = "7.6-20220520225140+0000" // quiet
+     private final static boolean NIGHTLY_EXISTS = nightlyExists(NIGHTLY_VERSION)
  
-     public final static String[] STANDARD_TEST_VERSIONS = [DEFAULT_GRADLE, PRE_RELEASE_GRADLE]
- }
+     public final static String DEFAULT_GRADLE = GradleVersion.current().getVersion()
+     // Tests that depend specifically on the nightly will run on the current version when the nightly is not available.
+-    public final static String PRE_RELEASE_GRADLE = NIGHTLY_EXISTS ? "7.6-20220516224938+0000" : DEFAULT_GRADLE
++    public final static String PRE_RELEASE_GRADLE = NIGHTLY_EXISTS ? NIGHTLY_VERSION : DEFAULT_GRADLE // quiet
+     public final static String[] STANDARD_TEST_VERSIONS = NIGHTLY_EXISTS ? [DEFAULT_GRADLE, PRE_RELEASE_GRADLE] : [DEFAULT_GRADLE]
+ 
+     /**
