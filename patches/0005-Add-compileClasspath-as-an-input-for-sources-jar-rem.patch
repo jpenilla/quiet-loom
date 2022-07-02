@@ -5,7 +5,7 @@ Subject: [PATCH] Add compileClasspath as an input for sources jar remap task
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 4d54eefb44d266e1016b69acd6dc004e899ba988..3f78fe3b952bbcf02b33d86549656190743e8791 100644
+index 14b5725e0a5521e3167e725758084886a8f745aa..a1756af251900be07c86048eac5dd9155b99d4f0 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 @@ -128,6 +128,12 @@ public class RemapTaskConfiguration {
