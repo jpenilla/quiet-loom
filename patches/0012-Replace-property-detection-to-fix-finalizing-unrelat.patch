@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Sat, 2 Jul 2022 15:16:10 -0700
+Subject: [PATCH] Replace property detection to fix finalizing unrelated
+ properties early
+
+
+diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+index 279e447c676f681364aa8432d1f7f89dd0613c3c..41f0dea7fc5f83ea8eef5dfdf458675364e4c8ea 100644
+--- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
++++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+@@ -179,17 +179,16 @@ public class RemapTaskConfiguration {
+ 	}
+ 
+ 	private static boolean getBooleanProperty(Project project, String key) {
+-		boolean result = false;
+-		Object value = project.getProperties().get(key);
+-
+-		if (value instanceof String) {
+-			try {
+-				result = Boolean.parseBoolean((String) value);
+-			} catch (IllegalArgumentException ignored) {
+-				// False
+-			}
+-		}
+-
+-		return result;
++		// quiet start
++		return project.getProviders().gradleProperty(key)
++				.map(string -> {
++					try {
++						return Boolean.parseBoolean(string);
++					} catch (final IllegalArgumentException ex) {
++						return false;
++					}
++				})
++				.getOrElse(false);
++		// quiet end
+ 	}
+ }
