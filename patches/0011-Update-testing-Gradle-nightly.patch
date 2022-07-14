@@ -5,7 +5,7 @@ Subject: [PATCH] Update testing Gradle nightly
 
 
 diff --git a/src/test/groovy/net/fabricmc/loom/test/LoomTestConstants.groovy b/src/test/groovy/net/fabricmc/loom/test/LoomTestConstants.groovy
-index ea5c33ec266bbece28d51a20380c494f0373d01f..7a19ab3757cbc244939879128e9ae60686496c95 100644
+index ea5c33ec266bbece28d51a20380c494f0373d01f..09d2527d8eb263ec25f9b79a6e8bdcda06dbb44f 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/LoomTestConstants.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/LoomTestConstants.groovy
 @@ -27,12 +27,12 @@ package net.fabricmc.loom.test
@@ -13,7 +13,7 @@ index ea5c33ec266bbece28d51a20380c494f0373d01f..7a19ab3757cbc244939879128e9ae606
  
  class LoomTestConstants {
 -    private final static String NIGHTLY_VERSION = "7.6-20220519002827+0000"
-+    private final static String NIGHTLY_VERSION = "7.6-20220701221816+0000" // quiet
++    private final static String NIGHTLY_VERSION = "7.6-20220714221139+0000" // quiet
      private final static boolean NIGHTLY_EXISTS = nightlyExists(NIGHTLY_VERSION)
  
      public final static String DEFAULT_GRADLE = GradleVersion.current().getVersion()
