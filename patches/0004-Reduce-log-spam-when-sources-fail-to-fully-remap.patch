@@ -5,18 +5,18 @@ Subject: [PATCH] Reduce log spam when sources fail to fully remap
 
 
 diff --git a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
-index 7ef9e10ae976365ecc6a0b07f55e8a117cbd089b..d462ac2618c5314370d0f79196131fcf60a63026 100644
+index 4c069aea7852903f862a87b4da5d78b8237e7a46..8c61796cc0e78d9a464fea55f9c6e9f13a6ceec6 100644
 --- a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
 +++ b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
-@@ -37,6 +37,7 @@ import org.cadixdev.lorenz.MappingSet;
- import org.cadixdev.mercury.Mercury;
+@@ -38,6 +38,7 @@ import org.cadixdev.mercury.Mercury;
  import org.cadixdev.mercury.remapper.MercuryRemapper;
  import org.gradle.api.Project;
+ import org.gradle.api.internal.project.ProjectInternal;
 +import org.gradle.api.logging.configuration.ShowStacktrace; // quiet
+ import org.gradle.internal.logging.progress.ProgressLogger;
+ import org.gradle.internal.logging.progress.ProgressLoggerFactory;
  import org.slf4j.Logger;
- 
- import net.fabricmc.loom.LoomGradleExtension;
-@@ -140,7 +141,14 @@ public class SourceRemapper {
+@@ -138,7 +139,14 @@ public class SourceRemapper {
  		try {
  			mercury.rewrite(srcPath, dstPath);
  		} catch (Exception e) {

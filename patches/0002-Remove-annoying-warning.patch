@@ -5,20 +5,19 @@ Subject: [PATCH] Remove annoying warning
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
-index 541fd489e57c300ae8d7e8ade033d9b607fc3467..12c0fbedd6c83a9ec6f8643afff3a660a4d109a6 100644
+index 580c39dcc9c76f8679ecd500fed26a1562355c34..ae8c55ca54d215998b293d966a0d68fded7fcf92 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
-@@ -58,8 +58,6 @@ public record MojangMappingLayer(MinecraftVersionMeta.Download clientDownload,
+@@ -48,7 +48,6 @@ public record MojangMappingLayer(Path clientMappings, Path serverMappings, boole
  
- 		download(clientMappings, serverMappings);
- 
+ 	@Override
+ 	public void visit(MappingVisitor mappingVisitor) throws IOException {
 -		printMappingsLicense(clientMappings);
--
+ 
  		// Filter out field names matching the pattern
  		DstNameFilterMappingVisitor nameFilter = new DstNameFilterMappingVisitor(mappingVisitor, SYNTHETIC_NAME_PATTERN);
- 
-@@ -78,24 +76,6 @@ public record MojangMappingLayer(MinecraftVersionMeta.Download clientDownload,
- 		HashedDownloadUtil.downloadIfInvalid(new URL(serverDownload().url()), serverMappings.toFile(), serverDownload().sha1(), logger(), false);
+@@ -63,24 +62,6 @@ public record MojangMappingLayer(Path clientMappings, Path serverMappings, boole
+ 		}
  	}
  
 -	private void printMappingsLicense(Path clientMappings) {
