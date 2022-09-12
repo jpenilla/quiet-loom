@@ -5,10 +5,10 @@ Subject: [PATCH] Decompiler changes
 
 
 diff --git a/build.gradle b/build.gradle
-index c41be5230a37ec7b458d8d4d5260ff12b9ef38d9..1dad7076d5e983313e38b2793e7d6104a4d3b59e 100644
+index 19d96d66f101ca1f94d67421260da627895f6c72..7db4a13e810904f2121046c9f417656d4c1e3fc3 100644
 --- a/build.gradle
 +++ b/build.gradle
-@@ -47,6 +47,12 @@ repositories {
+@@ -48,6 +48,12 @@ repositories {
  		name = 'Fabric'
  		url = 'https://maven.fabricmc.net/'
  	}
@@ -21,7 +21,7 @@ index c41be5230a37ec7b458d8d4d5260ff12b9ef38d9..1dad7076d5e983313e38b2793e7d6104
  	mavenCentral()
  }
  
-@@ -96,7 +102,11 @@ dependencies {
+@@ -97,7 +103,11 @@ dependencies {
  	}
  
  	// decompilers
