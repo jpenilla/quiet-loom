@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index 7e9be93395a6ca80cb59ab676760ab8a66a9cf8c..19d96d66f101ca1f94d67421260da627895f6c72 100644
+index 9c18bf1f61ab67c0ed5307d3c6b1784b985951a6..260fd12c8bc07ea5d38ef343af591ed44744b5d7 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,12 +5,13 @@ plugins {
@@ -62,7 +62,7 @@ index 7e9be93395a6ca80cb59ab676760ab8a66a9cf8c..19d96d66f101ca1f94d67421260da627
  			implementationClass = 'net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap'
  		}
  	}
-@@ -231,8 +237,10 @@ publishing {
+@@ -234,8 +240,10 @@ publishing {
  
  		// Manually crate the plugin marker for snapshot versions
  		snapshotPlugin(MavenPublication) { publication ->
@@ -75,7 +75,7 @@ index 7e9be93395a6ca80cb59ab676760ab8a66a9cf8c..19d96d66f101ca1f94d67421260da627
  			version baseVersion + '-SNAPSHOT'
  
  			pom.withXml({
-@@ -244,7 +252,7 @@ publishing {
+@@ -247,7 +255,7 @@ publishing {
  				Node groupId = dependency.appendChild(document.createElement('groupId'))
  				groupId.setTextContent('net.fabricmc')
  				Node artifactId = dependency.appendChild(document.createElement('artifactId'))
@@ -84,7 +84,7 @@ index 7e9be93395a6ca80cb59ab676760ab8a66a9cf8c..19d96d66f101ca1f94d67421260da627
  				Node version = dependency.appendChild(document.createElement('version'))
  				version.setTextContent(baseVersion + '-SNAPSHOT')
  			})
-@@ -252,13 +260,13 @@ publishing {
+@@ -255,13 +263,13 @@ publishing {
  	}
  	repositories {
  		maven {
