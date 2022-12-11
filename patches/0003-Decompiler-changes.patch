@@ -61,7 +61,7 @@ index 8bc63e20695c4f1fb0eca6a79c1bef3c25076eda..d7e0a254198f1a75a007a18b22d6b0de
  	}
  
 diff --git a/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java b/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java
-index 18d55451da32a6bae3dcc33e69ba6e661de8a1bc..57f70d762d19699ee9b95033946326268f8c6a2a 100644
+index 2d2041b6fea5697d72c4c2c8ff3b43fe47101fa1..0021e41e01ee5b839212d15c5ea2c6209dd419ce 100644
 --- a/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java
 +++ b/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java
 @@ -46,7 +46,7 @@ public final class FabricFernFlowerDecompiler implements LoomDecompiler {
