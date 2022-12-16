@@ -1,0 +1,71 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Fri, 16 Dec 2022 12:01:40 -0700
+Subject: [PATCH] Bump mercury
+
+
+diff --git a/build.gradle b/build.gradle
+index 4cf0872f6899dcb8c20ebc67ac0e941ed8dda73a..2076976f82e5510b8e16fec98f42efa1d08691db 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -111,7 +111,7 @@ dependencies {
+ 	implementation ('net.fabricmc:cfr:0.1.1')
+ 
+ 	// source code remapping
+-	implementation ('net.fabricmc:mercury:0.2.6')
++	implementation ('net.fabricmc:mercury:0.3.0')
+ 
+ 	// Kotlin
+ 	implementation('org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.4.2') {
+diff --git a/src/main/java/net/fabricmc/loom/task/MigrateMappingsTask.java b/src/main/java/net/fabricmc/loom/task/MigrateMappingsTask.java
+index f2b830bede2dff051244baab7d3b82827e364bba..54ed4f6fc0503f63ada13034e7e4ac9965ccf250 100644
+--- a/src/main/java/net/fabricmc/loom/task/MigrateMappingsTask.java
++++ b/src/main/java/net/fabricmc/loom/task/MigrateMappingsTask.java
+@@ -180,8 +180,7 @@ public abstract class MigrateMappingsTask extends AbstractLoomTask {
+ 		project.getLogger().lifecycle(":remapping");
+ 		Mercury mercury = SourceRemapper.createMercuryWithClassPath(project, false);
+ 
+-		final JavaVersion javaVersion = project.getExtensions().getByType(JavaPluginExtension.class).getSourceCompatibility();
+-		mercury.setSourceCompatibility(javaVersion.toString());
++		mercury.setSourceCompatibilityFromRelease(17);
+ 
+ 		for (Path intermediaryJar : extension.getMinecraftJars(MappingsNamespace.INTERMEDIARY)) {
+ 			mercury.getClassPath().add(intermediaryJar);
+diff --git a/src/main/java/net/fabricmc/loom/task/service/SourceRemapperService.java b/src/main/java/net/fabricmc/loom/task/service/SourceRemapperService.java
+index 30b1ea0fb56e2c313a76ac7a689e88ac1db304cd..fd21735bafa8fb309045f7a83ea3cad724065341 100644
+--- a/src/main/java/net/fabricmc/loom/task/service/SourceRemapperService.java
++++ b/src/main/java/net/fabricmc/loom/task/service/SourceRemapperService.java
+@@ -123,7 +123,7 @@ public final class SourceRemapperService implements SharedService {
+ 	private Mercury createMercury() {
+ 		var mercury = new Mercury();
+ 		mercury.setGracefulClasspathChecks(true);
+-		mercury.setSourceCompatibility(Constants.MERCURY_SOURCE_VERSION);
++		mercury.setSourceCompatibilityFromRelease(17);
+ 
+ 		try {
+ 			mercury.getProcessors().add(MercuryRemapper.create(getMappings()));
+diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
+index f5e694ea750ab9b3c67a2946146cd105908ecc8c..7b7fa5ada8a750d408e4b72ffb35a3e3263a4c6a 100644
+--- a/src/main/java/net/fabricmc/loom/util/Constants.java
++++ b/src/main/java/net/fabricmc/loom/util/Constants.java
+@@ -35,7 +35,6 @@ public class Constants {
+ 	public static final String FABRIC_REPOSITORY = "https://maven.fabricmc.net/";
+ 
+ 	public static final int ASM_VERSION = Opcodes.ASM9;
+-	public static final String MERCURY_SOURCE_VERSION = JavaCore.VERSION_17;
+ 
+ 	private Constants() {
+ 	}
+diff --git a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
+index 8c61796cc0e78d9a464fea55f9c6e9f13a6ceec6..f3c4ef74d628505c46660ba0a3431f49e452d93b 100644
+--- a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
++++ b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
+@@ -231,7 +231,7 @@ public class SourceRemapper {
+ 	public static Mercury createMercuryWithClassPath(Project project, boolean toNamed) {
+ 		Mercury m = new Mercury();
+ 		m.setGracefulClasspathChecks(true);
+-		m.setSourceCompatibility(Constants.MERCURY_SOURCE_VERSION);
++		m.setSourceCompatibilityFromRelease(17);
+ 
+ 		final List<Path> classPath = new ArrayList<>();
+ 
