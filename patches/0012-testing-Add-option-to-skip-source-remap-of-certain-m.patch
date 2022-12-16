@@ -1,0 +1,157 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Fri, 16 Dec 2022 15:00:55 -0700
+Subject: [PATCH] testing: Add option to skip source remap of certain mod files
+
+
+diff --git a/src/main/java/net/fabricmc/loom/api/LoomGradleExtensionAPI.java b/src/main/java/net/fabricmc/loom/api/LoomGradleExtensionAPI.java
+index 97979420ee53ade070b00895cf32c27a2ded341b..5fb03e288c16a6167ca3e1c7676e4cded7cfe655 100644
+--- a/src/main/java/net/fabricmc/loom/api/LoomGradleExtensionAPI.java
++++ b/src/main/java/net/fabricmc/loom/api/LoomGradleExtensionAPI.java
+@@ -53,6 +53,7 @@ import net.fabricmc.loom.util.DeprecationHelper;
+  * This is the public api available exposed to build scripts.
+  */
+ public interface LoomGradleExtensionAPI {
++	org.gradle.api.provider.ListProperty<String> skipModSourceRemapClassPatterns(); // quiet
+ 	@ApiStatus.Internal
+ 	DeprecationHelper getDeprecationHelper();
+ 
+diff --git a/src/main/java/net/fabricmc/loom/extension/LoomGradleExtensionApiImpl.java b/src/main/java/net/fabricmc/loom/extension/LoomGradleExtensionApiImpl.java
+index af111e9fddd0e67616073f78960d87d8c4f2d00d..c950b63639b9bb634f93fd9eb45ef1b62d91c99d 100644
+--- a/src/main/java/net/fabricmc/loom/extension/LoomGradleExtensionApiImpl.java
++++ b/src/main/java/net/fabricmc/loom/extension/LoomGradleExtensionApiImpl.java
+@@ -64,6 +64,7 @@ import net.fabricmc.loom.util.gradle.SourceSetHelper;
+  * This class implements the public extension api.
+  */
+ public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionAPI {
++	private final ListProperty<String> skipModSourceRemapClassPatterns; // quiet
+ 	protected final DeprecationHelper deprecationHelper;
+ 	protected final ListProperty<JarProcessor> jarProcessors;
+ 	protected final ConfigurableFileCollection log4jConfigs;
+@@ -90,6 +91,7 @@ public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionA
+ 	protected final ThreadLocal<Boolean> layeredSpecBuilderScope = ThreadLocal.withInitial(() -> false);
+ 
+ 	protected LoomGradleExtensionApiImpl(Project project, LoomFiles directories) {
++		this.skipModSourceRemapClassPatterns = project.getObjects().listProperty(String.class); // quiet
+ 		this.jarProcessors = project.getObjects().listProperty(JarProcessor.class)
+ 				.empty();
+ 		this.log4jConfigs = project.files(directories.getDefaultLog4jConfigFile());
+@@ -144,6 +146,13 @@ public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionA
+ 		});
+ 	}
+ 
++	// quiet start
++	@Override
++	public ListProperty<String> skipModSourceRemapClassPatterns() {
++		return this.skipModSourceRemapClassPatterns;
++	}
++	// quiet end
++
+ 	@Override
+ 	public DeprecationHelper getDeprecationHelper() {
+ 		return deprecationHelper;
+diff --git a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
+index f3c4ef74d628505c46660ba0a3431f49e452d93b..6af4ce559af25a649aaa3df8d60eecf1f94923d6 100644
+--- a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
++++ b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
+@@ -100,6 +100,7 @@ public class SourceRemapper {
+ 	}
+ 
+ 	private void remapSourcesInner(File source, File destination) throws Exception {
++		final var ext = LoomGradleExtension.get(project); final List<String> skipRemap = ext.skipModSourceRemapClassPatterns().get(); // quiet
+ 		project.getLogger().info(":remapping source jar");
+ 		Mercury mercury = getMercuryInstance();
+ 
+@@ -117,15 +118,41 @@ public class SourceRemapper {
+ 			}
+ 		}
+ 
+-		Path srcPath = source.toPath();
+-		boolean isSrcTmp = false;
++		// quiet start
++		Path srcPath = Files.createTempDirectory("fabric-loom-src");
++		boolean isSrcTmp = true;
+ 
+-		if (!source.isDirectory()) {
+-			// create tmp directory
+-			isSrcTmp = true;
+-			srcPath = Files.createTempDirectory("fabric-loom-src");
++		if (!Files.isDirectory(source.toPath())) {
+ 			ZipUtils.unpackAll(source.toPath(), srcPath);
++		} else {
++			copyRecursively(source.toPath(), srcPath);
++		}
++		final Path noRemapTmp;
++		if (!skipRemap.isEmpty()) {
++			noRemapTmp = Files.createTempDirectory("fabric-loom-src-no-remap");
++			final java.util.List<java.util.regex.Pattern> patterns = skipRemap.stream().map(java.util.regex.Pattern::compile).toList();
++			try (final java.util.stream.Stream<Path> s = Files.walk(srcPath)) {
++				s.forEach(f -> {
++					if (!Files.isRegularFile(f)) {
++						return;
++					}
++					final String pathString = invariantSeparatorsPathString(srcPath.relativize(f));
++					final boolean skip = patterns.stream().anyMatch(pattern -> pattern.matcher(pathString).find());
++					if (skip) {
++						final Path dest = noRemapTmp.resolve(pathString);
++						try {
++							Files.createDirectories(dest.getParent());
++							Files.move(f, dest);
++						} catch (final IOException ex) {
++							throw new RuntimeException(ex);
++						}
++					}
++				});
++			}
++		} else {
++			noRemapTmp = null;
+ 		}
++		// quiet end
+ 
+ 		if (!destination.isDirectory() && destination.exists()) {
+ 			if (!destination.delete()) {
+@@ -150,6 +177,10 @@ public class SourceRemapper {
+ 		}
+ 
+ 		copyNonJavaFiles(srcPath, dstPath, project.getLogger(), source.toPath());
++		// quiet start
++		if (noRemapTmp != null) {
++			copyRecursively(noRemapTmp, dstPath);
++		}
+ 
+ 		if (dstFs != null) {
+ 			dstFs.close();
+@@ -158,7 +189,33 @@ public class SourceRemapper {
+ 		if (isSrcTmp) {
+ 			Files.walkFileTree(srcPath, new DeletingFileVisitor());
+ 		}
++		if (noRemapTmp != null) {
++			Files.walkFileTree(noRemapTmp, new DeletingFileVisitor());
++		}
++	}
++
++	private static void copyRecursively(final Path from, final Path to) throws IOException {
++		Files.createDirectories(to);
++		try (final java.util.stream.Stream<Path> s = Files.walk(from)) {
++			for (final Path f : s.toList()) {
++				final Path targetPath = to.resolve(invariantSeparatorsPathString(from.relativize(f)));
++				if (Files.isDirectory(f)) {
++					Files.createDirectories(targetPath);
++				} else {
++					Files.copy(f, targetPath);
++				}
++			}
++		}
++	}
++
++	private static String invariantSeparatorsPathString(final Path path) {
++		final String separator = path.getFileSystem().getSeparator();
++		final String pathString = path.toString();
++		return separator.equals("/")
++				? pathString
++				: pathString.replace(separator, "/");
+ 	}
++	//quiet end
+ 
+ 	private Mercury getMercuryInstance() {
+ 		if (this.mercury != null) {
