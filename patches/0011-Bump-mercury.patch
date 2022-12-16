@@ -45,10 +45,18 @@ index 30b1ea0fb56e2c313a76ac7a689e88ac1db304cd..fd21735bafa8fb309045f7a83ea3cad7
  		try {
  			mercury.getProcessors().add(MercuryRemapper.create(getMappings()));
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index f5e694ea750ab9b3c67a2946146cd105908ecc8c..7b7fa5ada8a750d408e4b72ffb35a3e3263a4c6a 100644
+index f5e694ea750ab9b3c67a2946146cd105908ecc8c..03cf4899c111fb1b5cfcd4d811b03c73275c4290 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
-@@ -35,7 +35,6 @@ public class Constants {
+@@ -24,7 +24,6 @@
+ 
+ package net.fabricmc.loom.util;
+ 
+-import org.eclipse.jdt.core.JavaCore;
+ import org.objectweb.asm.Opcodes;
+ 
+ public class Constants {
+@@ -35,7 +34,6 @@ public class Constants {
  	public static final String FABRIC_REPOSITORY = "https://maven.fabricmc.net/";
  
  	public static final int ASM_VERSION = Opcodes.ASM9;
