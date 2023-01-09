@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index 9c18bf1f61ab67c0ed5307d3c6b1784b985951a6..260fd12c8bc07ea5d38ef343af591ed44744b5d7 100644
+index a8f5c65df863572333eeb5611edebadf6e4bdf47..66ef4197c2efbea241fd4d457e1fa8a2dba3f1a0 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,12 +5,13 @@ plugins {
