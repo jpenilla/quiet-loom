@@ -4,8 +4,22 @@ Date: Thu, 1 Jul 2021 21:06:34 -0700
 Subject: [PATCH] Build changes & rebrand
 
 
+diff --git a/.gitattributes b/.gitattributes
+index 36452a5b0cba931fd34b8179fc218c81b8208f03..9c62f78cffa160885fd599c0a4bf9e50c089611a 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -36,3 +36,9 @@
+ *.png           binary
+ *.so            binary
+ *.war           binary
++
++#
++# https://help.github.com/articles/dealing-with-line-endings/
++#
++# These are explicitly windows files and should use crlf
++*.bat           text eol=crlf
 diff --git a/build.gradle b/build.gradle
-index a8f5c65df863572333eeb5611edebadf6e4bdf47..66ef4197c2efbea241fd4d457e1fa8a2dba3f1a0 100644
+index 10a6e0c0dc68d863684b37e904396fb7b1cab39f..cf94d6845a1017b91ac4cd3bbdb5506cee5a3456 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,12 +5,13 @@ plugins {
@@ -17,14 +31,14 @@ index a8f5c65df863572333eeb5611edebadf6e4bdf47..66ef4197c2efbea241fd4d457e1fa8a2
  	id 'jacoco'
  	id 'codenarc'
  	id "org.jetbrains.kotlin.jvm" version "1.6.10" // Must match the version included with gradle.
- 	id "com.diffplug.spotless" version "6.8.0"
- 	id "org.gradle.test-retry" version "1.4.1"
+ 	id "com.diffplug.spotless" version "6.13.0"
+ 	id "org.gradle.test-retry" version "1.5.1"
 +	id "com.adarshr.test-logger" version "3.2.0" // quiet
  }
  
- java {
-@@ -34,8 +35,10 @@ archivesBaseName = project.name
- def baseVersion = '1.0'
+ tasks.withType(JavaCompile).configureEach {
+@@ -28,8 +29,10 @@ archivesBaseName = project.name
+ def baseVersion = '1.1'
  
  def ENV = System.getenv()
 -if (ENV.BUILD_NUMBER) {
@@ -42,7 +56,7 @@ index a8f5c65df863572333eeb5611edebadf6e4bdf47..66ef4197c2efbea241fd4d457e1fa8a2
  
 -checkstyle {
 -	configFile = file('checkstyle.xml')
--	toolVersion = '10.3.1'
+-	toolVersion = '10.6.0'
 +// quiet - remove checkstyle
 +
 +// quiet start
@@ -52,7 +66,7 @@ index a8f5c65df863572333eeb5611edebadf6e4bdf47..66ef4197c2efbea241fd4d457e1fa8a2
 +// quiet end
  
  codenarc {
- 	toolVersion = "3.1.0"
+ 	toolVersion = "3.2.0"
 @@ -171,7 +177,7 @@ codenarc {
  gradlePlugin {
  	plugins {
@@ -62,7 +76,7 @@ index a8f5c65df863572333eeb5611edebadf6e4bdf47..66ef4197c2efbea241fd4d457e1fa8a2
  			implementationClass = 'net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap'
  		}
  	}
-@@ -234,8 +240,10 @@ publishing {
+@@ -227,8 +233,10 @@ publishing {
  
  		// Manually crate the plugin marker for snapshot versions
  		snapshotPlugin(MavenPublication) { publication ->
@@ -75,7 +89,7 @@ index a8f5c65df863572333eeb5611edebadf6e4bdf47..66ef4197c2efbea241fd4d457e1fa8a2
  			version baseVersion + '-SNAPSHOT'
  
  			pom.withXml({
-@@ -247,7 +255,7 @@ publishing {
+@@ -240,7 +248,7 @@ publishing {
  				Node groupId = dependency.appendChild(document.createElement('groupId'))
  				groupId.setTextContent('net.fabricmc')
  				Node artifactId = dependency.appendChild(document.createElement('artifactId'))
@@ -84,7 +98,7 @@ index a8f5c65df863572333eeb5611edebadf6e4bdf47..66ef4197c2efbea241fd4d457e1fa8a2
  				Node version = dependency.appendChild(document.createElement('version'))
  				version.setTextContent(baseVersion + '-SNAPSHOT')
  			})
-@@ -255,13 +263,13 @@ publishing {
+@@ -248,13 +256,13 @@ publishing {
  	}
  	repositories {
  		maven {
@@ -128,16 +142,16 @@ index a75b67fcbd76a74b9e6f4786dd5bc5e19690790b..d0233a19d7bbe7b1152d34f18d9e949a
  
  		// Apply default plugins
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-index 8f909d79fd9ce0b8bdd10211917e8b555106f97e..99cfba0e60f3cbc8cffec0024efaf25768b40410 100644
+index d67a1159a166972a56e03d97c94e3217691c65f8..6c056a996155748eb33b05dc336faeaf076b8a6f 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-@@ -51,6 +51,7 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
+@@ -53,6 +53,7 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
  
  			// Set the version to something constant
  			gradle.buildGradle.text = gradle.buildGradle.text.replace('project.version + "+" + (ENV.GITHUB_RUN_NUMBER ? "" : "local-") + getBranch()', "\"$API_VERSION\"")
 +					.replace("fabric-loom", "quiet-fabric-loom") // quiet
  
- 			def server = ServerRunner.create(gradle.projectDir, "1.19.2")
+ 			def server = ServerRunner.create(gradle.projectDir, "1.19.3")
  										.withMod(gradle.getOutputFile("fabric-api-${API_VERSION}.jar"))
 diff --git a/src/test/resources/projects/accesswidener/build.gradle b/src/test/resources/projects/accesswidener/build.gradle
 index 9fa3cc36ef23ee7f9a03120624596c6fe1788de4..6b033c7b0002832af062c1acb867b3304ff88218 100644
@@ -226,18 +240,18 @@ index 45acf714efb54893e7867807d3bed47aa1a58223..93fe880c150bf047a93ab5d3ccb39954
  }
  
 diff --git a/src/test/resources/projects/kotlin/build.gradle.kts b/src/test/resources/projects/kotlin/build.gradle.kts
-index 904c20a405edee316288fd34e9dee881679528b4..4125e9aeb576883fdae77eb0c5049c1c6a0de79a 100644
+index 7f2e0f5d28bd402223319574cf804cc7ddeabc62..ad6c5ecbc9ab0a39d2f3151a6cbfdb1550cff52a 100644
 --- a/src/test/resources/projects/kotlin/build.gradle.kts
 +++ b/src/test/resources/projects/kotlin/build.gradle.kts
 @@ -3,7 +3,7 @@ import java.util.Properties
  plugins {
- 	kotlin("jvm") version "1.6.20"
- 	kotlin("plugin.serialization") version "1.6.20"
+ 	kotlin("jvm") version "1.7.22"
+ 	kotlin("plugin.serialization") version "1.7.22"
 -	id("fabric-loom")
 +	id("quiet-fabric-loom") // quiet
+ 	`maven-publish`
  }
  
- java {
 diff --git a/src/test/resources/projects/legacy/build.gradle b/src/test/resources/projects/legacy/build.gradle
 index 3b460c49aaa95a8b98cff43df820b257498ad668..5761c8bedcb5493791e108044d5b3da4974f7a31 100644
 --- a/src/test/resources/projects/legacy/build.gradle
@@ -272,7 +286,7 @@ index 18f4f0db4b857098a782cfa548a2954c44f363dc..80064373797d6f4de27cf041bc99d0d6
  }
  
 diff --git a/src/test/resources/projects/maven/build.gradle b/src/test/resources/projects/maven/build.gradle
-index 56930fcd776ea55ae9576655d38b55cf47de62d1..16fc3b9fff48698c5cd16abce88ff379595bace6 100644
+index 0b19a3addd2b7f9e4dd18d9d3c9f0cd143be5296..386d6ae30a4dbeaba05a2782d22d07da9400fef7 100644
 --- a/src/test/resources/projects/maven/build.gradle
 +++ b/src/test/resources/projects/maven/build.gradle
 @@ -1,5 +1,5 @@
@@ -283,7 +297,7 @@ index 56930fcd776ea55ae9576655d38b55cf47de62d1..16fc3b9fff48698c5cd16abce88ff379
  }
  
 diff --git a/src/test/resources/projects/mavenLibrary/build.gradle b/src/test/resources/projects/mavenLibrary/build.gradle
-index ff53dcc36eb20ffaf26ff75233524a4ba6075411..a58391e8375721604985dc46b975cc6a52039ff0 100644
+index 0001e2b7dd835ce6e1ef90415bb373563ec8e823..3279b8b352ba1cc4aa8baa186245947bc6cd432f 100644
 --- a/src/test/resources/projects/mavenLibrary/build.gradle
 +++ b/src/test/resources/projects/mavenLibrary/build.gradle
 @@ -1,5 +1,5 @@
@@ -371,7 +385,7 @@ index 62858e2f46a1c7d4e7cbc5fe7337bb90961c8490..3f8cbb87f9b640a5b4c0843793fa2e44
  	version = "1.0.0"
  
 diff --git a/src/test/resources/projects/parchment/build.gradle b/src/test/resources/projects/parchment/build.gradle
-index 21432d4e9a6befe1bde150585c45a05e4c45f312..0d61aa4cb4d3c0c564027501bdeb35f1cf159dfb 100644
+index 5fee81c5d1e07de0dfcf615795ec818a8e4705e2..b2f68f83de8a72fd9be20681c788eb1efc6befb2 100644
 --- a/src/test/resources/projects/parchment/build.gradle
 +++ b/src/test/resources/projects/parchment/build.gradle
 @@ -1,5 +1,5 @@

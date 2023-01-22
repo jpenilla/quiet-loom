@@ -5,34 +5,34 @@ Subject: [PATCH] Quilt - Fix interface injection of inner class interfaces
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/ifaceinject/InterfaceInjectionProcessor.java b/src/main/java/net/fabricmc/loom/configuration/ifaceinject/InterfaceInjectionProcessor.java
-index 033211390944bb090942ed7d8f167bacb244e158..8e4bf509cbb2c7a7d00bac57f7f84df201446c00 100644
+index ea0a7327246fe1da86ad80a4342e3f2299988541..eac2db8a5a000098f85cf3836468d7c4fba7c3e2 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/ifaceinject/InterfaceInjectionProcessor.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/ifaceinject/InterfaceInjectionProcessor.java
-@@ -33,6 +33,7 @@ import java.nio.file.Path;
+@@ -28,6 +28,7 @@ import java.io.IOException;
+ import java.nio.file.Path;
  import java.util.ArrayList;
  import java.util.Collections;
- import java.util.HashMap;
 +import java.util.HashSet;
  import java.util.LinkedHashSet;
  import java.util.List;
  import java.util.Map;
-@@ -52,6 +53,7 @@ import org.gradle.api.tasks.SourceSet;
- import org.objectweb.asm.ClassReader;
- import org.objectweb.asm.ClassVisitor;
- import org.objectweb.asm.ClassWriter;
-+import org.objectweb.asm.Opcodes;
- import org.objectweb.asm.commons.Remapper;
+@@ -47,6 +48,7 @@ import org.objectweb.asm.ClassWriter;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
  
- import net.fabricmc.loom.LoomGradleExtension;
-@@ -74,6 +76,7 @@ import net.fabricmc.tinyremapper.TinyRemapper;
- public class InterfaceInjectionProcessor implements JarProcessor, GenerateSourcesTask.MappingsProcessor {
- 	// Filename used to store hash of injected interfaces in processed jar file
- 	private static final String HASH_FILENAME = "injected_interfaces.sha256";
++import org.objectweb.asm.Opcodes;
+ import net.fabricmc.loom.api.mappings.layered.MappingsNamespace;
+ import net.fabricmc.loom.api.processor.MinecraftJarProcessor;
+ import net.fabricmc.loom.api.processor.ProcessorContext;
+@@ -60,6 +62,7 @@ import net.fabricmc.mappingio.tree.MemoryMappingTree;
+ 
+ public abstract class InterfaceInjectionProcessor implements MinecraftJarProcessor<InterfaceInjectionProcessor.Spec> {
+ 	private static final Logger LOGGER = LoggerFactory.getLogger(InterfaceInjectionProcessor.class);
 +	private static final int INTERFACE_ACCESS = Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_ABSTRACT | Opcodes.ACC_INTERFACE;
  
- 	private final Map<String, List<InjectedInterface>> injectedInterfaces;
- 	private final Project project;
-@@ -251,14 +254,18 @@ public class InterfaceInjectionProcessor implements JarProcessor, GenerateSource
+ 	private final String name;
+ 	private final boolean fromDependencies;
+@@ -173,14 +176,18 @@ public abstract class InterfaceInjectionProcessor implements MinecraftJarProcess
  	}
  
  	private static String appendComment(String comment, List<InjectedInterface> injectedInterfaces) {
@@ -56,7 +56,7 @@ index 033211390944bb090942ed7d8f167bacb244e158..8e4bf509cbb2c7a7d00bac57f7f84df2
  				}
  			}
  		}
-@@ -311,6 +318,7 @@ public class InterfaceInjectionProcessor implements JarProcessor, GenerateSource
+@@ -222,6 +229,7 @@ public abstract class InterfaceInjectionProcessor implements MinecraftJarProcess
  
  	private static class InjectingClassVisitor extends ClassVisitor {
  		private final List<InjectedInterface> injectedInterfaces;
@@ -64,7 +64,7 @@ index 033211390944bb090942ed7d8f167bacb244e158..8e4bf509cbb2c7a7d00bac57f7f84df2
  
  		InjectingClassVisitor(int asmVersion, ClassWriter writer, List<InjectedInterface> injectedInterfaces) {
  			super(asmVersion, writer);
-@@ -343,6 +351,54 @@ public class InterfaceInjectionProcessor implements JarProcessor, GenerateSource
+@@ -254,5 +262,53 @@ public abstract class InterfaceInjectionProcessor implements MinecraftJarProcess
  
  			super.visit(version, access, name, signature, superName, modifiedInterfaces.toArray(new String[0]));
  		}
@@ -117,5 +117,4 @@ index 033211390944bb090942ed7d8f167bacb244e158..8e4bf509cbb2c7a7d00bac57f7f84df2
 +			super.visitEnd();
 +		}
  	}
- 
- 	private TinyRemapper createTinyRemapper() {
+ }
