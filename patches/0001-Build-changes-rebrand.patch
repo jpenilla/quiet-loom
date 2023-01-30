@@ -286,7 +286,7 @@ index 18f4f0db4b857098a782cfa548a2954c44f363dc..80064373797d6f4de27cf041bc99d0d6
  }
  
 diff --git a/src/test/resources/projects/maven/build.gradle b/src/test/resources/projects/maven/build.gradle
-index 0b19a3addd2b7f9e4dd18d9d3c9f0cd143be5296..386d6ae30a4dbeaba05a2782d22d07da9400fef7 100644
+index 2c3e3786ffb233a2d4e355d21918552a067bf2da..44c0b7dd844e7545a0e0665c867b8378ed83e4c4 100644
 --- a/src/test/resources/projects/maven/build.gradle
 +++ b/src/test/resources/projects/maven/build.gradle
 @@ -1,5 +1,5 @@
