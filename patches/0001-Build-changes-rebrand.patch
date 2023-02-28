@@ -141,6 +141,19 @@ index a75b67fcbd76a74b9e6f4786dd5bc5e19690790b..d0233a19d7bbe7b1152d34f18d9e949a
  		LibraryLocationLogger.logLibraryVersions();
  
  		// Apply default plugins
+diff --git a/src/main/java/net/fabricmc/loom/util/gradle/GradleUtils.java b/src/main/java/net/fabricmc/loom/util/gradle/GradleUtils.java
+index 7fd5d15941dddd97c2631c26b243b7f320d9337f..ff5fdcfd4d229e0cb0418b9ff89a4d573039e40a 100644
+--- a/src/main/java/net/fabricmc/loom/util/gradle/GradleUtils.java
++++ b/src/main/java/net/fabricmc/loom/util/gradle/GradleUtils.java
+@@ -55,7 +55,7 @@ public final class GradleUtils {
+ 	}
+ 
+ 	public static boolean isLoomProject(Project project) {
+-		return project.getPluginManager().hasPlugin("fabric-loom");
++		return project.getPluginManager().hasPlugin("quiet-fabric-loom"); // quiet
+ 	}
+ 
+ 	public static Provider<Boolean> getBooleanPropertyProvider(Project project, String key) {
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 index d67a1159a166972a56e03d97c94e3217691c65f8..6c056a996155748eb33b05dc336faeaf076b8a6f 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
