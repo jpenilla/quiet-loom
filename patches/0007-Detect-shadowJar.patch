@@ -5,18 +5,18 @@ Subject: [PATCH] Detect shadowJar
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index e1798dfdc78aa54f7af5a1285c63ac68b0c22ec1..2625eb4d04f45413951a36700a3468c212586d9b 100644
+index 00ec1dc6727fc850af0b869ed9c7d11e2a3b8fa0..7375794d945f377da9014b58f29f6201a5e310d6 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -77,6 +77,22 @@ public class RemapTaskConfiguration {
- 			// task.getDestinationDirectory().set(new File(project.getBuildDir(), "devlibs")); // quiet - no
+@@ -92,6 +92,21 @@ public abstract class RemapTaskConfiguration implements Runnable {
+ 			// task.getDestinationDirectory().set(new File(getProject().getBuildDir(), "devlibs")); // quiet - no
  		});
  
 +		// quiet start
-+		project.getPlugins().withId("com.github.johnrengelman.shadow", new org.gradle.api.Action<>() {
++		getProject().getPlugins().withId("com.github.johnrengelman.shadow", new org.gradle.api.Action<>() {
 +			@Override
 +			public void execute(final org.gradle.api.Plugin shadowPlugin) {
-+				final TaskProvider<AbstractArchiveTask> shadowJar = tasks.named("shadowJar", AbstractArchiveTask.class);
++				final TaskProvider<AbstractArchiveTask> shadowJar = getTasks().named("shadowJar", AbstractArchiveTask.class);
 +				shadowJar.configure(new org.gradle.api.Action<>() {
 +					@Override
 +					public void execute(final AbstractArchiveTask shadowJarTask) {
@@ -27,7 +27,6 @@ index e1798dfdc78aa54f7af5a1285c63ac68b0c22ec1..2625eb4d04f45413951a36700a3468c2
 +			}
 +		});
 +		// quiet end
-+
- 		tasks.named(BasePlugin.ASSEMBLE_TASK_NAME).configure(task -> task.dependsOn(remapJarTask));
+ 		getTasks().named(BasePlugin.ASSEMBLE_TASK_NAME).configure(task -> task.dependsOn(remapJarTask));
  
- 		trySetupSourceRemapping(project);
+ 		trySetupSourceRemapping();

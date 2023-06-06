@@ -19,7 +19,7 @@ index 36452a5b0cba931fd34b8179fc218c81b8208f03..9c62f78cffa160885fd599c0a4bf9e50
 +# These are explicitly windows files and should use crlf
 +*.bat           text eol=crlf
 diff --git a/build.gradle b/build.gradle
-index 7546bbee8733abbaf8771375d49675c2f5f6a08d..3868d48fb7ccb5856d3260dc64216e350e624524 100644
+index a3c14eec516f7349d79e030b36a13f43dd64cc3e..0e75c3fcaf8ef66f8465efca4456de27a615f2aa 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,12 +5,13 @@ plugins {
@@ -30,15 +30,15 @@ index 7546bbee8733abbaf8771375d49675c2f5f6a08d..3868d48fb7ccb5856d3260dc64216e35
 +	// id 'checkstyle' // quiet - remove checkstyle
  	id 'jacoco'
  	id 'codenarc'
- 	id "org.jetbrains.kotlin.jvm" version "1.6.10" // Must match the version included with gradle.
- 	id "com.diffplug.spotless" version "6.13.0"
- 	id "org.gradle.test-retry" version "1.5.1"
+ 	id "org.jetbrains.kotlin.jvm" version "1.8.0" // Must match the version included with gradle.
+ 	id "com.diffplug.spotless" version "6.18.0"
+ 	id "org.gradle.test-retry" version "1.5.2"
 +	id "com.adarshr.test-logger" version "3.2.0" // quiet
  }
  
  tasks.withType(JavaCompile).configureEach {
 @@ -28,8 +29,10 @@ archivesBaseName = project.name
- def baseVersion = '1.1'
+ def baseVersion = '1.2'
  
  def ENV = System.getenv()
 -if (ENV.BUILD_NUMBER) {
@@ -129,10 +129,10 @@ index 885070a6d762361cb5edf6ce1f85a72e5b353407..3f0777d21b41a8c7aa32f04c7e32fe6f
  include "bootstrap"
 \ No newline at end of file
 diff --git a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
-index a75b67fcbd76a74b9e6f4786dd5bc5e19690790b..d0233a19d7bbe7b1152d34f18d9e949ab8a9c80c 100644
+index 9c9c938e2e57b1d41c732014a2d6f5bcefd37e7b..9eaed442ac1148044c5e94204e3c2b7b66e9cef8 100644
 --- a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
 +++ b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
-@@ -62,7 +62,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
+@@ -79,7 +79,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
  	}
  
  	public void apply(Project project) {
@@ -142,10 +142,10 @@ index a75b67fcbd76a74b9e6f4786dd5bc5e19690790b..d0233a19d7bbe7b1152d34f18d9e949a
  
  		// Apply default plugins
 diff --git a/src/main/java/net/fabricmc/loom/util/gradle/GradleUtils.java b/src/main/java/net/fabricmc/loom/util/gradle/GradleUtils.java
-index c529607c49c729f1f2d7a2c51dcd7ed6c4d82690..c9fdd701b8e5b992054837ae60ef58129f6a51e2 100644
+index 7fd5d15941dddd97c2631c26b243b7f320d9337f..ff5fdcfd4d229e0cb0418b9ff89a4d573039e40a 100644
 --- a/src/main/java/net/fabricmc/loom/util/gradle/GradleUtils.java
 +++ b/src/main/java/net/fabricmc/loom/util/gradle/GradleUtils.java
-@@ -66,7 +66,7 @@ public final class GradleUtils {
+@@ -55,7 +55,7 @@ public final class GradleUtils {
  	}
  
  	public static boolean isLoomProject(Project project) {
@@ -155,7 +155,7 @@ index c529607c49c729f1f2d7a2c51dcd7ed6c4d82690..c9fdd701b8e5b992054837ae60ef5812
  
  	public static Provider<Boolean> getBooleanPropertyProvider(Project project, String key) {
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-index 71620336076c88861a0556d5285758bb9a04ff31..ed96d9b844ca0587e85323614c44812e082f4bf0 100644
+index 0ea5b30b69bc652edea414da837e45c88119cc36..037977ac0ee6a13452ea6b72e1d246d3e7ff7546 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 @@ -54,6 +54,7 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
@@ -164,10 +164,10 @@ index 71620336076c88861a0556d5285758bb9a04ff31..ed96d9b844ca0587e85323614c44812e
  		gradle.buildGradle.text = gradle.buildGradle.text.replace('project.version + "+" + (ENV.GITHUB_RUN_NUMBER ? "" : "local-") + getBranch()', "\"$API_VERSION\"")
 +				.replace("fabric-loom", "quiet-fabric-loom") // quiet
  
- 		def server = ServerRunner.create(gradle.projectDir, "1.19.3")
+ 		def server = ServerRunner.create(gradle.projectDir, "1.19.4")
  				.withMod(gradle.getOutputFile("fabric-api-${API_VERSION}.jar"))
 diff --git a/src/test/resources/projects/accesswidener/build.gradle b/src/test/resources/projects/accesswidener/build.gradle
-index 2d3a533f8fb9117827808f8a31faeaafd0b9464e..72a8f5d27ef69e6331aff3e9a9569579e704c70a 100644
+index af697460cc9366f08ac6084c7d5dba1244426dca..1c3b783fe004c25788c5796a6cf9ddc276fbfc03 100644
 --- a/src/test/resources/projects/accesswidener/build.gradle
 +++ b/src/test/resources/projects/accesswidener/build.gradle
 @@ -1,5 +1,5 @@
@@ -189,7 +189,7 @@ index 993ac667071e4e3e2b1a8301121e817950663d61..b38fc44fb5f10c691e2d01b6d1b1e975
  
  dependencies {
 diff --git a/src/test/resources/projects/dependencyResolutionManagement/basic/build.gradle b/src/test/resources/projects/dependencyResolutionManagement/basic/build.gradle
-index 4dd1303845cc572acd980158cace8d94143c4544..4b2a571dd7e1ddeb6d642e2dfac9b01402c0e6f3 100644
+index 1ad70fd35b62504694311c46182f7004762e2213..a78671819753a6da6e3855c53681d4e2fb55107d 100644
 --- a/src/test/resources/projects/dependencyResolutionManagement/basic/build.gradle
 +++ b/src/test/resources/projects/dependencyResolutionManagement/basic/build.gradle
 @@ -1,5 +1,5 @@
@@ -200,7 +200,7 @@ index 4dd1303845cc572acd980158cace8d94143c4544..4b2a571dd7e1ddeb6d642e2dfac9b014
  }
  
 diff --git a/src/test/resources/projects/dependencyResolutionManagement/projmap/build.gradle b/src/test/resources/projects/dependencyResolutionManagement/projmap/build.gradle
-index 5083bcf6113ea4398d86e84693b27655ffddba42..41cd7173c8a5edc7d8c037670f1df16527508e29 100644
+index 11f94b3c2b6defeca5e16769192b0dee0d73b547..ab22b15f182c8734f1a5e89bf74eb651e4ce2931 100644
 --- a/src/test/resources/projects/dependencyResolutionManagement/projmap/build.gradle
 +++ b/src/test/resources/projects/dependencyResolutionManagement/projmap/build.gradle
 @@ -1,5 +1,5 @@
@@ -229,7 +229,7 @@ index 2c075f03ad35f9065fc5d9e501a236ede735a016..0218448da07934bccc350f4af49af6bd
  
  dependencyResolutionManagement {
 diff --git a/src/test/resources/projects/interfaceInjection/build.gradle b/src/test/resources/projects/interfaceInjection/build.gradle
-index 2396f3c34efc5d82e7af392cfa52ef420e5735fd..90e56515cfd38173aadad3e1eb6bdd3d49cb83af 100644
+index e631fd01bbce95d0eb6c494034cfe5fa5ec781f5..de401f596ab8eaa266cde25cc18c5c80ad66fe5e 100644
 --- a/src/test/resources/projects/interfaceInjection/build.gradle
 +++ b/src/test/resources/projects/interfaceInjection/build.gradle
 @@ -1,7 +1,7 @@
@@ -242,7 +242,7 @@ index 2396f3c34efc5d82e7af392cfa52ef420e5735fd..90e56515cfd38173aadad3e1eb6bdd3d
  }
  
 diff --git a/src/test/resources/projects/java16/build.gradle b/src/test/resources/projects/java16/build.gradle
-index 45acf714efb54893e7867807d3bed47aa1a58223..93fe880c150bf047a93ab5d3ccb39954b859904d 100644
+index 018aeb560dad93d12ab7646fb1cd86c14cbc866d..0e26c2c957ff24bd7c2164a19fbcab019254d3a9 100644
 --- a/src/test/resources/projects/java16/build.gradle
 +++ b/src/test/resources/projects/java16/build.gradle
 @@ -1,5 +1,5 @@
@@ -266,7 +266,7 @@ index 7f2e0f5d28bd402223319574cf804cc7ddeabc62..ad6c5ecbc9ab0a39d2f3151a6cbfdb15
  }
  
 diff --git a/src/test/resources/projects/legacy/build.gradle b/src/test/resources/projects/legacy/build.gradle
-index 3b460c49aaa95a8b98cff43df820b257498ad668..5761c8bedcb5493791e108044d5b3da4974f7a31 100644
+index 13e303a919faea188a009bd2152a78dd879777ed..df48165bf168a31e60c0f11993d475cafaa72f15 100644
 --- a/src/test/resources/projects/legacy/build.gradle
 +++ b/src/test/resources/projects/legacy/build.gradle
 @@ -1,5 +1,5 @@
@@ -275,9 +275,9 @@ index 3b460c49aaa95a8b98cff43df820b257498ad668..5761c8bedcb5493791e108044d5b3da4
 +	id 'quiet-fabric-loom' // quiet
  }
  
- sourceCompatibility = JavaVersion.VERSION_1_8
+ version = project.mod_version
 diff --git a/src/test/resources/projects/localFileDependency/build.gradle b/src/test/resources/projects/localFileDependency/build.gradle
-index bc6eb7cff351aaaa4991fd111471ea6d9b841972..0e489575708f83a8f316a37056bc2640c41d77cd 100644
+index 289b506359c6dff38067b1494ac4835a3bfd082d..e79c947b51f0c29478ab837892504f0fb2fea3a2 100644
 --- a/src/test/resources/projects/localFileDependency/build.gradle
 +++ b/src/test/resources/projects/localFileDependency/build.gradle
 @@ -1,5 +1,5 @@
@@ -288,7 +288,7 @@ index bc6eb7cff351aaaa4991fd111471ea6d9b841972..0e489575708f83a8f316a37056bc2640
  }
  
 diff --git a/src/test/resources/projects/localRuntime/build.gradle b/src/test/resources/projects/localRuntime/build.gradle
-index bcd01a811afc4721e56d222cd52584e10d11e495..1459fa25a8cc9ad7eb8735d0919c9c397b41591b 100644
+index a4f9a87821f907df4e36bcc10ca4622a74b4ffdc..8d0fef6bf524c5eb85ef102f92f525df606bb047 100644
 --- a/src/test/resources/projects/localRuntime/build.gradle
 +++ b/src/test/resources/projects/localRuntime/build.gradle
 @@ -1,5 +1,5 @@
@@ -299,7 +299,7 @@ index bcd01a811afc4721e56d222cd52584e10d11e495..1459fa25a8cc9ad7eb8735d0919c9c39
  }
  
 diff --git a/src/test/resources/projects/maven/build.gradle b/src/test/resources/projects/maven/build.gradle
-index 2c3e3786ffb233a2d4e355d21918552a067bf2da..44c0b7dd844e7545a0e0665c867b8378ed83e4c4 100644
+index f7069b886efbb520321cac93e2758c4ffccd28b7..b10a4310420cb574e1473f376b5a14f00e539dc6 100644
 --- a/src/test/resources/projects/maven/build.gradle
 +++ b/src/test/resources/projects/maven/build.gradle
 @@ -1,5 +1,5 @@
@@ -310,7 +310,7 @@ index 2c3e3786ffb233a2d4e355d21918552a067bf2da..44c0b7dd844e7545a0e0665c867b8378
  }
  
 diff --git a/src/test/resources/projects/mavenLibrary/build.gradle b/src/test/resources/projects/mavenLibrary/build.gradle
-index 83d608af1ca7173e3fbf2f2c27da38805a142d01..73a23ab3ffc2ed60ae577eba5b6ea875b8fb4728 100644
+index 95703b93c317eb35390fd945fdacbc46ff12deff..12b2060d16cbe7730be5ab52e313635c5dcd0b0b 100644
 --- a/src/test/resources/projects/mavenLibrary/build.gradle
 +++ b/src/test/resources/projects/mavenLibrary/build.gradle
 @@ -1,5 +1,5 @@
@@ -321,7 +321,7 @@ index 83d608af1ca7173e3fbf2f2c27da38805a142d01..73a23ab3ffc2ed60ae577eba5b6ea875
  }
  
 diff --git a/src/test/resources/projects/minimalBase/build.gradle b/src/test/resources/projects/minimalBase/build.gradle
-index 8fbea237ed6254ea326fecc3c6db1a732746a6e0..7c5e9db47caaf722348db871c5503847fc0156bc 100644
+index f3dc73941bc7331e8292466b924f4a769ae55a01..8fdbe5cd5ba9db93ba06dfd2ffe4f5df86cadd29 100644
 --- a/src/test/resources/projects/minimalBase/build.gradle
 +++ b/src/test/resources/projects/minimalBase/build.gradle
 @@ -1,7 +1,7 @@
@@ -334,7 +334,7 @@ index 8fbea237ed6254ea326fecc3c6db1a732746a6e0..7c5e9db47caaf722348db871c5503847
  }
  
 diff --git a/src/test/resources/projects/mixinApAutoRefmap/build.gradle b/src/test/resources/projects/mixinApAutoRefmap/build.gradle
-index 610d042d1a47cb4e3a82aad6e147b87248671333..9a912796ff75cc100f33937220eea76522a686df 100644
+index 058aef168b3bcb720935aac393c36b6c52a3538b..e21cddde5c444801a985ef57f61abc612b4efb30 100644
 --- a/src/test/resources/projects/mixinApAutoRefmap/build.gradle
 +++ b/src/test/resources/projects/mixinApAutoRefmap/build.gradle
 @@ -1,5 +1,5 @@
@@ -345,7 +345,7 @@ index 610d042d1a47cb4e3a82aad6e147b87248671333..9a912796ff75cc100f33937220eea765
  	id 'maven-publish'
  }
 diff --git a/src/test/resources/projects/mixinApSimple/build.gradle b/src/test/resources/projects/mixinApSimple/build.gradle
-index b21803ea86251da5162273226c5b38e3e4907f3f..73e08d3fbe0eb2d57fdbc0035746841398e52c1e 100644
+index 68b48e9c25d51cd96e7149243e911949262b5917..7bcb04ab1f048858e3fec4bd6a2ab79282ecef3a 100644
 --- a/src/test/resources/projects/mixinApSimple/build.gradle
 +++ b/src/test/resources/projects/mixinApSimple/build.gradle
 @@ -1,5 +1,5 @@
@@ -356,7 +356,7 @@ index b21803ea86251da5162273226c5b38e3e4907f3f..73e08d3fbe0eb2d57fdbc00357468413
  }
  
 diff --git a/src/test/resources/projects/modJavadoc/build.gradle b/src/test/resources/projects/modJavadoc/build.gradle
-index 52f1fc39f472e431795ddfe94cd85c6a01eade48..b374f3b02da2f1952df09e75759a2405d10c7c68 100644
+index 13aeb83ec713e9d3a37cf4c38f415a502e23c4aa..974e5b68c3802e744d72eb6f07cab634100e9bbf 100644
 --- a/src/test/resources/projects/modJavadoc/build.gradle
 +++ b/src/test/resources/projects/modJavadoc/build.gradle
 @@ -1,7 +1,7 @@
@@ -369,7 +369,7 @@ index 52f1fc39f472e431795ddfe94cd85c6a01eade48..b374f3b02da2f1952df09e75759a2405
  }
  
 diff --git a/src/test/resources/projects/mojangMappings/build.gradle b/src/test/resources/projects/mojangMappings/build.gradle
-index 31cd9f7860b3ec32bd544c7901aee10024246d22..b913bbb9f567e97b2b44b464014267ddfbe1b08a 100644
+index f58c485386bbf686967a3020c2326996da62441d..4b2a37ef4ee3edc283b8464f4d6b42210909ea98 100644
 --- a/src/test/resources/projects/mojangMappings/build.gradle
 +++ b/src/test/resources/projects/mojangMappings/build.gradle
 @@ -1,5 +1,5 @@
@@ -380,7 +380,7 @@ index 31cd9f7860b3ec32bd544c7901aee10024246d22..b913bbb9f567e97b2b44b464014267dd
  }
  
 diff --git a/src/test/resources/projects/multiproject/build.gradle b/src/test/resources/projects/multiproject/build.gradle
-index 62858e2f46a1c7d4e7cbc5fe7337bb90961c8490..3f8cbb87f9b640a5b4c0843793fa2e44aae10c3d 100644
+index ae3e637a0b52af9f00d9742c331f0cb943aaf9d4..bb46e17581f051767aacc9df45e8096486fc4468 100644
 --- a/src/test/resources/projects/multiproject/build.gradle
 +++ b/src/test/resources/projects/multiproject/build.gradle
 @@ -1,11 +1,11 @@
@@ -409,7 +409,7 @@ index 5fee81c5d1e07de0dfcf615795ec818a8e4705e2..b2f68f83de8a72fd9be20681c788eb1e
  
  repositories {
 diff --git a/src/test/resources/projects/reproducible/build.gradle b/src/test/resources/projects/reproducible/build.gradle
-index 272b54300fb625b10914091c5b8d1dabf1bcdd5c..d9acc53eb31a548bbd3aa587c8baccd2b8df1eaa 100644
+index bda1baa6271bb2deaf13ce40677923b9b1530672..2d79cc0cbd9a5104db2da6c669fd64c152649d30 100644
 --- a/src/test/resources/projects/reproducible/build.gradle
 +++ b/src/test/resources/projects/reproducible/build.gradle
 @@ -1,5 +1,5 @@
@@ -420,7 +420,7 @@ index 272b54300fb625b10914091c5b8d1dabf1bcdd5c..d9acc53eb31a548bbd3aa587c8baccd2
  }
  
 diff --git a/src/test/resources/projects/runconfigs/build.gradle b/src/test/resources/projects/runconfigs/build.gradle
-index a8e1f6bb073f57d6196eebe782836ed3f436b19b..9fe3374fef22b370c6810274650d5be8b6c664b0 100644
+index 5e504e20d2110896de2d182f0524be6cfe065411..b242ca75d4e946cfacb72a1e1c12982f7aaefcf3 100644
 --- a/src/test/resources/projects/runconfigs/build.gradle
 +++ b/src/test/resources/projects/runconfigs/build.gradle
 @@ -1,5 +1,5 @@
@@ -431,7 +431,7 @@ index a8e1f6bb073f57d6196eebe782836ed3f436b19b..9fe3374fef22b370c6810274650d5be8
  
  loom {
 diff --git a/src/test/resources/projects/signed/build.gradle b/src/test/resources/projects/signed/build.gradle
-index 195cc1dd05b9795ed70da07ca6d3986ee3d3e6d2..3b25141a71d6c52034f485bd64a30588095731b2 100644
+index 8a5445b05b1bd8953409adbb4ea0cd31fd4fcc56..aaec45fd622b2ca88738a7e8d5f434a69879fe4d 100644
 --- a/src/test/resources/projects/signed/build.gradle
 +++ b/src/test/resources/projects/signed/build.gradle
 @@ -1,5 +1,5 @@
@@ -442,7 +442,7 @@ index 195cc1dd05b9795ed70da07ca6d3986ee3d3e6d2..3b25141a71d6c52034f485bd64a30588
  	id 'signing'
  }
 diff --git a/src/test/resources/projects/simple/build.gradle b/src/test/resources/projects/simple/build.gradle
-index 5fc4de1f914f4db97e72d8e6b9f081ce82d34b18..2868dcdd1e848a13ed3f4931a802b8198e0d5d45 100644
+index ed7d9e49fa03821166e8f920e6497e2d66e42f82..a1d1157223cd18bc4fab43505e155f581b5937d8 100644
 --- a/src/test/resources/projects/simple/build.gradle
 +++ b/src/test/resources/projects/simple/build.gradle
 @@ -1,5 +1,5 @@
@@ -453,7 +453,7 @@ index 5fc4de1f914f4db97e72d8e6b9f081ce82d34b18..2868dcdd1e848a13ed3f4931a802b819
  }
  
 diff --git a/src/test/resources/projects/splitSources/build.gradle b/src/test/resources/projects/splitSources/build.gradle
-index c4d5174f802499c7e6a6bddd3b1c7f45ea542fc7..e7047864a131cf1a53e09a6e1c3e137bfdde1c73 100644
+index baa2ebc18bdda779888e0620488ad0e03e663c10..441294ae9d7c3046db06f6a5d8883af11bf9fa1b 100644
 --- a/src/test/resources/projects/splitSources/build.gradle
 +++ b/src/test/resources/projects/splitSources/build.gradle
 @@ -1,5 +1,5 @@
@@ -464,7 +464,7 @@ index c4d5174f802499c7e6a6bddd3b1c7f45ea542fc7..e7047864a131cf1a53e09a6e1c3e137b
  }
  
 diff --git a/src/test/resources/projects/transitiveAccesswidener/build.gradle b/src/test/resources/projects/transitiveAccesswidener/build.gradle
-index 52f1fc39f472e431795ddfe94cd85c6a01eade48..b374f3b02da2f1952df09e75759a2405d10c7c68 100644
+index 13aeb83ec713e9d3a37cf4c38f415a502e23c4aa..974e5b68c3802e744d72eb6f07cab634100e9bbf 100644
 --- a/src/test/resources/projects/transitiveAccesswidener/build.gradle
 +++ b/src/test/resources/projects/transitiveAccesswidener/build.gradle
 @@ -1,7 +1,7 @@

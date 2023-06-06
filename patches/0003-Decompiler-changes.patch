@@ -5,7 +5,7 @@ Subject: [PATCH] Decompiler changes
 
 
 diff --git a/build.gradle b/build.gradle
-index 3868d48fb7ccb5856d3260dc64216e350e624524..9f995cd56d2d576b16b2d1d30a69b9b07a089fb4 100644
+index 0e75c3fcaf8ef66f8465efca4456de27a615f2aa..13c915d4b3a2a463952e448573565ff49c11b681 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -42,6 +42,12 @@ repositories {
@@ -48,16 +48,16 @@ index 6fa25b5c570d6db178453bfa386fd863fdcfc490..e3cff700f6a960f675dd7a67959b5fc4
  	}
  }
 diff --git a/src/main/java/net/fabricmc/loom/decompilers/DecompilerConfiguration.java b/src/main/java/net/fabricmc/loom/decompilers/DecompilerConfiguration.java
-index 8bc63e20695c4f1fb0eca6a79c1bef3c25076eda..d7e0a254198f1a75a007a18b22d6b0de11ec23f5 100644
+index adf8650d40c3deaa22c0f6c91ae4a1520fa93bf3..111363c9afba2bcad1310852031c462b02fd2355 100644
 --- a/src/main/java/net/fabricmc/loom/decompilers/DecompilerConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/decompilers/DecompilerConfiguration.java
-@@ -36,7 +36,7 @@ public final class DecompilerConfiguration {
- 	}
+@@ -39,7 +39,7 @@ public abstract class DecompilerConfiguration implements Runnable {
  
- 	public static void setup(Project project) {
--		registerDecompiler(project, "fernFlower", FabricFernFlowerDecompiler.class);
-+		registerDecompiler(project, "quiltflower", FabricFernFlowerDecompiler.class); // quiet
- 		registerDecompiler(project, "cfr", LoomCFRDecompiler.class);
+ 	@Override
+ 	public void run() {
+-		registerDecompiler(getProject(), "fernFlower", FabricFernFlowerDecompiler.class);
++		registerDecompiler(getProject(), "quiltflower", FabricFernFlowerDecompiler.class); // quiet
+ 		registerDecompiler(getProject(), "cfr", LoomCFRDecompiler.class);
  	}
  
 diff --git a/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java b/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java
@@ -90,7 +90,7 @@ index 5b2f0e105991b8493ca4473a0570cd7457156c07..863fc08a83c0155e1115f023cdd3b981
  	}
  
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-index ed96d9b844ca0587e85323614c44812e082f4bf0..5186784e903f590863fff3168bdeaf1e6ba66510 100644
+index 037977ac0ee6a13452ea6b72e1d246d3e7ff7546..f18585a1fffce917a27c53b93b62ab7c830989ef 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 @@ -54,7 +54,7 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
@@ -100,7 +100,7 @@ index ed96d9b844ca0587e85323614c44812e082f4bf0..5186784e903f590863fff3168bdeaf1e
 -				.replace("fabric-loom", "quiet-fabric-loom") // quiet
 +				.replace("fabric-loom", "quiet-fabric-loom").replace("FernFlower", "Quiltflower") // quiet
  
- 		def server = ServerRunner.create(gradle.projectDir, "1.19.3")
+ 		def server = ServerRunner.create(gradle.projectDir, "1.19.4")
  				.withMod(gradle.getOutputFile("fabric-api-${API_VERSION}.jar"))
 diff --git a/src/test/resources/projects/decompile/build.gradle b/src/test/resources/projects/decompile/build.gradle
 index b38fc44fb5f10c691e2d01b6d1b1e97575ec5f38..2de0b93e0fa87011db4322cd849115e317cc54ab 100644

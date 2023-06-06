@@ -5,24 +5,24 @@ Subject: [PATCH] Don't change output directories of original jars
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index c74d0a9c5b8262c6c1977acd8d8d929f37a9db48..e1798dfdc78aa54f7af5a1285c63ac68b0c22ec1 100644
+index 9f741c5507f4f2fb34d26d513358850d3c4e5fe3..00ec1dc6727fc850af0b869ed9c7d11e2a3b8fa0 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -74,7 +74,7 @@ public class RemapTaskConfiguration {
+@@ -89,7 +89,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
  		// Configure the default jar task
- 		tasks.named(JavaPlugin.JAR_TASK_NAME, AbstractArchiveTask.class).configure(task -> {
+ 		getTasks().named(JavaPlugin.JAR_TASK_NAME, AbstractArchiveTask.class).configure(task -> {
  			task.getArchiveClassifier().convention("dev");
--			task.getDestinationDirectory().set(new File(project.getBuildDir(), "devlibs"));
-+			// task.getDestinationDirectory().set(new File(project.getBuildDir(), "devlibs")); // quiet - no
+-			task.getDestinationDirectory().set(new File(getProject().getBuildDir(), "devlibs"));
++			// task.getDestinationDirectory().set(new File(getProject().getBuildDir(), "devlibs")); // quiet - no
  		});
  
- 		tasks.named(BasePlugin.ASSEMBLE_TASK_NAME).configure(task -> task.dependsOn(remapJarTask));
-@@ -122,7 +122,7 @@ public class RemapTaskConfiguration {
+ 		getTasks().named(BasePlugin.ASSEMBLE_TASK_NAME).configure(task -> task.dependsOn(remapJarTask));
+@@ -136,7 +136,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
  			}
  
  			sourcesJarTask.getArchiveClassifier().convention("dev-sources");
--			sourcesJarTask.getDestinationDirectory().set(new File(project.getBuildDir(), "devlibs"));
-+			// sourcesJarTask.getDestinationDirectory().set(new File(project.getBuildDir(), "devlibs")); // quiet - no
+-			sourcesJarTask.getDestinationDirectory().set(new File(getProject().getBuildDir(), "devlibs"));
++			// sourcesJarTask.getDestinationDirectory().set(new File(getProject().getBuildDir(), "devlibs")); // quiet - no
  			task.getArchiveClassifier().convention("sources");
  
  			task.dependsOn(sourcesJarTask);
