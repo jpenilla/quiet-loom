@@ -5,10 +5,10 @@ Subject: [PATCH] Detect shadowJar
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 00ec1dc6727fc850af0b869ed9c7d11e2a3b8fa0..7375794d945f377da9014b58f29f6201a5e310d6 100644
+index 2f48bbdfbf275d49edbcab62ca7c0f5ef1099081..a22122b2e82c12669ebc59e75ce9ce4b382168ff 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -92,6 +92,21 @@ public abstract class RemapTaskConfiguration implements Runnable {
+@@ -95,6 +95,21 @@ public abstract class RemapTaskConfiguration implements Runnable {
  			// task.getDestinationDirectory().set(new File(getProject().getBuildDir(), "devlibs")); // quiet - no
  		});
  

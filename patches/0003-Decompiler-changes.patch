@@ -5,10 +5,10 @@ Subject: [PATCH] Decompiler changes
 
 
 diff --git a/build.gradle b/build.gradle
-index 0e75c3fcaf8ef66f8465efca4456de27a615f2aa..ac7078a71c4e05aec563d42bacb942d8f23e8829 100644
+index 04994f07b02c1b0cd132e94b9876e8fd12621f29..1cbc65a4c1500887be624e6af375b6e60d37d845 100644
 --- a/build.gradle
 +++ b/build.gradle
-@@ -91,7 +91,11 @@ dependencies {
+@@ -97,7 +97,11 @@ dependencies {
  	}
  
  	// decompilers
@@ -18,14 +18,14 @@ index 0e75c3fcaf8ef66f8465efca4456de27a615f2aa..ac7078a71c4e05aec563d42bacb942d8
 +		transitive = false
 +	}
 +	// quiet end
- 	implementation ('net.fabricmc:cfr:0.2.0')
+ 	implementation ('net.fabricmc:cfr:0.2.1')
  
  	// source code remapping
 diff --git a/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
-index 6fa25b5c570d6db178453bfa386fd863fdcfc490..c97d5bcf0c6f6f18a9852aaf17e5c68376e480d7 100644
+index 538c3018b085067e3d0e99d6fc8a0530b07cf6e9..9713b31bab625acc9332d9170f626c9dc77c6df6 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
-@@ -79,7 +79,7 @@ public class SingleJarDecompileConfiguration extends DecompileConfiguration<Mapp
+@@ -68,7 +68,7 @@ public class SingleJarDecompileConfiguration extends DecompileConfiguration<Mapp
  			task.setDescription("Decompile minecraft using the default decompiler.");
  			task.setGroup(Constants.TaskGroup.FABRIC);
  
@@ -77,7 +77,7 @@ index 5b2f0e105991b8493ca4473a0570cd7457156c07..e79ffd0bf856f58851a18216ea2e6270
  	}
  
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-index 037977ac0ee6a13452ea6b72e1d246d3e7ff7546..ba9f19b2b9408dff037ec569cf133fe39ed9c398 100644
+index e4ac0ac35ab3b919bc401f1383cff2f8fc7b88d7..36d7d8f09a7627f54d2afae6b81d61d36a1e6d6a 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 @@ -54,7 +54,7 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
@@ -87,7 +87,7 @@ index 037977ac0ee6a13452ea6b72e1d246d3e7ff7546..ba9f19b2b9408dff037ec569cf133fe3
 -				.replace("fabric-loom", "quiet-fabric-loom") // quiet
 +				.replace("fabric-loom", "quiet-fabric-loom").replace("FernFlower", "Vineflower") // quiet
  
- 		def server = ServerRunner.create(gradle.projectDir, "1.19.4")
+ 		def server = ServerRunner.create(gradle.projectDir, "1.20.1")
  				.withMod(gradle.getOutputFile("fabric-api-${API_VERSION}.jar"))
 diff --git a/src/test/resources/projects/decompile/build.gradle b/src/test/resources/projects/decompile/build.gradle
 index b38fc44fb5f10c691e2d01b6d1b1e97575ec5f38..cf9e1b88b86cae9b92c9f5dd7226fa8fa3495243 100644
