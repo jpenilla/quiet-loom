@@ -48,15 +48,12 @@ index adf8650d40c3deaa22c0f6c91ae4a1520fa93bf3..39f2b804c160110a1de13253934b648d
  	}
  
 diff --git a/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java b/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java
-index 2d2041b6fea5697d72c4c2c8ff3b43fe47101fa1..a8e6eef94935fbcff5f12a66368230f7455704c7 100644
+index 2d2041b6fea5697d72c4c2c8ff3b43fe47101fa1..0021e41e01ee5b839212d15c5ea2c6209dd419ce 100644
 --- a/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java
 +++ b/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java
-@@ -44,9 +44,9 @@ public final class FabricFernFlowerDecompiler implements LoomDecompiler {
- 					IFernflowerPreferences.DECOMPILE_GENERIC_SIGNATURES, "1",
- 					IFernflowerPreferences.BYTECODE_SOURCE_MAPPING, "1",
+@@ -46,7 +46,7 @@ public final class FabricFernFlowerDecompiler implements LoomDecompiler {
  					IFernflowerPreferences.REMOVE_SYNTHETIC, "1",
--					IFernflowerPreferences.LOG_LEVEL, "trace",
-+					IFernflowerPreferences.LOG_LEVEL, "warn", // quiet
+ 					IFernflowerPreferences.LOG_LEVEL, "trace",
  					IFernflowerPreferences.THREADS, String.valueOf(metaData.numberOfThreads()),
 -					IFernflowerPreferences.INDENT_STRING, "\t",
 +					IFernflowerPreferences.INDENT_STRING, "  ", // quiet
