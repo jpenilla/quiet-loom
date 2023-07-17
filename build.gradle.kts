@@ -1,13 +1,11 @@
-import net.minecrell.gitpatcher.PatchExtension
-
 plugins {
-  id("net.minecraftforge.gitpatcher") version "0.10.+"
+  id("ca.stellardrift.gitpatcher") version "1.0.0"
 }
 
-configure<PatchExtension> {
-  submodule = "fabric-loom"
-  target = file("patched-loom")
-  patches = file("patches")
+patches {
+  submodule.set("fabric-loom")
+  target.set(file("patched-loom"))
+  patches.set(file("patches"))
 }
 
 tasks.register("rebuildPatches") {
