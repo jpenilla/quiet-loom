@@ -5,7 +5,7 @@ Subject: [PATCH] Decompiler changes
 
 
 diff --git a/build.gradle b/build.gradle
-index 04994f07b02c1b0cd132e94b9876e8fd12621f29..1cbc65a4c1500887be624e6af375b6e60d37d845 100644
+index 04994f07b02c1b0cd132e94b9876e8fd12621f29..99919330b294855785757c57087f2def4da6d41e 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -97,7 +97,11 @@ dependencies {
@@ -14,7 +14,7 @@ index 04994f07b02c1b0cd132e94b9876e8fd12621f29..1cbc65a4c1500887be624e6af375b6e6
  	// decompilers
 -	implementation ('net.fabricmc:fabric-fernflower:2.0.0')
 +	// quiet start
-+	implementation("org.vineflower:vineflower:1.9.1") {
++	implementation("org.vineflower:vineflower:1.9.3") {
 +		transitive = false
 +	}
 +	// quiet end
