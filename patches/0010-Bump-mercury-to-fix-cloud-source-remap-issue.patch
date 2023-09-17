@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Sun, 17 Sep 2023 10:41:57 -0700
+Subject: [PATCH] Bump mercury to fix cloud source remap issue
+
+
+diff --git a/build.gradle b/build.gradle
+index 99919330b294855785757c57087f2def4da6d41e..1a5a40ade7e5a206b4e0e90d0b5ff5379309c63a 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -105,7 +105,7 @@ dependencies {
+ 	implementation ('net.fabricmc:cfr:0.2.1')
+ 
+ 	// source code remapping
+-	implementation ('net.fabricmc:mercury:0.3.0')
++	implementation ('net.fabricmc:mercury:0.4.0') // quiet
+ 
+ 	// Kotlin
+ 	implementation('org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.6.2') {
