@@ -5,7 +5,7 @@ Subject: [PATCH] Reduce log spam when sources fail to fully remap
 
 
 diff --git a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
-index 17fa8a52e63b8d17b7ae5e72402b47f4046f7e31..b45ef63d5c420f88836d79cf678a3f42daf92476 100644
+index 1f4fca35e5773219317492661abadbc3161ecba1..3bfb47e9dde16aed2e4a7776c15b4f1f2706588d 100644
 --- a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
 +++ b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
 @@ -42,6 +42,7 @@ import org.gradle.api.Project;

@@ -4,23 +4,19 @@ Date: Thu, 1 Jul 2021 22:01:14 -0700
 Subject: [PATCH] Decompiler changes
 
 
-diff --git a/build.gradle b/build.gradle
-index 04994f07b02c1b0cd132e94b9876e8fd12621f29..99919330b294855785757c57087f2def4da6d41e 100644
---- a/build.gradle
-+++ b/build.gradle
-@@ -97,7 +97,11 @@ dependencies {
- 	}
- 
- 	// decompilers
--	implementation ('net.fabricmc:fabric-fernflower:2.0.0')
-+	// quiet start
-+	implementation("org.vineflower:vineflower:1.9.3") {
-+		transitive = false
-+	}
-+	// quiet end
- 	implementation ('net.fabricmc:cfr:0.2.1')
- 
- 	// source code remapping
+diff --git a/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java b/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java
+index ad865d735bab1094a77d172e6e96c5107ded8904..bf54a2e250369fde15c8ee32dd07ddf0aa177d79 100644
+--- a/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java
++++ b/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java
+@@ -48,7 +48,7 @@ public final class VineflowerDecompiler implements LoomInternalDecompiler {
+ 					IFernflowerPreferences.REMOVE_SYNTHETIC, "1",
+ 					IFernflowerPreferences.LOG_LEVEL, "trace",
+ 					IFernflowerPreferences.THREADS, String.valueOf(context.numberOfThreads()),
+-					IFernflowerPreferences.INDENT_STRING, "\t",
++					IFernflowerPreferences.INDENT_STRING, "  ", // quiet
+ 					IFabricJavadocProvider.PROPERTY_NAME, new TinyJavadocProvider(context.javaDocs().toFile())
+ 				)
+ 		);
 diff --git a/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
 index 538c3018b085067e3d0e99d6fc8a0530b07cf6e9..9713b31bab625acc9332d9170f626c9dc77c6df6 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
@@ -34,68 +30,3 @@ index 538c3018b085067e3d0e99d6fc8a0530b07cf6e9..9713b31bab625acc9332d9170f626c9d
  		});
  	}
  }
-diff --git a/src/main/java/net/fabricmc/loom/decompilers/DecompilerConfiguration.java b/src/main/java/net/fabricmc/loom/decompilers/DecompilerConfiguration.java
-index adf8650d40c3deaa22c0f6c91ae4a1520fa93bf3..39f2b804c160110a1de13253934b648d8243b9f9 100644
---- a/src/main/java/net/fabricmc/loom/decompilers/DecompilerConfiguration.java
-+++ b/src/main/java/net/fabricmc/loom/decompilers/DecompilerConfiguration.java
-@@ -39,7 +39,7 @@ public abstract class DecompilerConfiguration implements Runnable {
- 
- 	@Override
- 	public void run() {
--		registerDecompiler(getProject(), "fernFlower", FabricFernFlowerDecompiler.class);
-+		registerDecompiler(getProject(), "vineflower", FabricFernFlowerDecompiler.class); // quiet
- 		registerDecompiler(getProject(), "cfr", LoomCFRDecompiler.class);
- 	}
- 
-diff --git a/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java b/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java
-index 2d2041b6fea5697d72c4c2c8ff3b43fe47101fa1..0021e41e01ee5b839212d15c5ea2c6209dd419ce 100644
---- a/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java
-+++ b/src/main/java/net/fabricmc/loom/decompilers/fernflower/FabricFernFlowerDecompiler.java
-@@ -46,7 +46,7 @@ public final class FabricFernFlowerDecompiler implements LoomDecompiler {
- 					IFernflowerPreferences.REMOVE_SYNTHETIC, "1",
- 					IFernflowerPreferences.LOG_LEVEL, "trace",
- 					IFernflowerPreferences.THREADS, String.valueOf(metaData.numberOfThreads()),
--					IFernflowerPreferences.INDENT_STRING, "\t",
-+					IFernflowerPreferences.INDENT_STRING, "  ", // quiet
- 					IFabricJavadocProvider.PROPERTY_NAME, new TinyJavadocProvider(metaData.javaDocs().toFile())
- 				)
- 		);
-diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
-index 5b2f0e105991b8493ca4473a0570cd7457156c07..e79ffd0bf856f58851a18216ea2e627057a9208e 100644
---- a/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
-+++ b/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
-@@ -46,7 +46,7 @@ class DecompileTest extends Specification implements GradleProjectTestTrait {
- 
- 		where:
- 		decompiler 		| task								| version
--		'fernflower'	| "genSourcesWithFernFlower"		| PRE_RELEASE_GRADLE
-+		'vineflower'	| "genSourcesWithVineflower"		| PRE_RELEASE_GRADLE // quiet
- 		'cfr' 			| "genSourcesWithCfr"				| PRE_RELEASE_GRADLE
- 	}
- 
-diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-index e4ac0ac35ab3b919bc401f1383cff2f8fc7b88d7..36d7d8f09a7627f54d2afae6b81d61d36a1e6d6a 100644
---- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-+++ b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-@@ -54,7 +54,7 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
- 
- 		// Set the version to something constant
- 		gradle.buildGradle.text = gradle.buildGradle.text.replace('project.version + "+" + (ENV.GITHUB_RUN_NUMBER ? "" : "local-") + getBranch()', "\"$API_VERSION\"")
--				.replace("fabric-loom", "quiet-fabric-loom") // quiet
-+				.replace("fabric-loom", "quiet-fabric-loom").replace("FernFlower", "Vineflower") // quiet
- 
- 		def server = ServerRunner.create(gradle.projectDir, "1.20.1")
- 				.withMod(gradle.getOutputFile("fabric-api-${API_VERSION}.jar"))
-diff --git a/src/test/resources/projects/decompile/build.gradle b/src/test/resources/projects/decompile/build.gradle
-index b38fc44fb5f10c691e2d01b6d1b1e97575ec5f38..cf9e1b88b86cae9b92c9f5dd7226fa8fa3495243 100644
---- a/src/test/resources/projects/decompile/build.gradle
-+++ b/src/test/resources/projects/decompile/build.gradle
-@@ -13,7 +13,7 @@ loom {
- 		cfr {
- 			options.put("test", "value")
- 		}
--		fernflower {
-+		vineflower { // quiet
- 			options.put("test", "value")
- 		}
- 	}

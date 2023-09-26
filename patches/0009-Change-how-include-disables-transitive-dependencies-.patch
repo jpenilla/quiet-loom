@@ -6,7 +6,7 @@ Subject: [PATCH] Change how `include` disables transitive dependencies to
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
-index d647c77a9da16292f25d37ddc5da260550d2dc65..bb001b1586be12b749316f06bdf0391223f62f1d 100644
+index 9d7008f35c13ed5b915a94a46c01f13033c5390b..84bceb3eba4fe8a66cf61f0d0dcd1f54cc14a9ca 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
 @@ -30,7 +30,9 @@ import org.gradle.api.NamedDomainObjectProvider;
@@ -19,7 +19,7 @@ index d647c77a9da16292f25d37ddc5da260550d2dc65..bb001b1586be12b749316f06bdf03912
  import org.gradle.api.plugins.JavaPlugin;
  
  import net.fabricmc.loom.LoomGradleExtension;
-@@ -80,7 +82,16 @@ public abstract class LoomConfigurations implements Runnable {
+@@ -81,7 +83,16 @@ public abstract class LoomConfigurations implements Runnable {
  		registerNonTransitive(Constants.Configurations.LOADER_DEPENDENCIES, Role.RESOLVABLE);
  
  		registerNonTransitive(Constants.Configurations.MINECRAFT, Role.NONE);
