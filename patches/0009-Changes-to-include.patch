@@ -1,0 +1,170 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Tue, 28 Feb 2023 12:12:48 -0700
+Subject: [PATCH] Changes to include
+
+- Add transitiveInclude configuration (self-explanatory)
+- Don't disable transitive deps on include - the way included
+  jars are resolved means we don't need to, and doing so
+  breaks platform dependencies needlessly.
+
+diff --git a/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java b/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
+index 925f5a7cb85c89f9596dd3de078c6d61d384595f..dd2750483e6467d4e61c9018cb1dc5347a9c2329 100644
+--- a/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
++++ b/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
+@@ -29,7 +29,9 @@ import java.io.IOException;
+ import java.io.UncheckedIOException;
+ import java.nio.charset.StandardCharsets;
+ import java.util.Collection;
++import java.util.HashSet;
+ import java.util.Locale;
++import java.util.Map;
+ import java.util.Set;
+ 
+ import com.google.common.collect.Sets;
+@@ -44,7 +46,11 @@ import org.gradle.api.artifacts.ProjectDependency;
+ import org.gradle.api.artifacts.ResolvedArtifact;
+ import org.gradle.api.artifacts.ResolvedConfiguration;
+ import org.gradle.api.artifacts.ResolvedDependency;
++import org.gradle.api.artifacts.component.ComponentIdentifier;
++import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
++import org.gradle.api.artifacts.component.ProjectComponentIdentifier;
+ import org.gradle.api.file.ConfigurableFileCollection;
++import org.gradle.api.internal.artifacts.repositories.resolver.MavenUniqueSnapshotComponentIdentifier;
+ import org.gradle.api.plugins.JavaPlugin;
+ import org.gradle.api.provider.Provider;
+ import org.gradle.api.tasks.bundling.AbstractArchiveTask;
+@@ -53,6 +59,7 @@ import org.jetbrains.annotations.Nullable;
+ import net.fabricmc.loom.LoomGradleExtension;
+ import net.fabricmc.loom.LoomGradlePlugin;
+ import net.fabricmc.loom.task.RemapTaskConfiguration;
++import net.fabricmc.loom.util.Constants;
+ import net.fabricmc.loom.util.ZipReprocessorUtil;
+ import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
+ 
+@@ -75,6 +82,54 @@ public final class IncludedJarFactory {
+ 		});
+ 	}
+ 
++	public Provider<ConfigurableFileCollection> transitiveNestedJars() {
++		return this.project.provider(() -> {
++			final ConfigurableFileCollection files = this.project.files();
++
++			final Configuration config = this.project.getConfigurations().getByName(Constants.Configurations.TRANSITIVE_INCLUDE);
++			files.from(artifacts(config));
++			files.builtBy(config.getBuildDependencies());
++			return files;
++		});
++	}
++
++	private ConfigurableFileCollection artifacts(final Configuration config) {
++		final Set<String> seen = new HashSet<>();
++
++		final ConfigurableFileCollection files = this.project.files();
++
++		final ResolvedConfiguration resolvedConfiguration = config.getResolvedConfiguration();
++		for (final ResolvedArtifact artifact : resolvedConfiguration.getResolvedArtifacts()) {
++			final ComponentIdentifier id = artifact.getId().getComponentIdentifier();
++			if (id instanceof ModuleComponentIdentifier module) {
++				final String version;
++				if (module instanceof MavenUniqueSnapshotComponentIdentifier snapshot) {
++					// vanilla loom doesn't use the timestamp
++					version = snapshot.getSnapshotVersion();
++				} else {
++					version = module.getVersion();
++				}
++				if (!seen.add(module.getGroup() + ":" + module.getModule() + ":" + version)) {
++					continue;
++				}
++				final Metadata metadata = new Metadata(
++						module.getGroup(),
++						module.getModule(),
++						version,
++						artifact.getClassifier()
++				);
++
++				files.from(this.project.provider(() -> this.getNestableJar(artifact.getFile(), metadata)));
++			} else if (id instanceof ProjectComponentIdentifier projectId) {
++				final ProjectDependency dependency = (ProjectDependency) this.project.getDependencies().project(Map.of("path", projectId.getProjectPath()));
++
++				this.addProjectDependency(files, dependency, seen);
++			}
++		}
++
++		return files;
++	}
++
+ 	private ConfigurableFileCollection getFileDeps(Configuration configuration, Set<String> visited) {
+ 		final ConfigurableFileCollection files = project.files();
+ 
+@@ -106,8 +161,16 @@ public final class IncludedJarFactory {
+ 
+ 		for (Dependency dependency : configuration.getDependencies()) {
+ 			if (dependency instanceof ProjectDependency projectDependency) {
+-				if (!visited.add(dependency.getGroup() + ":" + dependency.getName() + ":" + dependency.getVersion())) {
+-					continue;
++				this.addProjectDependency(files, projectDependency, visited);
++			}
++		}
++
++		return files;
++	}
++
++	private void addProjectDependency(final ConfigurableFileCollection files, final ProjectDependency projectDependency, final Set<String> visited) {
++				if (!visited.add(projectDependency.getGroup() + ":" + projectDependency.getName() + ":" + projectDependency.getVersion())) {
++					return;
+ 				}
+ 
+ 				// Get the outputs of the project
+@@ -136,10 +199,6 @@ public final class IncludedJarFactory {
+ 						throw new UnsupportedOperationException("Cannot nest none AbstractArchiveTask task: " + task.getName());
+ 					}
+ 				}
+-			}
+-		}
+-
+-		return files;
+ 	}
+ 
+ 	private File getNestableJar(final File input, final Metadata metadata) {
+diff --git a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
+index 9d7008f35c13ed5b915a94a46c01f13033c5390b..ed3a767acb594a1b40345b04382862a6627d425e 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
++++ b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
+@@ -81,7 +81,8 @@ public abstract class LoomConfigurations implements Runnable {
+ 		registerNonTransitive(Constants.Configurations.LOADER_DEPENDENCIES, Role.RESOLVABLE);
+ 
+ 		registerNonTransitive(Constants.Configurations.MINECRAFT, Role.NONE);
+-		registerNonTransitive(Constants.Configurations.INCLUDE, Role.RESOLVABLE);
++		register(Constants.Configurations.INCLUDE, Role.RESOLVABLE);
++		register(Constants.Configurations.TRANSITIVE_INCLUDE, Role.RESOLVABLE);
+ 		registerNonTransitive(Constants.Configurations.MAPPING_CONSTANTS, Role.RESOLVABLE);
+ 
+ 		register(Constants.Configurations.NAMED_ELEMENTS, Role.CONSUMABLE).configure(configuration -> {
+diff --git a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
+index 9639f3d18bb22c437bbb0d93ac025474adc0cf03..0c0b6ab0464ddcd5a8e83e355f7ee611df2164ad 100644
+--- a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
++++ b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
+@@ -98,7 +98,9 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+ 		getAddNestedDependencies().convention(true).finalizeValueOnRead();
+ 
+ 		Configuration includeConfiguration = getProject().getConfigurations().getByName(Constants.Configurations.INCLUDE);
+-		getNestedJars().from(new IncludedJarFactory(getProject()).getNestedJars(includeConfiguration));
++		final IncludedJarFactory includedJarFactory = new IncludedJarFactory(getProject());
++		getNestedJars().from(includedJarFactory.getNestedJars(includeConfiguration));
++		getNestedJars().from(includedJarFactory.transitiveNestedJars());
+ 
+ 		getUseMixinAP().set(LoomGradleExtension.get(getProject()).getMixin().getUseLegacyMixinAp());
+ 
+diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
+index 42692aabc0c49424b9fab10ae84b627ce6f5a9d5..718c681fccbe21c44f5c0774295c470f57606327 100644
+--- a/src/main/java/net/fabricmc/loom/util/Constants.java
++++ b/src/main/java/net/fabricmc/loom/util/Constants.java
+@@ -45,6 +45,7 @@ public class Constants {
+ 		public static final String MOD_COMPILE_CLASSPATH = "modCompileClasspath";
+ 		public static final String MOD_COMPILE_CLASSPATH_MAPPED = "modCompileClasspathMapped";
+ 		public static final String INCLUDE = "include";
++		public static final String TRANSITIVE_INCLUDE = "transitiveInclude";
+ 		public static final String MINECRAFT = "minecraft";
+ 
+ 		public static final String MINECRAFT_COMPILE_LIBRARIES = "minecraftLibraries";
