@@ -1,0 +1,177 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Sat, 11 Nov 2023 22:09:34 -0700
+Subject: [PATCH] avoid reading the same jar multiple times during
+ configuration and other small optimizations
+
+
+diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java b/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java
+index 7ff0fbc78dc242a82a925ca72dd85168116aa115..baf4e5305c1eb5009b651bdf353f53734101a531 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java
++++ b/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java
+@@ -125,6 +125,7 @@ public class ModConfigurationRemapper {
+ 		// the installer data. The installer data has to be added before
+ 		// any mods are remapped since remapping needs the dependencies provided by that data.
+ 		final Map<Configuration, List<ModDependency>> dependenciesBySourceConfig = new HashMap<>();
++		Map<ArtifactRef, ArtifactMetadata> metaCache = new HashMap<>();
+ 		configsToRemap.forEach((sourceConfig, remappedConfig) -> {
+ 			/*
+ 			sourceConfig - The source configuration where the intermediary named artifacts come from. i.e "modApi"
+@@ -137,9 +138,15 @@ public class ModConfigurationRemapper {
+ 				final ArtifactMetadata artifactMetadata;
+ 
+ 				try {
+-					artifactMetadata = ArtifactMetadata.create(artifact);
+-				} catch (IOException e) {
+-					throw new UncheckedIOException("Failed to read metadata from" + artifact.path(), e);
++					artifactMetadata = metaCache.computeIfAbsent(artifact, a -> {
++						try {
++							return ArtifactMetadata.create(a);
++						} catch (final IOException e) {
++							throw new UncheckedIOException(e);
++						}
++					});
++				} catch (UncheckedIOException e) {
++					throw new UncheckedIOException("Failed to read metadata from" + artifact.path(), e.getCause());
+ 				}
+ 
+ 				if (artifactMetadata.installerData() != null) {
+diff --git a/src/main/java/net/fabricmc/loom/configuration/processors/SpecContextImpl.java b/src/main/java/net/fabricmc/loom/configuration/processors/SpecContextImpl.java
+index 622a0a1c6766aed0f526019e7cf09b5042ed8bac..d61faddd12e89c37d886c6ed49dcd5c04028bbe9 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/processors/SpecContextImpl.java
++++ b/src/main/java/net/fabricmc/loom/configuration/processors/SpecContextImpl.java
+@@ -29,7 +29,10 @@ import java.nio.file.Path;
+ import java.util.ArrayList;
+ import java.util.Collections;
+ import java.util.Comparator;
++import java.util.HashMap;
+ import java.util.List;
++import java.util.Map;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Set;
+ import java.util.function.Function;
+@@ -57,11 +60,12 @@ import net.fabricmc.loom.util.gradle.GradleUtils;
+  */
+ public record SpecContextImpl(List<FabricModJson> modDependencies, List<FabricModJson> localMods, List<FabricModJson> compileRuntimeMods) implements SpecContext {
+ 	public static SpecContextImpl create(Project project) {
+-		return new SpecContextImpl(getDependentMods(project), FabricModJsonHelpers.getModsInProject(project), getCompileRuntimeMods(project));
++		Map<String, List<FabricModJson>> fmjCache = new HashMap<>();
++		return new SpecContextImpl(getDependentMods(project, fmjCache), FabricModJsonHelpers.getModsInProject(project), getCompileRuntimeMods(project, fmjCache));
+ 	}
+ 
+ 	// Reruns a list of mods found on both the compile and/or runtime classpaths
+-	private static List<FabricModJson> getDependentMods(Project project) {
++	private static List<FabricModJson> getDependentMods(Project project, Map<String, List<FabricModJson>> fmjCache) {
+ 		final LoomGradleExtension extension = LoomGradleExtension.get(project);
+ 		var mods = new ArrayList<FabricModJson>();
+ 
+@@ -69,10 +73,14 @@ public record SpecContextImpl(List<FabricModJson> modDependencies, List<FabricMo
+ 			final Set<File> artifacts = entry.getSourceConfiguration().get().resolve();
+ 
+ 			for (File artifact : artifacts) {
+-				final FabricModJson fabricModJson = FabricModJsonFactory.createFromZipNullable(artifact.toPath());
+-
+-				if (fabricModJson != null) {
+-					mods.add(fabricModJson);
++				final List<FabricModJson> fabricModJson = fmjCache.computeIfAbsent(artifact.toPath().toAbsolutePath().toString(), $ -> {
++					return FabricModJsonFactory.createFromZipOptional(artifact.toPath())
++							.map(List::of)
++							.orElseGet(List::of);
++				});
++
++				if (fabricModJson.size() != 0) {
++					mods.add(fabricModJson.get(0));
+ 				}
+ 			}
+ 		}
+@@ -80,7 +88,9 @@ public record SpecContextImpl(List<FabricModJson> modDependencies, List<FabricMo
+ 		if (!GradleUtils.getBooleanProperty(project, Constants.Properties.DISABLE_PROJECT_DEPENDENT_MODS)) {
+ 			// Add all the dependent projects
+ 			for (Project dependentProject : getDependentProjects(project).toList()) {
+-				mods.addAll(FabricModJsonHelpers.getModsInProject(dependentProject));
++				mods.addAll(fmjCache.computeIfAbsent(dependentProject.getPath(), $ -> {
++					return FabricModJsonHelpers.getModsInProject(dependentProject);
++				}));
+ 			}
+ 		}
+ 
+@@ -96,18 +106,20 @@ public record SpecContextImpl(List<FabricModJson> modDependencies, List<FabricMo
+ 	}
+ 
+ 	// Returns a list of mods that are on both to compile and runtime classpath
+-	private static List<FabricModJson> getCompileRuntimeMods(Project project) {
+-		var mods = new ArrayList<>(getCompileRuntimeModsFromRemapConfigs(project).toList());
++	private static List<FabricModJson> getCompileRuntimeMods(Project project, Map<String, List<FabricModJson>> fmjCache) {
++		var mods = new ArrayList<>(getCompileRuntimeModsFromRemapConfigs(project, fmjCache).toList());
+ 
+ 		for (Project dependentProject : getCompileRuntimeProjectDependencies(project).toList()) {
+-			mods.addAll(FabricModJsonHelpers.getModsInProject(dependentProject));
++			mods.addAll(fmjCache.computeIfAbsent(dependentProject.getPath(), $ -> {
++				return FabricModJsonHelpers.getModsInProject(dependentProject);
++			}));
+ 		}
+ 
+ 		return Collections.unmodifiableList(mods);
+ 	}
+ 
+ 	// Returns a list of jar mods that are found on the compile and runtime remapping configurations
+-	private static Stream<FabricModJson> getCompileRuntimeModsFromRemapConfigs(Project project) {
++	private static Stream<FabricModJson> getCompileRuntimeModsFromRemapConfigs(Project project, Map<String, List<FabricModJson>> fmjCache) {
+ 		final LoomGradleExtension extension = LoomGradleExtension.get(project);
+ 		final List<Path> runtimeEntries = extension.getRuntimeRemapConfigurations().stream()
+ 				.filter(settings -> settings.getApplyDependencyTransforms().get())
+@@ -118,9 +130,15 @@ public record SpecContextImpl(List<FabricModJson> modDependencies, List<FabricMo
+ 				.filter(settings -> settings.getApplyDependencyTransforms().get())
+ 				.flatMap(resolveArtifacts(project, false))
+ 				.filter(runtimeEntries::contains) // Use the intersection of the two configurations.
+-				.map(FabricModJsonFactory::createFromZipOptional)
+-				.filter(Optional::isPresent)
+-				.map(Optional::get)
++				.map(zipPath -> {
++					final List<FabricModJson> list = fmjCache.computeIfAbsent(zipPath.toAbsolutePath().toString(), $ -> {
++						return FabricModJsonFactory.createFromZipOptional(zipPath)
++								.map(List::of)
++								.orElseGet(List::of);
++					});
++					return list.size() == 0 ? null : list.get(0);
++				})
++				.filter(Objects::nonNull)
+ 				.sorted(Comparator.comparing(FabricModJson::getId));
+ 	}
+ 
+diff --git a/src/main/java/net/fabricmc/loom/util/download/Download.java b/src/main/java/net/fabricmc/loom/util/download/Download.java
+index 79c200cc024d6415e27d3eaefd91e856cd0a2e32..fbbbd13784fa9e9830c932db09b65fda4da73b50 100644
+--- a/src/main/java/net/fabricmc/loom/util/download/Download.java
++++ b/src/main/java/net/fabricmc/loom/util/download/Download.java
+@@ -51,6 +51,7 @@ import java.util.Locale;
+ import java.util.Optional;
+ import java.util.concurrent.atomic.AtomicLong;
+ import java.util.function.IntConsumer;
++import java.util.function.Supplier;
+ import java.util.zip.GZIPInputStream;
+ 
+ import org.slf4j.Logger;
+@@ -63,11 +64,11 @@ public final class Download {
+ 	private static final String E_TAG = "ETag";
+ 	private static final Logger LOGGER = LoggerFactory.getLogger(Download.class);
+ 	private static final Duration TIMEOUT = Duration.ofMinutes(1);
+-	private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
++	private static final Supplier<HttpClient> HTTP_CLIENT = com.google.common.base.Suppliers.memoize(() -> HttpClient.newBuilder()
+ 			.followRedirects(HttpClient.Redirect.ALWAYS)
+ 			.proxy(ProxySelector.getDefault())
+ 			.connectTimeout(TIMEOUT)
+-			.build();
++			.build());
+ 
+ 	public static DownloadBuilder create(String url) throws URISyntaxException {
+ 		return DownloadBuilder.create(url);
+@@ -121,7 +122,7 @@ public final class Download {
+ 		progressListener.onStart();
+ 
+ 		try {
+-			return HTTP_CLIENT.send(httpRequest, bodyHandler);
++			return HTTP_CLIENT.get().send(httpRequest, bodyHandler);
+ 		} catch (IOException | InterruptedException e) {
+ 			throw error(e, "Failed to download (%s)", url);
+ 		}
