@@ -168,3 +168,16 @@ index 42692aabc0c49424b9fab10ae84b627ce6f5a9d5..a3590f0e8e2bf32fc85ee98d4969713c
  		public static final String MINECRAFT = "minecraft";
  
  		public static final String MINECRAFT_COMPILE_LIBRARIES = "minecraftLibraries";
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/MultiProjectTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/MultiProjectTest.groovy
+index da86621384189424e7a03ba0a9d6e3dcddc64e51..c5669df049673b8800bf9d1cd2b3e9638c20a47d 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/integration/MultiProjectTest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/MultiProjectTest.groovy
+@@ -53,7 +53,7 @@ class MultiProjectTest extends Specification implements GradleProjectTestTrait {
+ 
+ 		gradle.hasOutputZipEntry("multiproject-1.0.0.jar", "META-INF/jars/example-1.0.0.jar")
+ 		gradle.hasOutputZipEntry("multiproject-1.0.0.jar", "META-INF/jars/core-1.0.0.jar")
+-		gradle.hasOutputZipEntry("multiproject-1.0.0.jar", "META-INF/jars/fabric-api-base-0.2.1+9354966b7d.jar")
++		gradle.hasOutputZipEntry("multiproject-1.0.0.jar", "META-INF/jars/fabric-api-base-0.3.0+f74f7c7d7d.jar")
+ 
+ 		where:
+ 		version << STANDARD_TEST_VERSIONS
