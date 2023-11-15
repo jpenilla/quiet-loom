@@ -30,3 +30,18 @@ index 538c3018b085067e3d0e99d6fc8a0530b07cf6e9..9713b31bab625acc9332d9170f626c9d
  		});
  	}
  }
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
+index 23a099af43e007602a2cdd424f6a3b3aff5771b4..f8f0e3e1cf39a5c64caee70da95ad626eae1ea1c 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
+@@ -83,8 +83,8 @@ class DebugLineNumbersTest extends Specification implements GradleProjectTestTra
+             '''
+ 		when:
+ 		// First generate sources
+-		def genSources = gradle.run(task: "genSources")
+-		genSources.task(":genSources").outcome == SUCCESS
++		def genSources = gradle.run(task: "genSourcesWithCfr")
++		genSources.task(":genSourcesWithCfr").outcome == SUCCESS
+ 
+ 		// Print out the source of the file
+ 		def lines = getClassSource(gradle, "net/minecraft/server/dedicated/ServerPropertiesLoader.java").lines().toList()
