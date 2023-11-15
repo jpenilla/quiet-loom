@@ -1,0 +1,98 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Wed, 15 Nov 2023 12:49:27 -0700
+Subject: [PATCH] Pass LinkOptions.NOFOLLOW_LINKS for exists checks
+
+
+diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
+index 024a35c8843e8f866f3885a1414124854bfe97ef..a560530a5673a178d12424906d22569abc3a1604 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
++++ b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
+@@ -28,6 +28,7 @@ import java.io.ByteArrayInputStream;
+ import java.io.IOException;
+ import java.nio.charset.StandardCharsets;
+ import java.nio.file.Files;
++import java.nio.file.LinkOption;
+ import java.nio.file.Path;
+ import java.util.function.Predicate;
+ import java.util.jar.Attributes;
+@@ -55,7 +56,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
+ 			isFabricMod = FabricModJsonFactory.containsMod(fs);
+ 			final Path manifestPath = fs.getPath(MANIFEST_PATH);
+ 
+-			if (Files.exists(manifestPath)) {
++			if (Files.exists(manifestPath, LinkOption.NOFOLLOW_LINKS)) {
+ 				final var manifest = new Manifest(new ByteArrayInputStream(Files.readAllBytes(manifestPath)));
+ 				final Attributes mainAttributes = manifest.getMainAttributes();
+ 				final String value = mainAttributes.getValue(MANIFEST_REMAP_KEY);
+@@ -68,7 +69,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
+ 
+ 			final Path installerPath = fs.getPath(INSTALLER_PATH);
+ 
+-			if (isFabricMod && Files.exists(installerPath)) {
++			if (isFabricMod && Files.exists(installerPath, LinkOption.NOFOLLOW_LINKS)) {
+ 				final JsonObject jsonObject = LoomGradlePlugin.GSON.fromJson(Files.readString(installerPath, StandardCharsets.UTF_8), JsonObject.class);
+ 				installerData = new InstallerData(artifact.version(), jsonObject);
+ 			}
+diff --git a/src/main/java/net/fabricmc/loom/util/FileSystemUtil.java b/src/main/java/net/fabricmc/loom/util/FileSystemUtil.java
+index 0a097c8312e36f3fba32a378a72648253b4f2ee1..43e1a342e7cc4bb1ee84367c2a1155416f462b97 100644
+--- a/src/main/java/net/fabricmc/loom/util/FileSystemUtil.java
++++ b/src/main/java/net/fabricmc/loom/util/FileSystemUtil.java
+@@ -31,6 +31,7 @@ import java.net.URI;
+ import java.nio.charset.StandardCharsets;
+ import java.nio.file.FileSystem;
+ import java.nio.file.Files;
++import java.nio.file.LinkOption;
+ import java.nio.file.NoSuchFileException;
+ import java.nio.file.Path;
+ import java.util.function.Supplier;
+@@ -46,7 +47,7 @@ public final class FileSystemUtil {
+ 		public byte[] readAllBytes(String path) throws IOException {
+ 			Path fsPath = getPath(path);
+ 
+-			if (Files.exists(fsPath)) {
++			if (Files.exists(fsPath, LinkOption.NOFOLLOW_LINKS)) {
+ 				return Files.readAllBytes(fsPath);
+ 			} else {
+ 				throw new NoSuchFileException(fsPath.toString());
+diff --git a/src/main/java/net/fabricmc/loom/util/ZipUtils.java b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
+index f6214aed8a99b99af52dcca76d78a36c2cf29213..6295d92313f0720ea278329b56029c04d6b8cb8c 100644
+--- a/src/main/java/net/fabricmc/loom/util/ZipUtils.java
++++ b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
+@@ -31,6 +31,7 @@ import java.io.InputStreamReader;
+ import java.io.UncheckedIOException;
+ import java.nio.charset.StandardCharsets;
+ import java.nio.file.Files;
++import java.nio.file.LinkOption;
+ import java.nio.file.NoSuchFileException;
+ import java.nio.file.Path;
+ import java.nio.file.StandardCopyOption;
+@@ -71,7 +72,7 @@ public class ZipUtils {
+ 		try (FileSystemUtil.Delegate fs = FileSystemUtil.getJarFileSystem(zip, false)) {
+ 			Path fsPath = fs.get().getPath(path);
+ 
+-			return Files.exists(fsPath);
++			return Files.exists(fsPath, LinkOption.NOFOLLOW_LINKS);
+ 		} catch (IOException e) {
+ 			throw new UncheckedIOException("Failed to check file from zip", e);
+ 		}
+diff --git a/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java b/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java
+index bbd229164587a7a291b480cd75226e4e23bdda6f..7145ed37434b995dab9d0aefb53bad3bbbaaa267 100644
+--- a/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java
++++ b/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java
+@@ -32,6 +32,7 @@ import java.io.Reader;
+ import java.io.UncheckedIOException;
+ import java.nio.charset.StandardCharsets;
+ import java.nio.file.Files;
++import java.nio.file.LinkOption;
+ import java.nio.file.Path;
+ import java.util.Optional;
+ 
+@@ -127,6 +128,6 @@ public final class FabricModJsonFactory {
+ 	}
+ 
+ 	public static boolean containsMod(FileSystemUtil.Delegate fs) {
+-		return Files.exists(fs.getPath(FABRIC_MOD_JSON));
++		return Files.exists(fs.getPath(FABRIC_MOD_JSON), LinkOption.NOFOLLOW_LINKS);
+ 	}
+ }
