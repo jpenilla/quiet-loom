@@ -413,7 +413,7 @@ index f58c485386bbf686967a3020c2326996da62441d..4b2a37ef4ee3edc283b8464f4d6b4221
  }
  
 diff --git a/src/test/resources/projects/multi-mc-versions/build.gradle b/src/test/resources/projects/multi-mc-versions/build.gradle
-index faa804c3e2416c4e6f25842f74436c4f215141a3..105d40b7a73285eb375889839cc83626c4c954db 100644
+index faa804c3e2416c4e6f25842f74436c4f215141a3..c8c1c53c713694adf5c3d934e921eb4cf5d468d1 100644
 --- a/src/test/resources/projects/multi-mc-versions/build.gradle
 +++ b/src/test/resources/projects/multi-mc-versions/build.gradle
 @@ -2,7 +2,7 @@ import groovy.json.JsonSlurper
@@ -425,6 +425,15 @@ index faa804c3e2416c4e6f25842f74436c4f215141a3..105d40b7a73285eb375889839cc83626
  }
  
  allprojects {
+@@ -19,7 +19,7 @@ def getMappingVersion(String mcVersion) {
+ }
+ 
+ subprojects {
+-	apply plugin: "fabric-loom"
++	apply plugin: "quiet-fabric-loom" // quiet
+ 
+ 	base {
+ 		archivesName = rootProject.name + "-" + project.name
 diff --git a/src/test/resources/projects/multiproject/build.gradle b/src/test/resources/projects/multiproject/build.gradle
 index ae3e637a0b52af9f00d9742c331f0cb943aaf9d4..bb46e17581f051767aacc9df45e8096486fc4468 100644
 --- a/src/test/resources/projects/multiproject/build.gradle
