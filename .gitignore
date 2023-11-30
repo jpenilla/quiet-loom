@@ -3,4 +3,4 @@
 /.gradle
 build
 .DS_Store
-/patched-loom
+/quiet-*-loom

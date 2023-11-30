@@ -1,0 +1,699 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Thu, 1 Jul 2021 21:06:34 -0700
+Subject: [PATCH] Build changes & rebrand
+
+
+diff --git a/.gitattributes b/.gitattributes
+index 36452a5b0cba931fd34b8179fc218c81b8208f03..9c62f78cffa160885fd599c0a4bf9e50c089611a 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -36,3 +36,9 @@
+ *.png           binary
+ *.so            binary
+ *.war           binary
++
++#
++# https://help.github.com/articles/dealing-with-line-endings/
++#
++# These are explicitly windows files and should use crlf
++*.bat           text eol=crlf
+diff --git a/build.gradle b/build.gradle
+index 287b0ce3db6ddcdb0d9184d67d02efabf09972cb..7284ef106748da25ae7c25a8cb02f49a3abd1206 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -5,11 +5,10 @@ plugins {
+ 	id 'idea'
+ 	id 'eclipse'
+ 	id 'groovy'
+-	id 'checkstyle'
++	// quiet - remove checkstyle
+ 	id 'jacoco'
+-	id 'codenarc'
+ 	alias(libs.plugins.kotlin) apply false // Delay this so we can perform magic 🪄 first.
+-	alias(libs.plugins.spotless)
++	// quiet - remove checkstyle
+ 	alias(libs.plugins.retry)
+ }
+ 
+@@ -49,19 +48,17 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+ 	}
+ }
+ 
+-group = "dev.architectury"
++group = "xyz.jpenilla" // quiet
+ def baseVersion = '1.4'
+ 
+ def ENV = System.getenv()
+-def runNumber = ENV.GITHUB_RUN_NUMBER ?: "9999"
+-
+-def isSnapshot = ENV.PR_NUM != null
+-
+-if (!isSnapshot) {
+-	version = baseVersion + "." + runNumber
++// quiet start
++if (ENV.GITHUB_RUN_NUMBER) {
++	version = baseVersion + '.' + ENV.GITHUB_RUN_NUMBER
+ } else {
+-	version = baseVersion + "-PR." + ENV.PR_NUM + "." + runNumber
++	version = baseVersion + '.local'
+ }
++// quiet end
+ 
+ logger.lifecycle(":building plugin v${version}")
+ 
+@@ -238,52 +235,12 @@ java {
+ 	targetCompatibility = JavaVersion.VERSION_17
+ }
+ 
+-spotless {
+-	java {
+-		licenseHeaderFile(rootProject.file("HEADER")).yearSeparator("-")
+-		targetExclude("**/loom/util/DownloadUtil.java", "**/loom/util/FileSystemUtil.java")
+-		targetExclude("**/dev/architectury/**")
+-	}
+-
+-	groovy {
+-		importOrder('java', 'javax', '', 'net.fabricmc', '\\#')
+-		licenseHeaderFile(rootProject.file("HEADER")).yearSeparator("-")
+-		greclipse()
+-	}
+-
+-	groovyGradle {
+-		target 'src/**/*.gradle', '*.gradle'
+-		greclipse()
+-
+-		targetExclude(
+-				// These files use a @MAPPINGS@ token which is not valid Groovy
+-				'**/projects/forge/simple/build.gradle',
+-				'**/projects/neoforge/simple/build.gradle'
+-				)
+-	}
+-
+-	kotlin {
+-		licenseHeaderFile(rootProject.file("HEADER")).yearSeparator("-")
+-		targetExclude("**/build.gradle.kts")
+-		targetExclude("src/test/resources/projects/*/**")
+-		ktlint()
+-	}
+-}
+-
+-checkstyle {
+-	configFile = file('checkstyle.xml')
+-	toolVersion = libs.versions.checkstyle.get()
+-}
+-
+-codenarc {
+-	toolVersion = libs.versions.codenarc.get()
+-	configFile = file("codenarc.groovy")
+-}
++// quiet - remove checkstyle
+ 
+ gradlePlugin {
+ 	plugins {
+ 		fabricLoom {
+-			id = 'dev.architectury.loom'
++			id = 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 			implementationClass = 'net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap'
+ 		}
+ 	}
+@@ -331,7 +288,6 @@ import org.w3c.dom.Node
+ 
+ publishing {
+ 	publications {
+-		if (isSnapshot) return
+ 
+ 			// Also publish a snapshot so people can use the latest version if they wish
+ 			snapshot(MavenPublication) { publication ->
+@@ -344,8 +300,8 @@ publishing {
+ 
+ 		// Manually crate the plugin marker for snapshot versions
+ 		snapshotPlugin(MavenPublication) {
+-			groupId 'dev.architectury.loom'
+-			artifactId 'dev.architectury.loom.gradle.plugin'
++			groupId 'xyz.jpenilla.quiet-architectury-loom' // quiet
++			artifactId 'xyz.jpenilla.quiet-architectury-loom.gradle.plugin' // quiet
+ 			version baseVersion + '-SNAPSHOT'
+ 
+ 			pom.withXml {
+@@ -365,13 +321,13 @@ publishing {
+ 	}
+ 
+ 	repositories {
+-		if (ENV.MAVEN_PASS != null) {
+-			maven {
+-				url = "https://deploy.shedaniel.me/"
+-				credentials {
+-					username = "shedaniel"
+-					password = ENV.MAVEN_PASS
+-				}
++		// quiet start
++		maven {
++			url("https://repo.jpenilla.xyz/snapshots/")
++			credentials {
++				username = System.getenv("JMP_REPO_USER")
++				password = System.getenv("JMP_REPO_PASSWORD")
++				// quiet end
+ 			}
+ 		}
+ 	}
+@@ -403,10 +359,10 @@ task writeActionsTestMatrix() {
+ 					return
+ 				}
+ 
+-				if (it.name.endsWith("FabricAPITest.groovy")) {
+-					// Arch: Disabled as it hangs
+-					return
+-				}
++				if (it.name.endsWith("FabricAPITest.groovy")) { // diff on change
++					// Arch: Disabled as it hangs // diff on change
++					return // diff on change
++				} // diff on change
+ 
+ 				def className = it.path.toString().replace(".groovy", "")
+ 				className = className.substring(className.lastIndexOf("integration/") + "integration/".length()).replace('/', '.')
+diff --git a/gradle/versions.gradle b/gradle/versions.gradle
+index 77f7890f5d30c7924f42c79249367f01fdf83318..98d29a89d5a63711eb7dff6b876e540acaec5303 100644
+--- a/gradle/versions.gradle
++++ b/gradle/versions.gradle
+@@ -22,7 +22,6 @@ def generateVersionConstants(def sourceSet, def catalogName, def sourcesName) {
+ 	}
+ 
+ 	sourceSet.java.srcDir task
+-	spotlessGroovyGradle.dependsOn task // Not quite sure why this is needed, but it fixes a warning.
+ 	compileKotlin.dependsOn task
+ 	sourcesJar.dependsOn task
+ }
+diff --git a/settings.gradle b/settings.gradle
+index 1856764627777899065d24f8ff6b936251afff54..cfbd37d74b37ce76f362c0a23dbb4930ca427d8b 100644
+--- a/settings.gradle
++++ b/settings.gradle
+@@ -1,4 +1,4 @@
+-rootProject.name = name
++rootProject.name = "quiet-architectury-loom" // quiet
+ 
+ dependencyResolutionManagement {
+ 	versionCatalogs {
+diff --git a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
+index 3f4833bc674ec44955425faa92d47541fb0b18b3..0e746e95f360f251f54407a4a96a5e8aa4e45ae5 100644
+--- a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
++++ b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
+@@ -87,8 +87,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
+ 		if (!loggedVersions.contains(LOOM_VERSION)) {
+ 			loggedVersions.add(LOOM_VERSION);
+ 			System.setProperty("loom.printed.logged", String.join(",", loggedVersions));
+-			project.getLogger().lifecycle("Architectury Loom: " + LOOM_VERSION);
+-			project.getLogger().lifecycle("This version of Architectury Loom is in beta! Please report any issues you encounter: https://github.com/architectury/architectury-loom/issues");
++			project.getLogger().lifecycle("Quiet Architectury Loom: " + LOOM_VERSION); // quiet
+ 		}
+ 
+ 		LibraryLocationLogger.logLibraryVersions();
+diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
+index 37b1ffafe8617793d51e7d533c434392dff72a87..54fbeeb0f5657d45336b7d78f5fed12a453caeed 100644
+--- a/src/main/java/net/fabricmc/loom/util/Constants.java
++++ b/src/main/java/net/fabricmc/loom/util/Constants.java
+@@ -27,7 +27,7 @@ package net.fabricmc.loom.util;
+ import org.objectweb.asm.Opcodes;
+ 
+ public class Constants {
+-	public static final String PLUGIN_ID = "dev.architectury.loom";
++	public static final String PLUGIN_ID = "xyz.jpenilla.quiet-architectury-loom";
+ 	public static final String LIBRARIES_BASE = "https://libraries.minecraft.net/";
+ 	public static final String RESOURCES_BASE = "https://resources.download.minecraft.net/";
+ 	public static final String VERSION_MANIFESTS = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
+index 7a4d82986e9a161908f76ebd88c6978846bace52..388bcb9ce44ec31eb46bf43068c6bdd04c821550 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
+@@ -37,6 +37,7 @@ import static net.fabricmc.loom.test.LoomTestConstants.*
+ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+ 
+ @Timeout(value = 30, unit = TimeUnit.MINUTES)
++@spock.lang.Ignore
+ class FabricAPITest extends Specification implements GradleProjectTestTrait {
+ 	private static final String API_VERSION = "0.0.0+loom"
+ 
+@@ -54,8 +55,8 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
+ 
+ 		// Set the version to something constant
+ 		gradle.buildGradle.text = gradle.buildGradle.text.replace('project.version + "+" + (ENV.GITHUB_RUN_NUMBER ? "" : "local-") + getBranch()', "\"$API_VERSION\"")
+-				.replace('id "fabric-loom" version "0.9.50"', 'id "dev.architectury.loom"')
+-				.replace('"fabric-loom"', '"dev.architectury.loom"')
++				.replaceAll('id "fabric-loom" version "([0-9.]+)"', 'id "xyz.jpenilla.quiet-architectury-loom"') // quiet
++				.replace('"fabric-loom"', '"xyz.jpenilla.quiet-architectury-loom"') // quiet
+ 
+ 		def server = ServerRunner.create(gradle.projectDir, "23w33a")
+ 				.withMod(gradle.getOutputFile("fabric-api-${API_VERSION}.jar"))
+diff --git a/src/test/resources/projects/accesswidener/build.gradle b/src/test/resources/projects/accesswidener/build.gradle
+index db62caeee6219cbac5a8e90e080ded4a04454cae..fe2d8c666c9eb486116d7b9d87edffaaa3866f9f 100644
+--- a/src/test/resources/projects/accesswidener/build.gradle
++++ b/src/test/resources/projects/accesswidener/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/decompile/build.gradle b/src/test/resources/projects/decompile/build.gradle
+index 103c113738bc0117729ba0ea8e5b8f94e6cfbc25..3d078858c526d88535867d43ca09339546390ecc 100644
+--- a/src/test/resources/projects/decompile/build.gradle
++++ b/src/test/resources/projects/decompile/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ }
+ 
+ dependencies {
+diff --git a/src/test/resources/projects/dependencyResolutionManagement/basic/build.gradle b/src/test/resources/projects/dependencyResolutionManagement/basic/build.gradle
+index 9d80b1bad2e68e7ac3d501463da3a4c8a0834daa..a9fe1e9aeb19fac2cc848159d6f42cc3e15618df 100644
+--- a/src/test/resources/projects/dependencyResolutionManagement/basic/build.gradle
++++ b/src/test/resources/projects/dependencyResolutionManagement/basic/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/dependencyResolutionManagement/projmap/build.gradle b/src/test/resources/projects/dependencyResolutionManagement/projmap/build.gradle
+index 7b772547f5ea7fa7c4a021cfdbc75805c9af0525..a59e73c5773d03f159345c0031f531b15973b923 100644
+--- a/src/test/resources/projects/dependencyResolutionManagement/projmap/build.gradle
++++ b/src/test/resources/projects/dependencyResolutionManagement/projmap/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/dependencyResolutionManagement/settings.gradle b/src/test/resources/projects/dependencyResolutionManagement/settings.gradle
+index fda5e86c677601656e9f3161feb9bac4d3cb885d..e66e0efe4bbb99e4a5a9d099b686a04e01469a3d 100644
+--- a/src/test/resources/projects/dependencyResolutionManagement/settings.gradle
++++ b/src/test/resources/projects/dependencyResolutionManagement/settings.gradle
+@@ -1,11 +1,11 @@
+ pluginManagement {
+ 	plugins {
+-		id 'dev.architectury.loom'
++		id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	}
+ }
+ 
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ }
+ 
+ dependencyResolutionManagement {
+diff --git a/src/test/resources/projects/forge/accessTransformer/build.gradle b/src/test/resources/projects/forge/accessTransformer/build.gradle
+index cecc62d242b6460535e84a99e23626d81de45988..6fb51255ea7886a2c7f3606f31dc6bd2e4c9a9a4 100644
+--- a/src/test/resources/projects/forge/accessTransformer/build.gradle
++++ b/src/test/resources/projects/forge/accessTransformer/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/forge/aw2At/build.gradle b/src/test/resources/projects/forge/aw2At/build.gradle
+index 7ed9dca7478d015498b6ca75d112c77b3d103e03..60f66089cfa674462dfc36a5e4809286e5b210d5 100644
+--- a/src/test/resources/projects/forge/aw2At/build.gradle
++++ b/src/test/resources/projects/forge/aw2At/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/forge/externalModDependency/build.gradle b/src/test/resources/projects/forge/externalModDependency/build.gradle
+index fede83e97fd9f96ad402d534152bbf12b717a237..0b2969fd5761396e96d1bd13e9b1f8dc4fd30ee2 100644
+--- a/src/test/resources/projects/forge/externalModDependency/build.gradle
++++ b/src/test/resources/projects/forge/externalModDependency/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/forge/legacyAw2AtMojmap/build.gradle b/src/test/resources/projects/forge/legacyAw2AtMojmap/build.gradle
+index f0326ce3f3ca4b24cb8f0fe76486187e0f678a2c..b7e39ab45c0562f253ee97ea41de084c043225d6 100644
+--- a/src/test/resources/projects/forge/legacyAw2AtMojmap/build.gradle
++++ b/src/test/resources/projects/forge/legacyAw2AtMojmap/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/forge/legacyAw2AtYarn/build.gradle b/src/test/resources/projects/forge/legacyAw2AtYarn/build.gradle
+index 967f25906bb08badbb1c20a304aaa63a26c3d958..0f764a60427972a1ec624c458628fa4f1e8e0b01 100644
+--- a/src/test/resources/projects/forge/legacyAw2AtYarn/build.gradle
++++ b/src/test/resources/projects/forge/legacyAw2AtYarn/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/forge/loggerConfig/build.gradle b/src/test/resources/projects/forge/loggerConfig/build.gradle
+index d6865c5e56dc6333eb026a04e37ba8b0fffe8afa..81b4625d368fdfa598c52c48e04b0b7a8fd9636b 100644
+--- a/src/test/resources/projects/forge/loggerConfig/build.gradle
++++ b/src/test/resources/projects/forge/loggerConfig/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ }
+ 
+ base {
+diff --git a/src/test/resources/projects/forge/simple/build.gradle b/src/test/resources/projects/forge/simple/build.gradle
+index 844f05b6b3ce2b54bd7e0cdda4b59f3017ff5829..9a25cd9ddd548f564a06b3a57a5076509f6343f0 100644
+--- a/src/test/resources/projects/forge/simple/build.gradle
++++ b/src/test/resources/projects/forge/simple/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/forge/simpleMixinAp/build.gradle b/src/test/resources/projects/forge/simpleMixinAp/build.gradle
+index a8f550144950c985eb1b0fd8212173b68d09f8d0..88c5adf7a0376371600362dea1a840cab41554f8 100644
+--- a/src/test/resources/projects/forge/simpleMixinAp/build.gradle
++++ b/src/test/resources/projects/forge/simpleMixinAp/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/forge/singleJar/build.gradle b/src/test/resources/projects/forge/singleJar/build.gradle
+index 99d3cd63e4c73e552c18b8bc4ef61357376f82cd..57d4b0130e0548d5f1db87c5c752e37726737275 100644
+--- a/src/test/resources/projects/forge/singleJar/build.gradle
++++ b/src/test/resources/projects/forge/singleJar/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/interfaceInjection/build.gradle b/src/test/resources/projects/interfaceInjection/build.gradle
+index 7d0a7c17e2693dabab246c42a5e0395ee3edb74d..fa92fbe46077c50ca7b171eb45ce2e462333fcc9 100644
+--- a/src/test/resources/projects/interfaceInjection/build.gradle
++++ b/src/test/resources/projects/interfaceInjection/build.gradle
+@@ -1,7 +1,7 @@
+ // This is used by a range of tests that append to this file before running the gradle tasks.
+ // Can be used for tests that require minimal custom setup
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/java16/build.gradle b/src/test/resources/projects/java16/build.gradle
+index 707cdc682d7b44adbee0be9c836e80a0a2488cc0..07f00f1c391226c6e3682a942f2745b4c2d0c07e 100644
+--- a/src/test/resources/projects/java16/build.gradle
++++ b/src/test/resources/projects/java16/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/kotlin/build.gradle.kts b/src/test/resources/projects/kotlin/build.gradle.kts
+index f1b6bb71a642d19cc6ec94a23e9d05f732806bfa..254914bce80ca36c8ce6fc19e58f618f852f4819 100644
+--- a/src/test/resources/projects/kotlin/build.gradle.kts
++++ b/src/test/resources/projects/kotlin/build.gradle.kts
+@@ -3,7 +3,7 @@ import java.util.Properties
+ plugins {
+ 	kotlin("jvm") version "1.7.22"
+ 	kotlin("plugin.serialization") version "1.7.22"
+-    id("dev.architectury.loom")
++	id("xyz.jpenilla.quiet-architectury-loom") // quiet
+ 	`maven-publish`
+ }
+ 
+diff --git a/src/test/resources/projects/legacy/build.gradle b/src/test/resources/projects/legacy/build.gradle
+index 481c139afe85e29f47b6d1ee258039db02dacea7..65850f37a38a21df86074d39019829d43ac245d4 100644
+--- a/src/test/resources/projects/legacy/build.gradle
++++ b/src/test/resources/projects/legacy/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ }
+ 
+ version = project.mod_version
+diff --git a/src/test/resources/projects/localFileDependency/build.gradle b/src/test/resources/projects/localFileDependency/build.gradle
+index 67e94cf412cf9b47b4d8e16f1ff101c00ba54282..73d0611230a66425c1fbc395be68edc4c7e114cf 100644
+--- a/src/test/resources/projects/localFileDependency/build.gradle
++++ b/src/test/resources/projects/localFileDependency/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/localRuntime/build.gradle b/src/test/resources/projects/localRuntime/build.gradle
+index bf5519d0b04b144eec0e9a0a1a8c771a3e5dc031..d3e6c5212aad2daffa83d2fecabceffdb9decec6 100644
+--- a/src/test/resources/projects/localRuntime/build.gradle
++++ b/src/test/resources/projects/localRuntime/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/maven/build.gradle b/src/test/resources/projects/maven/build.gradle
+index b79c63d5b5c56977f5eed17690f80ec9bad7446f..cdc942889d8bd184869040748b98dc223c43980d 100644
+--- a/src/test/resources/projects/maven/build.gradle
++++ b/src/test/resources/projects/maven/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/mavenLibrary/build.gradle b/src/test/resources/projects/mavenLibrary/build.gradle
+index 5f6642f60e589bce6c572f7b22a0c89dc8ba5e25..b42efff5bf28a40e3fe0a993402676cb782af9a8 100644
+--- a/src/test/resources/projects/mavenLibrary/build.gradle
++++ b/src/test/resources/projects/mavenLibrary/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/minimalBase/build.gradle b/src/test/resources/projects/minimalBase/build.gradle
+index dbe70455d45756ae2c7011578e80301a78c4d45d..249142a23b8ede823fc588515c2286ba717a0b8d 100644
+--- a/src/test/resources/projects/minimalBase/build.gradle
++++ b/src/test/resources/projects/minimalBase/build.gradle
+@@ -1,7 +1,7 @@
+ // This is used by a range of tests that append to this file before running the gradle tasks.
+ // Can be used for tests that require minimal custom setup
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/mixinApAutoRefmap/build.gradle b/src/test/resources/projects/mixinApAutoRefmap/build.gradle
+index ae698037c6fde1959b2e8ee170f3ee72f2212a92..d0c86f034be70e1f75dfb1b57501baf143e1abd1 100644
+--- a/src/test/resources/projects/mixinApAutoRefmap/build.gradle
++++ b/src/test/resources/projects/mixinApAutoRefmap/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'com.github.johnrengelman.shadow' version '7.0.0'
+ 	id 'maven-publish'
+ }
+diff --git a/src/test/resources/projects/mixinApSimple/build.gradle b/src/test/resources/projects/mixinApSimple/build.gradle
+index d368d500e90a92daaa0ba0e0404f1c55f8531382..5ae2f8d368eb9d0d7c747850ef40eabb0b05ee17 100644
+--- a/src/test/resources/projects/mixinApSimple/build.gradle
++++ b/src/test/resources/projects/mixinApSimple/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/modJavadoc/build.gradle b/src/test/resources/projects/modJavadoc/build.gradle
+index 986377fdc23151bbbe1be5b03e8e7796d80b87af..319037eabea9361969b96849ecdf6d2103f9baf2 100644
+--- a/src/test/resources/projects/modJavadoc/build.gradle
++++ b/src/test/resources/projects/modJavadoc/build.gradle
+@@ -1,7 +1,7 @@
+ // This is used by a range of tests that append to this file before running the gradle tasks.
+ // Can be used for tests that require minimal custom setup
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/mojangMappings/build.gradle b/src/test/resources/projects/mojangMappings/build.gradle
+index e8a66fa15665ffab6906e9f7073e6e9aac831a01..ecabb1678b2630ea4235b8d148f5b7bb89528cda 100644
+--- a/src/test/resources/projects/mojangMappings/build.gradle
++++ b/src/test/resources/projects/mojangMappings/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/multi-mc-versions/build.gradle b/src/test/resources/projects/multi-mc-versions/build.gradle
+index ef8182d72ed1ce419f286527e02758c85401f190..480731d93b52f0a36f1b6ab10238f5dc3349b62e 100644
+--- a/src/test/resources/projects/multi-mc-versions/build.gradle
++++ b/src/test/resources/projects/multi-mc-versions/build.gradle
+@@ -2,7 +2,7 @@ import groovy.json.JsonSlurper
+ 
+ plugins {
+ 	id "java"
+-	id 'dev.architectury.loom' apply false
++	id 'xyz.jpenilla.quiet-architectury-loom' apply false // quiet
+ }
+ 
+ allprojects {
+@@ -19,7 +19,7 @@ def getMappingVersion(String mcVersion) {
+ }
+ 
+ subprojects {
+-	apply plugin: "dev.architectury.loom"
++	apply plugin: "xyz.jpenilla.quiet-architectury-loom" // quiet
+ 
+ 	base {
+ 		archivesName = rootProject.name + "-" + project.name
+diff --git a/src/test/resources/projects/multiproject/build.gradle b/src/test/resources/projects/multiproject/build.gradle
+index 9786856226c636e2c8fe63ef18dafcafc494f13d..7002f39c015d9613dbca610be51ac5435311b80d 100644
+--- a/src/test/resources/projects/multiproject/build.gradle
++++ b/src/test/resources/projects/multiproject/build.gradle
+@@ -1,11 +1,11 @@
+ plugins {
+ 	id "java"
+ 	id "java-library"
+-	id 'dev.architectury.loom' apply false
++	id 'xyz.jpenilla.quiet-architectury-loom' apply false // quiet
+ }
+ 
+ allprojects {
+-	apply plugin: "dev.architectury.loom"
++	apply plugin: "xyz.jpenilla.quiet-architectury-loom"
+ 
+ 	version = "1.0.0"
+ 
+diff --git a/src/test/resources/projects/neoforge/simple/build.gradle b/src/test/resources/projects/neoforge/simple/build.gradle
+index 03a3d7c10f7e99fe6e83c9dd4ac1b9c0bb0b02c9..843d6abc9e995f27189bc1bc0fd98e7beaaaaea2 100644
+--- a/src/test/resources/projects/neoforge/simple/build.gradle
++++ b/src/test/resources/projects/neoforge/simple/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/parchment/build.gradle b/src/test/resources/projects/parchment/build.gradle
+index 9be2eddf4ad8d18b7646a671b7cb921b704a0ca9..fbc927af183a62f1b3f7ef2039259bd67afdb8ba 100644
+--- a/src/test/resources/projects/parchment/build.gradle
++++ b/src/test/resources/projects/parchment/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ }
+ 
+ repositories {
+diff --git a/src/test/resources/projects/reproducible/build.gradle b/src/test/resources/projects/reproducible/build.gradle
+index c866b265579609e51d0c72273488477a21237716..2a72b6c0c7a5b37d98bef73f66ba49b35a790c1a 100644
+--- a/src/test/resources/projects/reproducible/build.gradle
++++ b/src/test/resources/projects/reproducible/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/runconfigs/build.gradle b/src/test/resources/projects/runconfigs/build.gradle
+index 2b146cee076db3751b4958e50a71c8e5bf3c608b..c9ef83f0e2805a00945fd2930bbb726508668a3a 100644
+--- a/src/test/resources/projects/runconfigs/build.gradle
++++ b/src/test/resources/projects/runconfigs/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ }
+ 
+ loom {
+diff --git a/src/test/resources/projects/signed/build.gradle b/src/test/resources/projects/signed/build.gradle
+index c5ff324eb4fc7af316df92a7805c4b45a06739a0..9cd2d5484c040fd347d7a9ef7502299f808c9d5e 100644
+--- a/src/test/resources/projects/signed/build.gradle
++++ b/src/test/resources/projects/signed/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ 	id 'signing'
+ }
+diff --git a/src/test/resources/projects/simple/build.gradle b/src/test/resources/projects/simple/build.gradle
+index d17c31340012d0dc06931efb4231897513de36fc..c5f94cb6ca01c497e7f4fee33cdd2456c50a9a06 100644
+--- a/src/test/resources/projects/simple/build.gradle
++++ b/src/test/resources/projects/simple/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/splitSources/build.gradle b/src/test/resources/projects/splitSources/build.gradle
+index a074a191d98e99972184cbd41d7f145682b9dead..c48806804240b30de63cc95755ecdf9a6a87c3a5 100644
+--- a/src/test/resources/projects/splitSources/build.gradle
++++ b/src/test/resources/projects/splitSources/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom' version '0.12.local'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/transitiveAccesswidener/build.gradle b/src/test/resources/projects/transitiveAccesswidener/build.gradle
+index 986377fdc23151bbbe1be5b03e8e7796d80b87af..319037eabea9361969b96849ecdf6d2103f9baf2 100644
+--- a/src/test/resources/projects/transitiveAccesswidener/build.gradle
++++ b/src/test/resources/projects/transitiveAccesswidener/build.gradle
+@@ -1,7 +1,7 @@
+ // This is used by a range of tests that append to this file before running the gradle tasks.
+ // Can be used for tests that require minimal custom setup
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
+diff --git a/src/test/resources/projects/unpick/build.gradle b/src/test/resources/projects/unpick/build.gradle
+index a0d8b2234faf7646351b2e03fe49f8d9df2267f3..d309f90e57ef712b081bcbb74bb857a337d810d6 100644
+--- a/src/test/resources/projects/unpick/build.gradle
++++ b/src/test/resources/projects/unpick/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ }
+ 
+ dependencies {

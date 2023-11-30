@@ -6,7 +6,10 @@ on:
 jobs:
   test:
     strategy:
+      fail-fast: false
+      max-parallel: 1
       matrix:
+        buildDir: [ "quiet-fabric-loom", "quiet-architectury-loom" ]
         java: [ "17" ]
         os: [ "ubuntu-latest" ]
     # Only run on PRs if the source branch is on someone else's repo
@@ -29,4 +32,11 @@ jobs:
       - name: "apply patches"
         run: "git submodule update --init && ./gradlew applyPatches"
       - name: "build and test"
-        run: "cd patched-loom && ./gradlew build"
+        run: "cd ${{ matrix.buildDir }} && ./gradlew build"
+      - name: "archive test results"
+        uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+          name: "test-results-${{ matrix.buildDir }}-java${{ matrix.java }}-${{ matrix.os }}"
+          path: |
+            */build/reports/

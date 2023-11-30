@@ -1,3 +1,6 @@
 [submodule "fabric-loom"]
-	path = fabric-loom
+	path = upstreams/fabric-loom
 	url = https://github.com/FabricMC/fabric-loom.git
+[submodule "upstreams/architectury-loom"]
+	path = upstreams/architectury-loom
+	url = https://github.com/architectury/architectury-loom.git

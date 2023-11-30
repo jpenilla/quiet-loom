@@ -6,7 +6,9 @@ on:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
+        buildDir: [ "quiet-fabric-loom", "quiet-architectury-loom" ]
         java: [ "17" ]
         os: [ "ubuntu-latest" ]
     # Only run on PRs if the source branch is on someone else's repo
@@ -29,10 +31,10 @@ jobs:
       - name: "apply patches"
         run: "git submodule update --init && ./gradlew applyPatches"
       - name: "build"
-        run: "cd patched-loom && ./gradlew build -x check"
+        run: "cd ${{ matrix.buildDir }} && ./gradlew build -x check"
       - name: "publish"
         if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/dev/') }}
-        run: "cd patched-loom && ./gradlew publish -x check"
+        run: "cd ${{ matrix.buildDir }} && ./gradlew publish -x check"
         env:
           JMP_REPO_USER: ${{ secrets.JMP_REPO_USER }}
           JMP_REPO_PASSWORD: ${{ secrets.JMP_REPO_PASSWORD }}

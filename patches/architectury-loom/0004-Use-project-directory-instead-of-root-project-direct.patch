@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Sat, 9 Oct 2021 13:47:46 -0700
+Subject: [PATCH] Use project directory instead of root project directory for
+ runs
+
+
+diff --git a/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java b/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
+index bdab49b4a85c339f27e00a5023b0c2b81e0378e3..8efdb0d1383bab5e978e141c1cc8c7939c737937 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
++++ b/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
+@@ -174,7 +174,10 @@ public class RunConfig {
+ 		runConfig.configName = configName;
+ 		populate(project, extension, runConfig, environment);
+ 		runConfig.ideaModuleName = IdeaUtils.getIdeaModuleName(new SourceSetReference(sourceSet, project));
+-		runConfig.runDirIdeaUrl = "file://$PROJECT_DIR$/" + runDir;
++		// quiet start
++		final Path relativeProjectPath = project.getRootDir().toPath().relativize(project.getProjectDir().toPath());
++		runConfig.runDirIdeaUrl = "file://$PROJECT_DIR$/" + relativeProjectPath + "/" + runDir;
++		// quiet end
+ 		runConfig.runDir = runDir;
+ 		runConfig.sourceSet = sourceSet;
+ 		runConfig.environment = environment;

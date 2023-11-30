@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Thu, 1 Jul 2021 20:46:20 -0700
+Subject: [PATCH] Remove annoying warning
+
+
+diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
+index a6adf4e46b937de6a2786bf4d352e6f4bebdf180..c3a1d2f94c8665bd6efa30450b5109d103205525 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
++++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
+@@ -51,9 +51,6 @@ public record MojangMappingLayer(String minecraftVersion,
+ 	private static final Pattern SYNTHETIC_NAME_PATTERN = Pattern.compile("^(access|this|val\\$this|lambda\\$.*)\\$[0-9]+$");
+ 	@Override
+ 	public void visit(MappingVisitor mappingVisitor) throws IOException {
+-		if (!silenceLicense.isSilent()) {
+-			printMappingsLicense(clientMappings);
+-		}
+ 
+ 		// Filter out field names matching the pattern
+ 		DstNameFilterMappingVisitor nameFilter = new DstNameFilterMappingVisitor(mappingVisitor, SYNTHETIC_NAME_PATTERN);
+@@ -68,24 +65,6 @@ public record MojangMappingLayer(String minecraftVersion,
+ 		}
+ 	}
+ 
+-	private void printMappingsLicense(Path clientMappings) {
+-		try (BufferedReader clientBufferedReader = Files.newBufferedReader(clientMappings, StandardCharsets.UTF_8)) {
+-			logger().warn("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+-			logger().warn("Using of the official minecraft mappings is at your own risk!");
+-			logger().warn("Please make sure to read and understand the following license:");
+-			logger().warn("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+-			String line;
+-
+-			while ((line = clientBufferedReader.readLine()).startsWith("#")) {
+-				logger().warn(line);
+-			}
+-
+-			logger().warn("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+-		} catch (IOException e) {
+-			throw new RuntimeException("Failed to read client mappings", e);
+-		}
+-	}
+-
+ 	@Override
+ 	public MappingsNamespace getSourceNamespace() {
+ 		return MappingsNamespace.OFFICIAL;
