@@ -81,3 +81,23 @@ index 6ea2863524cc0da3665b0dac0b4e7e53bb16f1e4..0ac4ee963caff903d175457d551b8480
  				AtRemapper.remap(project, output, mappings);
  				CoreModClassRemapper.remapJar(project, extension.getPlatform().get(), output, mappings);
  			}
+diff --git a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
+index 53ad034ec0acdd4e6aaf131aed801b0a1ce25971..a6f04669d12dfe2a406d4b204cb9f1919b2d0c97 100644
+--- a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
++++ b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
+@@ -113,6 +113,15 @@ public class SourceRemapper {
+ 	}
+ 
+ 	private void remapSourcesInner(File source, File destination) throws Exception {
++		if (source.isFile()) {
++			boolean skipRemap = LoomGradleExtension.get(project).getMappingConfiguration() instanceof net.fabricmc.loom.configuration.providers.forge.FieldMigratedMappingConfiguration m
++					&& m.isMojangMappedProject()
++					&& IntermediaryNamespaces.intermediaryNamespace(project) == MappingsNamespace.MOJANG;
++			if (skipRemap) {
++				Files.copy(source.toPath(), destination.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
++				return;
++			}
++		}
+ 		project.getLogger().info(":remapping source jar");
+ 		Mercury mercury = getMercuryInstance();
+ 
