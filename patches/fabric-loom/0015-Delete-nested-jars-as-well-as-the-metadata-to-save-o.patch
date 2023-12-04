@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Sun, 3 Dec 2023 19:07:19 -0700
+Subject: [PATCH] Delete nested jars as well as the metadata to save on disk
+ space
+
+
+diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java b/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
+index 3ed36eef9786d0c89a45d5552d05be292425cee8..fa8a82f59580a0e9fbb074ba7bbbae28964fab7d 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
++++ b/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
+@@ -121,6 +121,7 @@ public class ModProcessor {
+ 				json.remove("jars");
+ 				return json;
+ 			}));
++			ZipUtils.deleteRecursiveIfExists(path, "META-INF/jars");
+ 		} catch (IOException e) {
+ 			throw new UncheckedIOException("Failed to strip nested jars from %s".formatted(path), e);
+ 		}
+diff --git a/src/main/java/net/fabricmc/loom/util/ZipUtils.java b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
+index 15c59bbf3afa23fc68911bc7b306f5ca06b345b2..ba7b03d47fb8fd4b11a1ad4c8134f98c17d6ce00 100644
+--- a/src/main/java/net/fabricmc/loom/util/ZipUtils.java
++++ b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
+@@ -186,6 +186,14 @@ public class ZipUtils {
+ 		}
+ 	}
+ 
++	public static void deleteRecursiveIfExists(Path zip, String path) throws IOException {
++		try (FileSystemUtil.Delegate fs = FileSystemUtil.getJarFileSystem(zip, false)) {
++			if (Files.exists(fs.getPath(path))) {
++				Files.walkFileTree(fs.getPath(path), new DeletingFileVisitor());
++			}
++		}
++	}
++
+ 	public static int transformString(Path zip, Collection<Pair<String, UnsafeUnaryOperator<String>>> transforms) throws IOException {
+ 		return transformString(zip, transforms.stream());
+ 	}
