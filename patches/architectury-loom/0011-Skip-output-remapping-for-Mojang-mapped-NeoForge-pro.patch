@@ -121,7 +121,7 @@ index 9569968aa0c6917e9d090c4b4cf060749c8e96e1..b8b1be7679eaea32b1e9c876100e3fcd
  		});
  	}
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-index ff2d328dd69f147313ddeaa693eb1f8ffacf5e3c..a16c5d823a83c8de3447df357588e379db965cac 100644
+index 38d01a958b6e03a4d9ee91aad5d5b47cef16a52f..4baf53a1dce58101ac47bddaa401a93e653e51df 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
 @@ -29,6 +29,7 @@ import java.io.IOException;
@@ -140,7 +140,7 @@ index ff2d328dd69f147313ddeaa693eb1f8ffacf5e3c..a16c5d823a83c8de3447df357588e379
  import org.slf4j.Logger;
  import org.slf4j.LoggerFactory;
  
-@@ -201,7 +203,12 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+@@ -210,7 +212,12 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
  				}
  			}
  
@@ -154,7 +154,7 @@ index ff2d328dd69f147313ddeaa693eb1f8ffacf5e3c..a16c5d823a83c8de3447df357588e379
  			params.getRemapClasspath().from(getClasspath());
  			params.getMultiProjectOptimisation().set(getLoomExtension().multiProjectOptimisation());
  
-@@ -294,11 +301,15 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+@@ -303,11 +310,15 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
  	public abstract static class RemapAction extends AbstractRemapAction<RemapParams> {
  		private static final Logger LOGGER = LoggerFactory.getLogger(RemapAction.class);
  
@@ -173,7 +173,7 @@ index ff2d328dd69f147313ddeaa693eb1f8ffacf5e3c..a16c5d823a83c8de3447df357588e379
  		}
  
  		@Override
-@@ -310,9 +321,13 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+@@ -319,9 +330,13 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
  					prepare();
  				}
  
@@ -189,7 +189,7 @@ index ff2d328dd69f147313ddeaa693eb1f8ffacf5e3c..a16c5d823a83c8de3447df357588e379
  
  				if (getParameters().getClientOnlyEntries().isPresent()) {
  					markClientOnlyClasses();
-@@ -333,7 +348,9 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+@@ -342,7 +357,9 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
  				rewriteJar();
  
  				if (!getParameters().getMultiProjectOptimisation().get()) {
@@ -200,7 +200,7 @@ index ff2d328dd69f147313ddeaa693eb1f8ffacf5e3c..a16c5d823a83c8de3447df357588e379
  				}
  
  				LOGGER.debug("Finished remapping {}", inputFile);
-@@ -350,10 +367,16 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+@@ -359,10 +376,16 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
  
  		private void prepare() {
  			final Path inputFile = getParameters().getInputFile().getAsFile().get().toPath();
@@ -218,7 +218,7 @@ index ff2d328dd69f147313ddeaa693eb1f8ffacf5e3c..a16c5d823a83c8de3447df357588e379
  			try (OutputConsumerPath outputConsumer = new OutputConsumerPath.Builder(outputFile).build()) {
  				outputConsumer.addNonClassFiles(inputFile);
  				tinyRemapper.apply(outputConsumer, tinyRemapperService.getOrCreateTag(inputFile));
-@@ -408,6 +431,10 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+@@ -417,6 +440,10 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
  		}
  
  		private byte[] remapAccessWidener(byte[] input) {
@@ -229,7 +229,7 @@ index ff2d328dd69f147313ddeaa693eb1f8ffacf5e3c..a16c5d823a83c8de3447df357588e379
  			int version = AccessWidenerReader.readVersion(input);
  
  			AccessWidenerWriter writer = new AccessWidenerWriter(version);
-@@ -471,7 +498,7 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+@@ -480,7 +507,7 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
  	}
  
  	@Internal

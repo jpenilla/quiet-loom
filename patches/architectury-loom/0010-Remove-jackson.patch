@@ -175,7 +175,7 @@ index b84557f3064151cf5e76e32d74eac0c762a0d2a6..40fa937d85f592c3856afdd00c985606
  		}
  
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index 54fbeeb0f5657d45336b7d78f5fed12a453caeed..57e07cbb8ed2ccf38e892a7e2250d097652bb6c1 100644
+index 69998b9c46776ee949c5ccbbab773a8511418103..124b805c141339994a8d28e0dddaad91600a0c43 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -24,6 +24,9 @@
@@ -188,7 +188,7 @@ index 54fbeeb0f5657d45336b7d78f5fed12a453caeed..57e07cbb8ed2ccf38e892a7e2250d097
  import org.objectweb.asm.Opcodes;
  
  public class Constants {
-@@ -150,6 +153,10 @@ public class Constants {
+@@ -151,6 +154,10 @@ public class Constants {
  		public static final String LIBRARY_PROCESSORS = "fabric.loom.libraryProcessors";
  	}
  
