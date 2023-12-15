@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Sat, 2 Dec 2023 12:39:48 -0700
+Subject: [PATCH] Don't resolve source artifacts in CI
+
+
+diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java b/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java
+index baf4e5305c1eb5009b651bdf353f53734101a531..96bb844aad0e69b0581695b9aeb186c63535f102 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java
++++ b/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java
+@@ -264,6 +264,10 @@ public class ModConfigurationRemapper {
+ 
+ 	@Nullable
+ 	public static Path findSources(Project project, ResolvedArtifact artifact) {
++		if (isCIBuild()) {
++			return null;
++		}
++
+ 		final DependencyHandler dependencies = project.getDependencies();
+ 
+ 		@SuppressWarnings("unchecked") ArtifactResolutionQuery query = dependencies.createArtifactResolutionQuery()

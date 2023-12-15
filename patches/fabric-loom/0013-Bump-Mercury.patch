@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Thu, 30 Nov 2023 14:55:30 -0700
+Subject: [PATCH] Bump Mercury
+
+
+diff --git a/gradle/libs.versions.toml b/gradle/libs.versions.toml
+index 08e91098dcd59de779b2946040968609062a205a..932362d353b1fd1016656b52fc8d48ef88111b08 100644
+--- a/gradle/libs.versions.toml
++++ b/gradle/libs.versions.toml
+@@ -11,7 +11,7 @@ tiny-remapper = "0.8.9"
+ access-widener = "2.1.0"
+ mapping-io = "0.4.2"
+ lorenz-tiny = "4.0.2"
+-mercury = "0.4.0"
++mercury = "0.4.1"
+ kotlinx-metadata = "0.7.0"
+ 
+ # Plugins

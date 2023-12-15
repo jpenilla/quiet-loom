@@ -4,26 +4,40 @@ Date: Thu, 1 Jul 2021 21:06:34 -0700
 Subject: [PATCH] Build changes & rebrand
 
 
+diff --git a/.gitattributes b/.gitattributes
+index 36452a5b0cba931fd34b8179fc218c81b8208f03..9c62f78cffa160885fd599c0a4bf9e50c089611a 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -36,3 +36,9 @@
+ *.png           binary
+ *.so            binary
+ *.war           binary
++
++#
++# https://help.github.com/articles/dealing-with-line-endings/
++#
++# These are explicitly windows files and should use crlf
++*.bat           text eol=crlf
 diff --git a/build.gradle b/build.gradle
-index 2db6d937608db52aff52a989015257b52e1d0a86..626eb8cd06b79432f542e9cd9f66d129318a259c 100644
+index 014f8da9a6d07b509d938de7c6090c1b3b8de573..b4304c7e505c88537aa3e204fb17c167f780af79 100644
 --- a/build.gradle
 +++ b/build.gradle
-@@ -5,11 +5,12 @@ plugins {
+@@ -5,11 +5,10 @@ plugins {
  	id 'idea'
  	id 'eclipse'
  	id 'groovy'
 -	id 'checkstyle'
-+	// id 'checkstyle' // quiet - remove checkstyle
++	// quiet - remove checkstyle
  	id 'jacoco'
- 	id 'codenarc'
- 	id "org.jetbrains.kotlin.jvm" version "1.5.31" // Must match the version included with gradle.
- 	id "com.diffplug.spotless" version "5.14.1"
-+	id "com.adarshr.test-logger" version "3.2.0" // quiet
+-	id 'codenarc'
+ 	alias(libs.plugins.kotlin) apply false // Delay this so we can perform magic 🪄 first.
+-	alias(libs.plugins.spotless)
++	// quiet - remove checkstyle
+ 	alias(libs.plugins.retry)
  }
  
- sourceCompatibility = 17
-@@ -31,8 +32,10 @@ archivesBaseName = project.name
- def baseVersion = '0.11'
+@@ -53,8 +52,10 @@ group = 'net.fabricmc'
+ def baseVersion = '1.4'
  
  def ENV = System.getenv()
 -if (ENV.BUILD_NUMBER) {
@@ -35,24 +49,46 @@ index 2db6d937608db52aff52a989015257b52e1d0a86..626eb8cd06b79432f542e9cd9f66d129
  } else {
  	version = baseVersion + '.local'
  }
-@@ -150,10 +153,13 @@ spotless {
- 	}
+@@ -214,45 +215,12 @@ java {
+ 	targetCompatibility = JavaVersion.VERSION_17
  }
  
+-spotless {
+-	java {
+-		licenseHeaderFile(rootProject.file("HEADER")).yearSeparator("-")
+-		targetExclude("**/loom/util/DownloadUtil.java")
+-	}
+-
+-	groovy {
+-		importOrder('java', 'javax', '', 'net.fabricmc', '\\#')
+-		licenseHeaderFile(rootProject.file("HEADER")).yearSeparator("-")
+-		greclipse()
+-	}
+-
+-	groovyGradle {
+-		target 'src/**/*.gradle', '*.gradle'
+-		greclipse()
+-	}
+-
+-	kotlin {
+-		licenseHeaderFile(rootProject.file("HEADER")).yearSeparator("-")
+-		targetExclude("**/build.gradle.kts")
+-		targetExclude("src/test/resources/projects/*/**")
+-		ktlint()
+-	}
+-}
+-
 -checkstyle {
 -	configFile = file('checkstyle.xml')
--	toolVersion = '9.2'
+-	toolVersion = libs.versions.checkstyle.get()
+-}
+-
+-codenarc {
+-	toolVersion = libs.versions.codenarc.get()
+-	configFile = file("codenarc.groovy")
+-}
 +// quiet - remove checkstyle
-+
-+// quiet start
-+testlogger {
-+	theme = com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA_PARALLEL
- }
-+// quiet end
  
- codenarc {
- 	toolVersion = "2.2.0"
-@@ -163,7 +169,7 @@ codenarc {
  gradlePlugin {
  	plugins {
  		fabricLoom {
@@ -61,7 +97,7 @@ index 2db6d937608db52aff52a989015257b52e1d0a86..626eb8cd06b79432f542e9cd9f66d129
  			implementationClass = 'net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap'
  		}
  	}
-@@ -214,8 +220,10 @@ publishing {
+@@ -311,8 +279,10 @@ publishing {
  
  		// Manually crate the plugin marker for snapshot versions
  		snapshotPlugin(MavenPublication) { publication ->
@@ -74,7 +110,7 @@ index 2db6d937608db52aff52a989015257b52e1d0a86..626eb8cd06b79432f542e9cd9f66d129
  			version baseVersion + '-SNAPSHOT'
  
  			pom.withXml({
-@@ -227,7 +235,7 @@ publishing {
+@@ -324,7 +294,7 @@ publishing {
  				Node groupId = dependency.appendChild(document.createElement('groupId'))
  				groupId.setTextContent('net.fabricmc')
  				Node artifactId = dependency.appendChild(document.createElement('artifactId'))
@@ -83,7 +119,7 @@ index 2db6d937608db52aff52a989015257b52e1d0a86..626eb8cd06b79432f542e9cd9f66d129
  				Node version = dependency.appendChild(document.createElement('version'))
  				version.setTextContent(baseVersion + '-SNAPSHOT')
  			})
-@@ -235,13 +243,13 @@ publishing {
+@@ -332,13 +302,13 @@ publishing {
  	}
  	repositories {
  		maven {
@@ -103,43 +139,68 @@ index 2db6d937608db52aff52a989015257b52e1d0a86..626eb8cd06b79432f542e9cd9f66d129
  		}
  	}
  }
+diff --git a/gradle/versions.gradle b/gradle/versions.gradle
+index 77f7890f5d30c7924f42c79249367f01fdf83318..98d29a89d5a63711eb7dff6b876e540acaec5303 100644
+--- a/gradle/versions.gradle
++++ b/gradle/versions.gradle
+@@ -22,7 +22,6 @@ def generateVersionConstants(def sourceSet, def catalogName, def sourcesName) {
+ 	}
+ 
+ 	sourceSet.java.srcDir task
+-	spotlessGroovyGradle.dependsOn task // Not quite sure why this is needed, but it fixes a warning.
+ 	compileKotlin.dependsOn task
+ 	sourcesJar.dependsOn task
+ }
 diff --git a/settings.gradle b/settings.gradle
-index 885070a6d762361cb5edf6ce1f85a72e5b353407..3f0777d21b41a8c7aa32f04c7e32fe6f4d171916 100644
+index 039a49da24b9cbae596a5d27ff04d13ef76e104e..2bc847c77078162e40f0ced0af0379f12ea48ff7 100644
 --- a/settings.gradle
 +++ b/settings.gradle
-@@ -1,3 +1,3 @@
+@@ -1,4 +1,4 @@
 -rootProject.name = name
 +rootProject.name = "quiet-fabric-loom" // quiet
  
- include "bootstrap"
-\ No newline at end of file
+ dependencyResolutionManagement {
+ 	versionCatalogs {
 diff --git a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
-index 096c1b816359e037a8aa3512dd6bb3d0cb4851bb..d261e83960452f8cf3531d999c4ce5e9eacd4ee1 100644
+index 8231476d474a431b632ee75251dbc76e9212bc7f..c37ebd5c2ee12867a86e61bbc00aa21f20ab26a8 100644
 --- a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
 +++ b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
-@@ -62,7 +62,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
+@@ -79,7 +79,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
  	}
  
  	public void apply(Project project) {
 -		project.getLogger().lifecycle("Fabric Loom: " + LOOM_VERSION);
 +		project.getLogger().lifecycle("Quiet Fabric Loom: " + LOOM_VERSION); // quiet
+ 		LibraryLocationLogger.logLibraryVersions();
  
- 		refreshDeps = project.getGradle().getStartParameter().isRefreshDependencies() || Boolean.getBoolean("loom.refresh");
+ 		// Apply default plugins
+diff --git a/src/main/java/net/fabricmc/loom/util/gradle/GradleUtils.java b/src/main/java/net/fabricmc/loom/util/gradle/GradleUtils.java
+index dbe9144276405ca3206c88f19dae49d643ee163f..105b8e60ef0cc56196ebfc9df214194ed38e0495 100644
+--- a/src/main/java/net/fabricmc/loom/util/gradle/GradleUtils.java
++++ b/src/main/java/net/fabricmc/loom/util/gradle/GradleUtils.java
+@@ -55,7 +55,7 @@ public final class GradleUtils {
+ 	}
  
+ 	public static boolean isLoomProject(Project project) {
+-		return project.getPluginManager().hasPlugin("fabric-loom");
++		return project.getPluginManager().hasPlugin("quiet-fabric-loom"); // quiet
+ 	}
+ 
+ 	public static Provider<Boolean> getBooleanPropertyProvider(Project project, String key) {
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-index 0bfbf172886ff02c292ff03987bbb84f24dbad5e..fa5d783b912661a25cc0ce7060ac78e5c14a98fc 100644
+index f46cc99007f612d2e10429c7b61a3a4588025ed9..de2026e33e05a285cffd60012215820e85704d01 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-@@ -51,6 +51,7 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
+@@ -54,6 +54,7 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
  
- 			// Set the version to something constant
- 			gradle.buildGradle.text = gradle.buildGradle.text.replace('project.version + "+" + (ENV.GITHUB_RUN_NUMBER ? "" : "local-") + getBranch()', "\"$API_VERSION\"")
-+					.replace("fabric-loom", "quiet-fabric-loom") // quiet
+ 		// Set the version to something constant
+ 		gradle.buildGradle.text = gradle.buildGradle.text.replace('project.version + "+" + (ENV.GITHUB_RUN_NUMBER ? "" : "local-") + getBranch()', "\"$API_VERSION\"")
++				.replace("fabric-loom", "quiet-fabric-loom") // quiet
  
- 			def server = ServerRunner.create(gradle.projectDir, "1.17.1")
- 										.withMod(gradle.getOutputFile("fabric-api-${API_VERSION}.jar"))
+ 		def server = ServerRunner.create(gradle.projectDir, "23w33a")
+ 				.withMod(gradle.getOutputFile("fabric-api-${API_VERSION}.jar"))
 diff --git a/src/test/resources/projects/accesswidener/build.gradle b/src/test/resources/projects/accesswidener/build.gradle
-index 9fa3cc36ef23ee7f9a03120624596c6fe1788de4..6b033c7b0002832af062c1acb867b3304ff88218 100644
+index af697460cc9366f08ac6084c7d5dba1244426dca..1c3b783fe004c25788c5796a6cf9ddc276fbfc03 100644
 --- a/src/test/resources/projects/accesswidener/build.gradle
 +++ b/src/test/resources/projects/accesswidener/build.gradle
 @@ -1,5 +1,5 @@
@@ -161,7 +222,7 @@ index 993ac667071e4e3e2b1a8301121e817950663d61..b38fc44fb5f10c691e2d01b6d1b1e975
  
  dependencies {
 diff --git a/src/test/resources/projects/dependencyResolutionManagement/basic/build.gradle b/src/test/resources/projects/dependencyResolutionManagement/basic/build.gradle
-index c7b6ef6c0a20c1d4b2936dcbdf222f201be41ccc..5cada09eb9648958f9748ff77046bf69f2d37f41 100644
+index 1ad70fd35b62504694311c46182f7004762e2213..a78671819753a6da6e3855c53681d4e2fb55107d 100644
 --- a/src/test/resources/projects/dependencyResolutionManagement/basic/build.gradle
 +++ b/src/test/resources/projects/dependencyResolutionManagement/basic/build.gradle
 @@ -1,5 +1,5 @@
@@ -172,7 +233,7 @@ index c7b6ef6c0a20c1d4b2936dcbdf222f201be41ccc..5cada09eb9648958f9748ff77046bf69
  }
  
 diff --git a/src/test/resources/projects/dependencyResolutionManagement/projmap/build.gradle b/src/test/resources/projects/dependencyResolutionManagement/projmap/build.gradle
-index 6472ec7e63ab88f17b626c68393faca58042a8d2..d09f8dba9f427000af38974497c434753a810b72 100644
+index 11f94b3c2b6defeca5e16769192b0dee0d73b547..ab22b15f182c8734f1a5e89bf74eb651e4ce2931 100644
 --- a/src/test/resources/projects/dependencyResolutionManagement/projmap/build.gradle
 +++ b/src/test/resources/projects/dependencyResolutionManagement/projmap/build.gradle
 @@ -1,5 +1,5 @@
@@ -183,25 +244,25 @@ index 6472ec7e63ab88f17b626c68393faca58042a8d2..d09f8dba9f427000af38974497c43475
  }
  
 diff --git a/src/test/resources/projects/dependencyResolutionManagement/settings.gradle b/src/test/resources/projects/dependencyResolutionManagement/settings.gradle
-index c05e369995a4d8c5479de657d6c8ab52a6cba940..311b16a654c8e51f2eeaf3a090f883ba2f020f42 100644
+index 2c075f03ad35f9065fc5d9e501a236ede735a016..0218448da07934bccc350f4af49af6bd9f476945 100644
 --- a/src/test/resources/projects/dependencyResolutionManagement/settings.gradle
 +++ b/src/test/resources/projects/dependencyResolutionManagement/settings.gradle
 @@ -1,11 +1,11 @@
  pluginManagement {
-     plugins {
--        id 'fabric-loom'
-+        id 'quiet-fabric-loom' // quiet
-     }
+ 	plugins {
+-		id 'fabric-loom'
++		id 'quiet-fabric-loom' // quiet
+ 	}
  }
  
  plugins {
--    id 'fabric-loom'
-+    id 'quiet-fabric-loom' // quiet
+-	id 'fabric-loom'
++	id 'quiet-fabric-loom' // quiet
  }
  
  dependencyResolutionManagement {
 diff --git a/src/test/resources/projects/interfaceInjection/build.gradle b/src/test/resources/projects/interfaceInjection/build.gradle
-index 52f1fc39f472e431795ddfe94cd85c6a01eade48..b374f3b02da2f1952df09e75759a2405d10c7c68 100644
+index e631fd01bbce95d0eb6c494034cfe5fa5ec781f5..de401f596ab8eaa266cde25cc18c5c80ad66fe5e 100644
 --- a/src/test/resources/projects/interfaceInjection/build.gradle
 +++ b/src/test/resources/projects/interfaceInjection/build.gradle
 @@ -1,7 +1,7 @@
@@ -214,7 +275,7 @@ index 52f1fc39f472e431795ddfe94cd85c6a01eade48..b374f3b02da2f1952df09e75759a2405
  }
  
 diff --git a/src/test/resources/projects/java16/build.gradle b/src/test/resources/projects/java16/build.gradle
-index 45acf714efb54893e7867807d3bed47aa1a58223..93fe880c150bf047a93ab5d3ccb39954b859904d 100644
+index 018aeb560dad93d12ab7646fb1cd86c14cbc866d..0e26c2c957ff24bd7c2164a19fbcab019254d3a9 100644
 --- a/src/test/resources/projects/java16/build.gradle
 +++ b/src/test/resources/projects/java16/build.gradle
 @@ -1,5 +1,5 @@
@@ -225,20 +286,20 @@ index 45acf714efb54893e7867807d3bed47aa1a58223..93fe880c150bf047a93ab5d3ccb39954
  }
  
 diff --git a/src/test/resources/projects/kotlin/build.gradle.kts b/src/test/resources/projects/kotlin/build.gradle.kts
-index 6e9bcc2bec7645ab08ef6f770ceb1022a53681cc..680b8c96287de27fe81ddad8129aae51eb02e536 100644
+index 7f2e0f5d28bd402223319574cf804cc7ddeabc62..ad6c5ecbc9ab0a39d2f3151a6cbfdb1550cff52a 100644
 --- a/src/test/resources/projects/kotlin/build.gradle.kts
 +++ b/src/test/resources/projects/kotlin/build.gradle.kts
 @@ -3,7 +3,7 @@ import java.util.Properties
  plugins {
- 	kotlin("jvm") version "1.6.10"
- 	kotlin("plugin.serialization") version "1.6.10"
+ 	kotlin("jvm") version "1.7.22"
+ 	kotlin("plugin.serialization") version "1.7.22"
 -	id("fabric-loom")
 +	id("quiet-fabric-loom") // quiet
+ 	`maven-publish`
  }
  
- java {
 diff --git a/src/test/resources/projects/legacy/build.gradle b/src/test/resources/projects/legacy/build.gradle
-index 3b460c49aaa95a8b98cff43df820b257498ad668..5761c8bedcb5493791e108044d5b3da4974f7a31 100644
+index 13e303a919faea188a009bd2152a78dd879777ed..df48165bf168a31e60c0f11993d475cafaa72f15 100644
 --- a/src/test/resources/projects/legacy/build.gradle
 +++ b/src/test/resources/projects/legacy/build.gradle
 @@ -1,5 +1,5 @@
@@ -247,9 +308,9 @@ index 3b460c49aaa95a8b98cff43df820b257498ad668..5761c8bedcb5493791e108044d5b3da4
 +	id 'quiet-fabric-loom' // quiet
  }
  
- sourceCompatibility = JavaVersion.VERSION_1_8
+ version = project.mod_version
 diff --git a/src/test/resources/projects/localFileDependency/build.gradle b/src/test/resources/projects/localFileDependency/build.gradle
-index 811d945a9a903d2e43e949de2e2fea4f99882edd..afa0c16e6c39f02e3b7dd0f6421ba7174874ec92 100644
+index 289b506359c6dff38067b1494ac4835a3bfd082d..e79c947b51f0c29478ab837892504f0fb2fea3a2 100644
 --- a/src/test/resources/projects/localFileDependency/build.gradle
 +++ b/src/test/resources/projects/localFileDependency/build.gradle
 @@ -1,5 +1,5 @@
@@ -260,7 +321,7 @@ index 811d945a9a903d2e43e949de2e2fea4f99882edd..afa0c16e6c39f02e3b7dd0f6421ba717
  }
  
 diff --git a/src/test/resources/projects/localRuntime/build.gradle b/src/test/resources/projects/localRuntime/build.gradle
-index 18f4f0db4b857098a782cfa548a2954c44f363dc..80064373797d6f4de27cf041bc99d0d6a38ed651 100644
+index a4f9a87821f907df4e36bcc10ca4622a74b4ffdc..8d0fef6bf524c5eb85ef102f92f525df606bb047 100644
 --- a/src/test/resources/projects/localRuntime/build.gradle
 +++ b/src/test/resources/projects/localRuntime/build.gradle
 @@ -1,5 +1,5 @@
@@ -271,7 +332,7 @@ index 18f4f0db4b857098a782cfa548a2954c44f363dc..80064373797d6f4de27cf041bc99d0d6
  }
  
 diff --git a/src/test/resources/projects/maven/build.gradle b/src/test/resources/projects/maven/build.gradle
-index 56930fcd776ea55ae9576655d38b55cf47de62d1..16fc3b9fff48698c5cd16abce88ff379595bace6 100644
+index f7069b886efbb520321cac93e2758c4ffccd28b7..b10a4310420cb574e1473f376b5a14f00e539dc6 100644
 --- a/src/test/resources/projects/maven/build.gradle
 +++ b/src/test/resources/projects/maven/build.gradle
 @@ -1,5 +1,5 @@
@@ -282,7 +343,7 @@ index 56930fcd776ea55ae9576655d38b55cf47de62d1..16fc3b9fff48698c5cd16abce88ff379
  }
  
 diff --git a/src/test/resources/projects/mavenLibrary/build.gradle b/src/test/resources/projects/mavenLibrary/build.gradle
-index ff53dcc36eb20ffaf26ff75233524a4ba6075411..a58391e8375721604985dc46b975cc6a52039ff0 100644
+index 95703b93c317eb35390fd945fdacbc46ff12deff..12b2060d16cbe7730be5ab52e313635c5dcd0b0b 100644
 --- a/src/test/resources/projects/mavenLibrary/build.gradle
 +++ b/src/test/resources/projects/mavenLibrary/build.gradle
 @@ -1,5 +1,5 @@
@@ -293,7 +354,7 @@ index ff53dcc36eb20ffaf26ff75233524a4ba6075411..a58391e8375721604985dc46b975cc6a
  }
  
 diff --git a/src/test/resources/projects/minimalBase/build.gradle b/src/test/resources/projects/minimalBase/build.gradle
-index 8fbea237ed6254ea326fecc3c6db1a732746a6e0..7c5e9db47caaf722348db871c5503847fc0156bc 100644
+index f3dc73941bc7331e8292466b924f4a769ae55a01..8fdbe5cd5ba9db93ba06dfd2ffe4f5df86cadd29 100644
 --- a/src/test/resources/projects/minimalBase/build.gradle
 +++ b/src/test/resources/projects/minimalBase/build.gradle
 @@ -1,7 +1,7 @@
@@ -306,7 +367,7 @@ index 8fbea237ed6254ea326fecc3c6db1a732746a6e0..7c5e9db47caaf722348db871c5503847
  }
  
 diff --git a/src/test/resources/projects/mixinApAutoRefmap/build.gradle b/src/test/resources/projects/mixinApAutoRefmap/build.gradle
-index 610d042d1a47cb4e3a82aad6e147b87248671333..9a912796ff75cc100f33937220eea76522a686df 100644
+index 058aef168b3bcb720935aac393c36b6c52a3538b..e21cddde5c444801a985ef57f61abc612b4efb30 100644
 --- a/src/test/resources/projects/mixinApAutoRefmap/build.gradle
 +++ b/src/test/resources/projects/mixinApAutoRefmap/build.gradle
 @@ -1,5 +1,5 @@
@@ -317,7 +378,7 @@ index 610d042d1a47cb4e3a82aad6e147b87248671333..9a912796ff75cc100f33937220eea765
  	id 'maven-publish'
  }
 diff --git a/src/test/resources/projects/mixinApSimple/build.gradle b/src/test/resources/projects/mixinApSimple/build.gradle
-index f641e66b1cc5919df2eb3356948d08a111c710eb..ab04e0e90ba7c7b5f3e2d3a1907829055d40ba16 100644
+index 68b48e9c25d51cd96e7149243e911949262b5917..7bcb04ab1f048858e3fec4bd6a2ab79282ecef3a 100644
 --- a/src/test/resources/projects/mixinApSimple/build.gradle
 +++ b/src/test/resources/projects/mixinApSimple/build.gradle
 @@ -1,5 +1,5 @@
@@ -327,8 +388,21 @@ index f641e66b1cc5919df2eb3356948d08a111c710eb..ab04e0e90ba7c7b5f3e2d3a190782905
  	id 'maven-publish'
  }
  
+diff --git a/src/test/resources/projects/modJavadoc/build.gradle b/src/test/resources/projects/modJavadoc/build.gradle
+index 13aeb83ec713e9d3a37cf4c38f415a502e23c4aa..974e5b68c3802e744d72eb6f07cab634100e9bbf 100644
+--- a/src/test/resources/projects/modJavadoc/build.gradle
++++ b/src/test/resources/projects/modJavadoc/build.gradle
+@@ -1,7 +1,7 @@
+ // This is used by a range of tests that append to this file before running the gradle tasks.
+ // Can be used for tests that require minimal custom setup
+ plugins {
+-	id 'fabric-loom'
++	id 'quiet-fabric-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
 diff --git a/src/test/resources/projects/mojangMappings/build.gradle b/src/test/resources/projects/mojangMappings/build.gradle
-index 895bdb752a2aec465a2d430814229a1b2d35b0ee..2b748808c5d9f21a55cce1612b4a32b692569ae7 100644
+index f58c485386bbf686967a3020c2326996da62441d..4b2a37ef4ee3edc283b8464f4d6b42210909ea98 100644
 --- a/src/test/resources/projects/mojangMappings/build.gradle
 +++ b/src/test/resources/projects/mojangMappings/build.gradle
 @@ -1,5 +1,5 @@
@@ -338,8 +412,30 @@ index 895bdb752a2aec465a2d430814229a1b2d35b0ee..2b748808c5d9f21a55cce1612b4a32b6
  	id 'maven-publish'
  }
  
+diff --git a/src/test/resources/projects/multi-mc-versions/build.gradle b/src/test/resources/projects/multi-mc-versions/build.gradle
+index faa804c3e2416c4e6f25842f74436c4f215141a3..c8c1c53c713694adf5c3d934e921eb4cf5d468d1 100644
+--- a/src/test/resources/projects/multi-mc-versions/build.gradle
++++ b/src/test/resources/projects/multi-mc-versions/build.gradle
+@@ -2,7 +2,7 @@ import groovy.json.JsonSlurper
+ 
+ plugins {
+ 	id "java"
+-	id 'fabric-loom' apply false
++	id 'quiet-fabric-loom' apply false // quiet
+ }
+ 
+ allprojects {
+@@ -19,7 +19,7 @@ def getMappingVersion(String mcVersion) {
+ }
+ 
+ subprojects {
+-	apply plugin: "fabric-loom"
++	apply plugin: "quiet-fabric-loom" // quiet
+ 
+ 	base {
+ 		archivesName = rootProject.name + "-" + project.name
 diff --git a/src/test/resources/projects/multiproject/build.gradle b/src/test/resources/projects/multiproject/build.gradle
-index 17480a88c7ce6c16b53ce766ccb7722203fcb3a6..eccd7533265f4d60739afdba65c40cc091f377cd 100644
+index ae3e637a0b52af9f00d9742c331f0cb943aaf9d4..bb46e17581f051767aacc9df45e8096486fc4468 100644
 --- a/src/test/resources/projects/multiproject/build.gradle
 +++ b/src/test/resources/projects/multiproject/build.gradle
 @@ -1,11 +1,11 @@
@@ -357,7 +453,7 @@ index 17480a88c7ce6c16b53ce766ccb7722203fcb3a6..eccd7533265f4d60739afdba65c40cc0
  	version = "1.0.0"
  
 diff --git a/src/test/resources/projects/parchment/build.gradle b/src/test/resources/projects/parchment/build.gradle
-index 21432d4e9a6befe1bde150585c45a05e4c45f312..0d61aa4cb4d3c0c564027501bdeb35f1cf159dfb 100644
+index 5fee81c5d1e07de0dfcf615795ec818a8e4705e2..b2f68f83de8a72fd9be20681c788eb1efc6befb2 100644
 --- a/src/test/resources/projects/parchment/build.gradle
 +++ b/src/test/resources/projects/parchment/build.gradle
 @@ -1,5 +1,5 @@
@@ -368,7 +464,7 @@ index 21432d4e9a6befe1bde150585c45a05e4c45f312..0d61aa4cb4d3c0c564027501bdeb35f1
  
  repositories {
 diff --git a/src/test/resources/projects/reproducible/build.gradle b/src/test/resources/projects/reproducible/build.gradle
-index 4bc4926136fa448fd4268d7392217bf7f160fb9a..30c027462766555d41faaea0257b705a0ae58838 100644
+index 08c393f887b92c81a02841ad72ea90a8a0f1d0ab..6821d2171bc947b513cd5a0b0450d873d762c1ba 100644
 --- a/src/test/resources/projects/reproducible/build.gradle
 +++ b/src/test/resources/projects/reproducible/build.gradle
 @@ -1,5 +1,5 @@
@@ -379,7 +475,7 @@ index 4bc4926136fa448fd4268d7392217bf7f160fb9a..30c027462766555d41faaea0257b705a
  }
  
 diff --git a/src/test/resources/projects/runconfigs/build.gradle b/src/test/resources/projects/runconfigs/build.gradle
-index a8e1f6bb073f57d6196eebe782836ed3f436b19b..9fe3374fef22b370c6810274650d5be8b6c664b0 100644
+index 5e504e20d2110896de2d182f0524be6cfe065411..b242ca75d4e946cfacb72a1e1c12982f7aaefcf3 100644
 --- a/src/test/resources/projects/runconfigs/build.gradle
 +++ b/src/test/resources/projects/runconfigs/build.gradle
 @@ -1,5 +1,5 @@
@@ -390,7 +486,7 @@ index a8e1f6bb073f57d6196eebe782836ed3f436b19b..9fe3374fef22b370c6810274650d5be8
  
  loom {
 diff --git a/src/test/resources/projects/signed/build.gradle b/src/test/resources/projects/signed/build.gradle
-index 45a2a278a761e5f9cc0f56bb7972719196660cfe..f4097c5e1408e35b85019fc5ed846b7c24efe9ce 100644
+index 8a5445b05b1bd8953409adbb4ea0cd31fd4fcc56..aaec45fd622b2ca88738a7e8d5f434a69879fe4d 100644
 --- a/src/test/resources/projects/signed/build.gradle
 +++ b/src/test/resources/projects/signed/build.gradle
 @@ -1,5 +1,5 @@
@@ -401,7 +497,7 @@ index 45a2a278a761e5f9cc0f56bb7972719196660cfe..f4097c5e1408e35b85019fc5ed846b7c
  	id 'signing'
  }
 diff --git a/src/test/resources/projects/simple/build.gradle b/src/test/resources/projects/simple/build.gradle
-index 5ce232ea8a8d7975252e63da3bb7a471e22c39b3..da085453d98704b87a0533934bb7fe566e76065b 100644
+index ed7d9e49fa03821166e8f920e6497e2d66e42f82..a1d1157223cd18bc4fab43505e155f581b5937d8 100644
 --- a/src/test/resources/projects/simple/build.gradle
 +++ b/src/test/resources/projects/simple/build.gradle
 @@ -1,5 +1,5 @@
@@ -411,8 +507,19 @@ index 5ce232ea8a8d7975252e63da3bb7a471e22c39b3..da085453d98704b87a0533934bb7fe56
  	id 'maven-publish'
  }
  
+diff --git a/src/test/resources/projects/splitSources/build.gradle b/src/test/resources/projects/splitSources/build.gradle
+index baa2ebc18bdda779888e0620488ad0e03e663c10..441294ae9d7c3046db06f6a5d8883af11bf9fa1b 100644
+--- a/src/test/resources/projects/splitSources/build.gradle
++++ b/src/test/resources/projects/splitSources/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'fabric-loom' version '0.12.local'
++	id 'quiet-fabric-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
 diff --git a/src/test/resources/projects/transitiveAccesswidener/build.gradle b/src/test/resources/projects/transitiveAccesswidener/build.gradle
-index 52f1fc39f472e431795ddfe94cd85c6a01eade48..b374f3b02da2f1952df09e75759a2405d10c7c68 100644
+index 13aeb83ec713e9d3a37cf4c38f415a502e23c4aa..974e5b68c3802e744d72eb6f07cab634100e9bbf 100644
 --- a/src/test/resources/projects/transitiveAccesswidener/build.gradle
 +++ b/src/test/resources/projects/transitiveAccesswidener/build.gradle
 @@ -1,7 +1,7 @@

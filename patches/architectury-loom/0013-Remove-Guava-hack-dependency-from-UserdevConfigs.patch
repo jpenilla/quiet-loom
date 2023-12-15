@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Wed, 29 Nov 2023 15:36:08 -0700
+Subject: [PATCH] Remove Guava hack dependency from UserdevConfigs
+
+Fixes NeoForge dependencies being broken in combination with org.gradlex.java-ecosystem-capabilities
+
+diff --git a/src/main/java/dev/architectury/loom/forge/UserdevConfig.java b/src/main/java/dev/architectury/loom/forge/UserdevConfig.java
+index a22aecb551486d27ecc9da97f0df0611ea937751..e1af066aaa7211fe583db1268d643a88c9a1f22f 100644
+--- a/src/main/java/dev/architectury/loom/forge/UserdevConfig.java
++++ b/src/main/java/dev/architectury/loom/forge/UserdevConfig.java
+@@ -1,8 +1,11 @@
+ package dev.architectury.loom.forge;
+ 
++import java.util.ArrayList;
++import java.util.Collections;
+ import java.util.List;
+ import java.util.Map;
+ import java.util.Optional;
++import java.util.function.Function;
+ 
+ import com.mojang.serialization.Codec;
+ import com.mojang.serialization.codecs.RecordCodecBuilder;
+@@ -31,11 +34,22 @@ public record UserdevConfig(
+ 			Codec.STRING.optionalFieldOf("patchesModifiedPrefix").forGetter(UserdevConfig::patchesModifiedPrefix),
+ 			Codec.STRING.fieldOf("binpatches").forGetter(UserdevConfig::binpatches),
+ 			BinaryPatcherConfig.CODEC.fieldOf("binpatcher").forGetter(UserdevConfig::binpatcher),
+-			Codec.STRING.listOf().fieldOf("libraries").forGetter(UserdevConfig::libraries),
++			Codec.STRING.listOf().xmap(UserdevConfig::fixDependencies, Function.identity()).fieldOf("libraries").forGetter(UserdevConfig::libraries),
+ 			ForgeRunTemplate.MAP_CODEC.fieldOf("runs").forGetter(UserdevConfig::runs),
+ 			Codec.STRING.listOf().optionalFieldOf("sass", List.of()).forGetter(UserdevConfig::sass)
+ 	).apply(instance, UserdevConfig::new));
+ 
++	private static List<String> fixDependencies(List<String> deps) {
++		final List<String> newDeps = new ArrayList<>(deps);
++
++		if (deps.stream().anyMatch(dep -> dep.startsWith("com.google.guava:guava:"))) {
++			// Work around issues caused by the dependency tree being flattened
++			newDeps.remove("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava@jar");
++		}
++
++		return Collections.unmodifiableList(newDeps);
++	}
++
+ 	public record BinaryPatcherConfig(String dependency, List<String> args) {
+ 		public static final Codec<BinaryPatcherConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+ 				Codec.STRING.fieldOf("version").forGetter(BinaryPatcherConfig::dependency),

@@ -1,0 +1,355 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Sun, 19 Nov 2023 16:19:02 -0700
+Subject: [PATCH] Skip output remapping for Mojang-mapped NeoForge projects
+
+
+diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/forge/FieldMigratedMappingConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/providers/forge/FieldMigratedMappingConfiguration.java
+index c9ef7402285754b5017fd8fe94ca8eb609fd2a1d..cc0136f7892d9d93a5781374b3cb70e6a08b2251 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/providers/forge/FieldMigratedMappingConfiguration.java
++++ b/src/main/java/net/fabricmc/loom/configuration/providers/forge/FieldMigratedMappingConfiguration.java
+@@ -69,9 +69,15 @@ public final class FieldMigratedMappingConfiguration extends MappingConfiguratio
+ 	private Path rawTinyMappings;
+ 	private Path rawTinyMappingsWithSrg;
+ 	private Path rawTinyMappingsWithMojang;
++	private final boolean mojangMappedProject;
+ 
+-	public FieldMigratedMappingConfiguration(String mappingsIdentifier, Path mappingsWorkingDir) {
++	public FieldMigratedMappingConfiguration(String mappingsIdentifier, Path mappingsWorkingDir, boolean mojangMappedProject) {
+ 		super(mappingsIdentifier, mappingsWorkingDir);
++		this.mojangMappedProject = mojangMappedProject;
++	}
++
++	public boolean isMojangMappedProject() {
++		return this.mojangMappedProject;
+ 	}
+ 
+ 	@Override
+diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/LayeredMappingsDependency.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/LayeredMappingsDependency.java
+index 7504e1b6e8d3721214aa5f79eae8a197cf7cc9c1..cd0902ad12576026f2c4bfccafd2c703a8ffaa72 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/LayeredMappingsDependency.java
++++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/LayeredMappingsDependency.java
+@@ -49,6 +49,8 @@ import net.fabricmc.loom.api.mappings.layered.MappingContext;
+ import net.fabricmc.loom.api.mappings.layered.MappingLayer;
+ import net.fabricmc.loom.api.mappings.layered.MappingsNamespace;
+ import net.fabricmc.loom.configuration.providers.mappings.extras.unpick.UnpickLayer;
++import net.fabricmc.loom.configuration.providers.mappings.mojmap.MojangMappingsSpec;
++import net.fabricmc.loom.configuration.providers.mappings.parchment.ParchmentMappingsSpec;
+ import net.fabricmc.loom.configuration.providers.mappings.utils.AddConstructorMappingVisitor;
+ import net.fabricmc.loom.util.Constants;
+ import net.fabricmc.loom.util.ZipUtils;
+@@ -187,4 +189,10 @@ public class LayeredMappingsDependency implements SelfResolvingDependency, FileC
+ 	public FileCollection getFiles() {
+ 		return project.files(resolve());
+ 	}
++
++	public boolean isMojangMappings() {
++		return this.layeredMappingSpec.layers().stream()
++				.skip(1) // see LayeredMappingSpecBuilderImpl
++				.allMatch(spec -> spec instanceof MojangMappingsSpec || spec instanceof ParchmentMappingsSpec);
++	}
+ }
+diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
+index a30a1dc05758c3444eda00740b0af6c32ee99984..83605b46c3d541994c69233ca894c11c2012c087 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
++++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
+@@ -144,7 +144,15 @@ public class MappingConfiguration {
+ 		MappingConfiguration mappingConfiguration;
+ 
+ 		if (extension.isForgeLike()) {
+-			mappingConfiguration = new FieldMigratedMappingConfiguration(mappingsIdentifier, workingDir);
++			final boolean mojmap;
++
++			if (dependency.getDependency() instanceof LayeredMappingsDependency layered) {
++				mojmap = layered.isMojangMappings();
++			} else {
++				mojmap = false;
++			}
++
++			mappingConfiguration = new FieldMigratedMappingConfiguration(mappingsIdentifier, workingDir, mojmap);
+ 		} else {
+ 			mappingConfiguration = new MappingConfiguration(mappingsIdentifier, workingDir);
+ 		}
+diff --git a/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java b/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
+index 6f17fe68f63b807298e085a8eaf00259610056b2..5f66a51e67b6f366fbf19c851548c0444f59bfc6 100644
+--- a/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
++++ b/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
+@@ -66,6 +66,7 @@ import org.jetbrains.annotations.ApiStatus;
+ import net.fabricmc.loom.LoomGradleExtension;
+ import net.fabricmc.loom.api.mappings.layered.MappingsNamespace;
+ import net.fabricmc.loom.build.IntermediaryNamespaces;
++import net.fabricmc.loom.configuration.providers.forge.FieldMigratedMappingConfiguration;
+ import net.fabricmc.loom.task.service.JarManifestService;
+ import net.fabricmc.loom.util.ZipReprocessorUtil;
+ import net.fabricmc.loom.util.ZipUtils;
+@@ -167,6 +168,15 @@ public abstract class AbstractRemapJarTask extends Jar {
+ 
+ 	protected abstract List<String> getClientOnlyEntries(SourceSet sourceSet);
+ 
++	@ApiStatus.Internal
++	public boolean shouldSkipRemap(LoomGradleExtension extension) {
++		return extension.isNeoForge()
++				&& extension.getMappingConfiguration() instanceof FieldMigratedMappingConfiguration c
++				&& c.isMojangMappedProject()
++				&& MappingsNamespace.of(this.getSourceNamespace().get()) == MappingsNamespace.NAMED
++				&& MappingsNamespace.of(this.getTargetNamespace().get()) == MappingsNamespace.MOJANG;
++	}
++
+ 	public interface AbstractRemapParams extends WorkParameters {
+ 		RegularFileProperty getInputFile();
+ 		RegularFileProperty getOutputFile();
+diff --git a/src/main/java/net/fabricmc/loom/task/PrepareJarRemapTask.java b/src/main/java/net/fabricmc/loom/task/PrepareJarRemapTask.java
+index 9569968aa0c6917e9d090c4b4cf060749c8e96e1..b8b1be7679eaea32b1e9c876100e3fcd13ce27f5 100644
+--- a/src/main/java/net/fabricmc/loom/task/PrepareJarRemapTask.java
++++ b/src/main/java/net/fabricmc/loom/task/PrepareJarRemapTask.java
+@@ -72,10 +72,16 @@ public abstract class PrepareJarRemapTask extends AbstractLoomTask {
+ 
+ 	@TaskAction
+ 	public void run() {
++		final var service = remapJarTask.getTinyRemapperService();
++
++		if (service == null) {
++			return;
++		}
++
+ 		final WorkQueue workQueue = getWorkerExecutor().noIsolation();
+ 
+ 		workQueue.submit(ReadInputsAction.class, params -> {
+-			params.getTinyRemapperBuildServiceUuid().set(UnsafeWorkQueueHelper.create(remapJarTask.getTinyRemapperService()));
++			params.getTinyRemapperBuildServiceUuid().set(UnsafeWorkQueueHelper.create(service));
+ 			params.getInputFile().set(getInputFile());
+ 		});
+ 	}
+diff --git a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
+index 38d01a958b6e03a4d9ee91aad5d5b47cef16a52f..4baf53a1dce58101ac47bddaa401a93e653e51df 100644
+--- a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
++++ b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
+@@ -29,6 +29,7 @@ import java.io.IOException;
+ import java.io.Serializable;
+ import java.nio.file.Files;
+ import java.nio.file.Path;
++import java.nio.file.StandardCopyOption;
+ import java.util.ArrayList;
+ import java.util.Collection;
+ import java.util.LinkedHashSet;
+@@ -61,6 +62,7 @@ import org.gradle.api.tasks.SourceSet;
+ import org.gradle.api.tasks.TaskAction;
+ import org.gradle.api.tasks.TaskDependency;
+ import org.jetbrains.annotations.ApiStatus;
++import org.jetbrains.annotations.Nullable;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ 
+@@ -210,7 +212,12 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+ 				}
+ 			}
+ 
+-			params.getTinyRemapperBuildServiceUuid().set(UnsafeWorkQueueHelper.create(getTinyRemapperService()));
++			final var trService = getTinyRemapperService();
++
++			if (trService != null) {
++				params.getTinyRemapperBuildServiceUuid().set(UnsafeWorkQueueHelper.create(trService));
++			}
++
+ 			params.getRemapClasspath().from(getClasspath());
+ 			params.getMultiProjectOptimisation().set(getLoomExtension().multiProjectOptimisation());
+ 
+@@ -303,11 +310,15 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+ 	public abstract static class RemapAction extends AbstractRemapAction<RemapParams> {
+ 		private static final Logger LOGGER = LoggerFactory.getLogger(RemapAction.class);
+ 
+-		private final TinyRemapperService tinyRemapperService;
+-		private TinyRemapper tinyRemapper;
++		private final @Nullable TinyRemapperService tinyRemapperService;
++		private @Nullable TinyRemapper tinyRemapper;
+ 
+ 		public RemapAction() {
+-			this.tinyRemapperService = UnsafeWorkQueueHelper.get(getParameters().getTinyRemapperBuildServiceUuid(), TinyRemapperService.class);
++			if (getParameters().getTinyRemapperBuildServiceUuid().isPresent()) {
++				this.tinyRemapperService = UnsafeWorkQueueHelper.get(getParameters().getTinyRemapperBuildServiceUuid(), TinyRemapperService.class);
++			} else {
++				this.tinyRemapperService = null;
++			}
+ 		}
+ 
+ 		@Override
+@@ -319,9 +330,13 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+ 					prepare();
+ 				}
+ 
+-				tinyRemapper = tinyRemapperService.getTinyRemapperForRemapping();
++				tinyRemapper = tinyRemapperService == null ? null : tinyRemapperService.getTinyRemapperForRemapping();
+ 
+-				remap();
++				if (tinyRemapper == null) {
++					Files.copy(inputFile, outputFile, StandardCopyOption.REPLACE_EXISTING);
++				} else {
++					remap();
++				}
+ 
+ 				if (getParameters().getClientOnlyEntries().isPresent()) {
+ 					markClientOnlyClasses();
+@@ -342,7 +357,9 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+ 				rewriteJar();
+ 
+ 				if (!getParameters().getMultiProjectOptimisation().get()) {
+-					tinyRemapperService.close();
++					if (tinyRemapperService != null) {
++						tinyRemapperService.close();
++					}
+ 				}
+ 
+ 				LOGGER.debug("Finished remapping {}", inputFile);
+@@ -359,10 +376,16 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+ 
+ 		private void prepare() {
+ 			final Path inputFile = getParameters().getInputFile().getAsFile().get().toPath();
+-			PrepareJarRemapTask.prepare(tinyRemapperService, inputFile);
++
++			if (tinyRemapperService != null) {
++				PrepareJarRemapTask.prepare(tinyRemapperService, inputFile);
++			}
+ 		}
+ 
+ 		private void remap() throws IOException {
++			Objects.requireNonNull(tinyRemapper);
++			Objects.requireNonNull(tinyRemapperService);
++
+ 			try (OutputConsumerPath outputConsumer = new OutputConsumerPath.Builder(outputFile).build()) {
+ 				outputConsumer.addNonClassFiles(inputFile);
+ 				tinyRemapper.apply(outputConsumer, tinyRemapperService.getOrCreateTag(inputFile));
+@@ -417,6 +440,10 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+ 		}
+ 
+ 		private byte[] remapAccessWidener(byte[] input) {
++			if (this.tinyRemapper == null) {
++				return input;
++			}
++
+ 			int version = AccessWidenerReader.readVersion(input);
+ 
+ 			AccessWidenerWriter writer = new AccessWidenerWriter(version);
+@@ -480,7 +507,7 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+ 	}
+ 
+ 	@Internal
+-	public TinyRemapperService getTinyRemapperService() {
++	public @Nullable TinyRemapperService getTinyRemapperService() {
+ 		return TinyRemapperService.getOrCreate(serviceManagerProvider.get().get(), this);
+ 	}
+ }
+diff --git a/src/main/java/net/fabricmc/loom/task/RemapSourcesJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapSourcesJarTask.java
+index 2a9424acc87f88c62cb2e9595dea0c80300de0ba..48a1d845f5fc4eed9b3962b16f9e3f46fc4850e6 100644
+--- a/src/main/java/net/fabricmc/loom/task/RemapSourcesJarTask.java
++++ b/src/main/java/net/fabricmc/loom/task/RemapSourcesJarTask.java
+@@ -26,6 +26,7 @@ package net.fabricmc.loom.task;
+ 
+ import java.io.IOException;
+ import java.nio.file.Files;
++import java.nio.file.StandardCopyOption;
+ import java.util.List;
+ 
+ import javax.inject.Inject;
+@@ -35,6 +36,7 @@ import org.gradle.api.provider.Property;
+ import org.gradle.api.provider.Provider;
+ import org.gradle.api.tasks.SourceSet;
+ import org.gradle.api.tasks.TaskAction;
++import org.jetbrains.annotations.Nullable;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ 
+@@ -57,7 +59,11 @@ public abstract class RemapSourcesJarTask extends AbstractRemapJarTask {
+ 	@TaskAction
+ 	public void run() {
+ 		submitWork(RemapSourcesAction.class, params -> {
+-			params.getSourcesRemapperServiceUuid().set(UnsafeWorkQueueHelper.create(SourceRemapperService.create(serviceManagerProvider.get().get(), this)));
++			final @Nullable var service = SourceRemapperService.create(serviceManagerProvider.get().get(), this);
++
++			if (service != null) {
++				params.getSourcesRemapperServiceUuid().set(UnsafeWorkQueueHelper.create(service));
++			}
+ 		});
+ 	}
+ 
+@@ -75,18 +81,26 @@ public abstract class RemapSourcesJarTask extends AbstractRemapJarTask {
+ 	public abstract static class RemapSourcesAction extends AbstractRemapAction<RemapSourcesParams> {
+ 		private static final Logger LOGGER = LoggerFactory.getLogger(RemapSourcesAction.class);
+ 
+-		private final SourceRemapperService sourceRemapperService;
++		private final @Nullable SourceRemapperService sourceRemapperService;
+ 
+ 		public RemapSourcesAction() {
+ 			super();
+ 
+-			sourceRemapperService = UnsafeWorkQueueHelper.get(getParameters().getSourcesRemapperServiceUuid(), SourceRemapperService.class);
++			if (getParameters().getSourcesRemapperServiceUuid().isPresent()) {
++				sourceRemapperService = UnsafeWorkQueueHelper.get(getParameters().getSourcesRemapperServiceUuid(), SourceRemapperService.class);
++			} else {
++				sourceRemapperService = null;
++			}
+ 		}
+ 
+ 		@Override
+ 		public void execute() {
+ 			try {
+-				sourceRemapperService.remapSourcesJar(inputFile, outputFile);
++				if (sourceRemapperService == null) {
++					Files.copy(inputFile, outputFile, StandardCopyOption.REPLACE_EXISTING);
++				} else {
++					sourceRemapperService.remapSourcesJar(inputFile, outputFile);
++				}
+ 
+ 				modifyJarManifest();
+ 				rewriteJar();
+diff --git a/src/main/java/net/fabricmc/loom/task/service/SourceRemapperService.java b/src/main/java/net/fabricmc/loom/task/service/SourceRemapperService.java
+index b3f5456c1317acc23b903df9451b59683d677dcf..bb5bb97566a59c9f9a4736d8edb088e4f54a026d 100644
+--- a/src/main/java/net/fabricmc/loom/task/service/SourceRemapperService.java
++++ b/src/main/java/net/fabricmc/loom/task/service/SourceRemapperService.java
+@@ -37,6 +37,7 @@ import org.cadixdev.mercury.Mercury;
+ import org.cadixdev.mercury.remapper.MercuryRemapper;
+ import org.gradle.api.Project;
+ import org.gradle.api.file.ConfigurableFileCollection;
++import org.jetbrains.annotations.Nullable;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ 
+@@ -51,11 +52,16 @@ import net.fabricmc.loom.util.service.SharedServiceManager;
+ import net.fabricmc.lorenztiny.TinyMappingsReader;
+ 
+ public final class SourceRemapperService implements SharedService {
+-	public static synchronized SourceRemapperService create(SharedServiceManager serviceManager, RemapSourcesJarTask task) {
++	public static synchronized @Nullable SourceRemapperService create(SharedServiceManager serviceManager, RemapSourcesJarTask task) {
+ 		final Project project = task.getProject();
+ 		final String to = task.getTargetNamespace().get();
+ 		final String from = task.getSourceNamespace().get();
+ 		final LoomGradleExtension extension = LoomGradleExtension.get(project);
++
++		if (task.shouldSkipRemap(extension)) {
++			return null;
++		}
++
+ 		final String id = extension.getMappingConfiguration().getBuildServiceName("sourceremapper", from, to);
+ 		final int javaCompileRelease = SourceRemapper.getJavaCompileRelease(project);
+ 
+diff --git a/src/main/java/net/fabricmc/loom/task/service/TinyRemapperService.java b/src/main/java/net/fabricmc/loom/task/service/TinyRemapperService.java
+index 05e3b40a21b4826837d2bca5c87b5c235bd03990..bba0a38cf336727c3b7b3209ac26b1d91835f9b6 100644
+--- a/src/main/java/net/fabricmc/loom/task/service/TinyRemapperService.java
++++ b/src/main/java/net/fabricmc/loom/task/service/TinyRemapperService.java
+@@ -58,11 +58,16 @@ import net.fabricmc.loom.util.service.SharedService;
+ import net.fabricmc.loom.util.service.SharedServiceManager;
+ 
+ public class TinyRemapperService implements SharedService {
+-	public static synchronized TinyRemapperService getOrCreate(SharedServiceManager serviceManager, AbstractRemapJarTask remapJarTask) {
++	public static synchronized @Nullable TinyRemapperService getOrCreate(SharedServiceManager serviceManager, AbstractRemapJarTask remapJarTask) {
+ 		final Project project = remapJarTask.getProject();
+ 		final String to = remapJarTask.getTargetNamespace().get();
+ 		final String from = remapJarTask.getSourceNamespace().get();
+ 		final LoomGradleExtension extension = LoomGradleExtension.get(project);
++
++		if (remapJarTask.shouldSkipRemap(extension)) {
++			return null;
++		}
++
+ 		final boolean legacyMixin = extension.getMixin().getUseLegacyMixinAp().get();
+ 		final @Nullable KotlinClasspathService kotlinClasspathService = KotlinClasspathService.getOrCreateIfRequired(serviceManager, project);
+ 

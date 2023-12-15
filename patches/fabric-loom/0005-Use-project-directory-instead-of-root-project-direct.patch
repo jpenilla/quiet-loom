@@ -6,13 +6,13 @@ Subject: [PATCH] Use project directory instead of root project directory for
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java b/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
-index 7979b1b2546a6cfbae09a930307b89c75967d7e9..9ead9b8128fb8035c292f48ad0ff46670f5db403 100644
+index 1783e903a88ef3f049575a1165f995ce1528a935..5a3744f9518e805ff8d9dbca988a263f24caa2d6 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
-@@ -167,7 +167,10 @@ public class RunConfig {
+@@ -171,7 +171,10 @@ public class RunConfig {
  		runConfig.configName = configName;
  		populate(project, extension, runConfig, environment);
- 		runConfig.ideaModuleName = getIdeaModuleName(project, sourceSet);
+ 		runConfig.ideaModuleName = IdeaUtils.getIdeaModuleName(new SourceSetReference(sourceSet, project));
 -		runConfig.runDirIdeaUrl = "file://$PROJECT_DIR$/" + runDir;
 +		// quiet start
 +		final Path relativeProjectPath = project.getRootDir().toPath().relativize(project.getProjectDir().toPath());
@@ -21,16 +21,3 @@ index 7979b1b2546a6cfbae09a930307b89c75967d7e9..9ead9b8128fb8035c292f48ad0ff4667
  		runConfig.runDir = runDir;
  		runConfig.sourceSet = sourceSet;
  		runConfig.environment = environment;
-diff --git a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
-index e52f3a3164591980d1f718bb893305460915c7ea..2ebb6428189a0f9b395fc81b27e9e503f9de33ae 100644
---- a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
-+++ b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
-@@ -52,7 +52,7 @@ public abstract class AbstractRunTask extends JavaExec {
- 
- 	@Override
- 	public void exec() {
--		setWorkingDir(new File(getProject().getRootDir(), config.runDir));
-+		setWorkingDir(new File(getProject().getProjectDir(), config.runDir)); // quiet
- 
- 		super.exec();
- 	}

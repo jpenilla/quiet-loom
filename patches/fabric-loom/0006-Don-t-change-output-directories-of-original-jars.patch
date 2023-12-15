@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Tue, 25 Jan 2022 21:57:36 -0700
+Subject: [PATCH] Don't change output directories of original jars
+
+
+diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+index cbd3630a291cd796a91ba54961fe8493191c9c17..2f48bbdfbf275d49edbcab62ca7c0f5ef1099081 100644
+--- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
++++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+@@ -92,7 +92,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
+ 		// Configure the default jar task
+ 		getTasks().named(JavaPlugin.JAR_TASK_NAME, AbstractArchiveTask.class).configure(task -> {
+ 			task.getArchiveClassifier().convention("dev");
+-			task.getDestinationDirectory().set(new File(getProject().getBuildDir(), "devlibs"));
++			// task.getDestinationDirectory().set(new File(getProject().getBuildDir(), "devlibs")); // quiet - no
+ 		});
+ 
+ 		getTasks().named(BasePlugin.ASSEMBLE_TASK_NAME).configure(task -> task.dependsOn(remapJarTask));
+@@ -139,7 +139,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
+ 			}
+ 
+ 			sourcesJarTask.getArchiveClassifier().convention("dev-sources");
+-			sourcesJarTask.getDestinationDirectory().set(new File(getProject().getBuildDir(), "devlibs"));
++			// sourcesJarTask.getDestinationDirectory().set(new File(getProject().getBuildDir(), "devlibs")); // quiet - no
+ 			task.getArchiveClassifier().convention("sources");
+ 
+ 			task.dependsOn(sourcesJarTask);
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/MixinApSimpleTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/MixinApSimpleTest.groovy
+index ed0aaa9b29c3c8eee94757318f71340a4a165ea2..8d596334dea63ec9457ccdca131a5054df4360f9 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/integration/MixinApSimpleTest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/MixinApSimpleTest.groovy
+@@ -47,7 +47,7 @@ class MixinApSimpleTest extends Specification implements GradleProjectTestTrait
+ 		result.task(":build").outcome == SUCCESS
+ 
+ 		// verify the ref-map name is correctly generated
+-		def main = new JarFile(new File(gradle.projectDir, "build/devlibs/fabric-example-mod-1.0.0-dev.jar").absoluteFile)
++		def main = new JarFile(gradle.getOutputFile("fabric-example-mod-1.0.0-dev.jar").absoluteFile) // quiet - remove devlibs
+ 		main.getEntry("main-refmap0000.json") != null
+ 		def mixin = new JarFile(gradle.getOutputFile("fabric-example-mod-1.0.0-mixin.jar").absoluteFile)
+ 		mixin.getEntry("default-refmap0000.json") != null

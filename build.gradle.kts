@@ -1,15 +1,16 @@
-import net.minecrell.gitpatcher.PatchExtension
-
 plugins {
-  id("net.minecraftforge.gitpatcher") version "0.10.+"
+  id("ca.stellardrift.gitpatcher") version "1.1.0"
 }
 
-configure<PatchExtension> {
-  submodule = "fabric-loom"
-  target = file("patched-loom")
-  patches = file("patches")
-}
-
-tasks.register("rebuildPatches") {
-  dependsOn(tasks.makePatches)
+gitPatcher.patchedRepos {
+  register("fabricLoom") {
+    submodule = "upstreams/fabric-loom"
+    target = file("quiet-fabric-loom")
+    patches = file("patches/fabric-loom")
+  }
+  register("architecturyLoom") {
+    submodule = "upstreams/architectury-loom"
+    target = file("quiet-architectury-loom")
+    patches = file("patches/architectury-loom")
+  }
 }

@@ -1,0 +1,103 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Sat, 2 Dec 2023 11:55:14 -0700
+Subject: [PATCH] Skip dependency remapping for Mojang-mapped NeoForge projects
+
+
+diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java b/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
+index 6ea2863524cc0da3665b0dac0b4e7e53bb16f1e4..0ac4ee963caff903d175457d551b84801306c1d5 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
++++ b/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
+@@ -88,7 +88,6 @@ public class ModProcessor {
+ 
+ 	public void processMods(List<ModDependency> remapList) throws IOException {
+ 		try {
+-			project.getLogger().lifecycle(":remapping {} mods from {}", remapList.size(), describeConfiguration(sourceConfiguration));
+ 			remapJars(remapList);
+ 		} catch (Exception e) {
+ 			throw new RuntimeException(String.format(Locale.ENGLISH, "Failed to remap %d mods", remapList.size()), e);
+@@ -162,6 +161,20 @@ public class ModProcessor {
+ 	private void remapJars(List<ModDependency> remapList) throws IOException {
+ 		final LoomGradleExtension extension = LoomGradleExtension.get(project);
+ 		final MappingConfiguration mappingConfiguration = extension.getMappingConfiguration();
++		boolean skipRemap = mappingConfiguration instanceof net.fabricmc.loom.configuration.providers.forge.FieldMigratedMappingConfiguration m
++				&& m.isMojangMappedProject()
++				&& IntermediaryNamespaces.intermediaryNamespace(project) == MappingsNamespace.MOJANG;
++		if (!skipRemap) {
++			project.getLogger().lifecycle(":remapping {} mods from {}", remapList.size(), describeConfiguration(sourceConfiguration));
++			remapJars_(extension, mappingConfiguration, remapList);
++		} else {
++			project.getLogger().lifecycle(":transforming {} mods from {}", remapList.size(), describeConfiguration(sourceConfiguration));
++			Stopwatch stopwatch = Stopwatch.createStarted();
++			finishRemapJars(extension, remapList, null, null, null);
++			project.getLogger().lifecycle(":transformed {} mods in {}", remapList.size(), stopwatch.stop());
++		}
++	}
++	private void remapJars_(LoomGradleExtension extension, MappingConfiguration mappingConfiguration, List<ModDependency> remapList) throws IOException {
+ 		String fromM = IntermediaryNamespaces.intermediary(project);
+ 		Path[] mcDeps = project.getConfigurations().getByName(Constants.Configurations.MINECRAFT_COMPILE_LIBRARIES).getFiles()
+ 				.stream().map(File::toPath).toArray(Path[]::new);
+@@ -257,20 +270,40 @@ public class ModProcessor {
+ 
+ 		project.getLogger().lifecycle(":remapped {} mods ({} -> {}) in {}", remapList.size(), fromM, toM, stopwatch.stop());
+ 
++		finishRemapJars(extension, remapList, outputConsumerMap, accessWidenerMap, mappings);
++	}
++	private void finishRemapJars(
++			LoomGradleExtension extension,
++			List<ModDependency> remapList,
++			Map<ModDependency, OutputConsumerPath> outputConsumerMap,
++			Map<ModDependency, Pair<byte[], String>> accessWidenerMap,
++			MemoryMappingTree mappings
++	) throws IOException {
++
+ 		for (ModDependency dependency : remapList) {
+-			outputConsumerMap.get(dependency).close();
++			if (outputConsumerMap != null) outputConsumerMap.get(dependency).close();
+ 
+ 			final Path output = getRemappedOutput(dependency);
+-			final Pair<byte[], String> accessWidener = accessWidenerMap.get(dependency);
++			final Pair<byte[], String> accessWidener = accessWidenerMap != null
++					? accessWidenerMap.get(dependency)
++					: null;
+ 
+ 			if (accessWidener != null) {
+ 				ZipUtils.replace(output, accessWidener.right(), accessWidener.left());
+ 			}
+ 
++			if (!Files.exists(output, java.nio.file.LinkOption.NOFOLLOW_LINKS)) {
++				Files.deleteIfExists(output);
++				if (!Files.isDirectory(output.getParent(), java.nio.file.LinkOption.NOFOLLOW_LINKS)) {
++					Files.createDirectories(output.getParent());
++				}
++				Files.copy(dependency.getInputFile(), output);
++			}
++
+ 			stripNestedJars(output);
+ 			remapJarManifestEntries(output);
+ 
+-			if (extension.isForgeLike()) {
++			if (outputConsumerMap != null && extension.isForgeLike()) {
+ 				AtRemapper.remap(project, output, mappings);
+ 				CoreModClassRemapper.remapJar(project, extension.getPlatform().get(), output, mappings);
+ 			}
+diff --git a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
+index 53ad034ec0acdd4e6aaf131aed801b0a1ce25971..a6f04669d12dfe2a406d4b204cb9f1919b2d0c97 100644
+--- a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
++++ b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
+@@ -113,6 +113,15 @@ public class SourceRemapper {
+ 	}
+ 
+ 	private void remapSourcesInner(File source, File destination) throws Exception {
++		if (source.isFile()) {
++			boolean skipRemap = LoomGradleExtension.get(project).getMappingConfiguration() instanceof net.fabricmc.loom.configuration.providers.forge.FieldMigratedMappingConfiguration m
++					&& m.isMojangMappedProject()
++					&& IntermediaryNamespaces.intermediaryNamespace(project) == MappingsNamespace.MOJANG;
++			if (skipRemap) {
++				Files.copy(source.toPath(), destination.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
++				return;
++			}
++		}
+ 		project.getLogger().info(":remapping source jar");
+ 		Mercury mercury = getMercuryInstance();
+ 

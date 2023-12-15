@@ -1,12 +1,10 @@
-pluginManagement {
-  repositories {
-    gradlePluginPortal()
-    maven("https://files.minecraftforge.net/maven/")
+maybeIncludeBuild("quiet-fabric-loom")
+maybeIncludeBuild("quiet-architectury-loom")
+
+fun maybeIncludeBuild(path: String) {
+  if (file(path).exists()) {
+    includeBuild(path)
   }
 }
 
-if (file("patched-loom").exists()) {
-  includeBuild("patched-loom")
-}
-
-rootProject.name = "quiet-loom"
+rootProject.name = "quiet-loom-parent"

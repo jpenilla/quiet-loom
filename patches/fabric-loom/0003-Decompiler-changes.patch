@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Thu, 1 Jul 2021 22:01:14 -0700
+Subject: [PATCH] Decompiler changes
+
+
+diff --git a/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java b/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java
+index ad865d735bab1094a77d172e6e96c5107ded8904..bf54a2e250369fde15c8ee32dd07ddf0aa177d79 100644
+--- a/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java
++++ b/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java
+@@ -48,7 +48,7 @@ public final class VineflowerDecompiler implements LoomInternalDecompiler {
+ 					IFernflowerPreferences.REMOVE_SYNTHETIC, "1",
+ 					IFernflowerPreferences.LOG_LEVEL, "trace",
+ 					IFernflowerPreferences.THREADS, String.valueOf(context.numberOfThreads()),
+-					IFernflowerPreferences.INDENT_STRING, "\t",
++					IFernflowerPreferences.INDENT_STRING, "  ", // quiet
+ 					IFabricJavadocProvider.PROPERTY_NAME, new TinyJavadocProvider(context.javaDocs().toFile())
+ 				)
+ 		);
+diff --git a/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
+index 538c3018b085067e3d0e99d6fc8a0530b07cf6e9..9713b31bab625acc9332d9170f626c9dc77c6df6 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
++++ b/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
+@@ -68,7 +68,7 @@ public class SingleJarDecompileConfiguration extends DecompileConfiguration<Mapp
+ 			task.setDescription("Decompile minecraft using the default decompiler.");
+ 			task.setGroup(Constants.TaskGroup.FABRIC);
+ 
+-			task.dependsOn(project.getTasks().named("genSourcesWithCfr"));
++			task.dependsOn(project.getTasks().named("genSourcesWithVineflower")); // quiet
+ 		});
+ 	}
+ }
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
+index 23a099af43e007602a2cdd424f6a3b3aff5771b4..f8f0e3e1cf39a5c64caee70da95ad626eae1ea1c 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
+@@ -83,8 +83,8 @@ class DebugLineNumbersTest extends Specification implements GradleProjectTestTra
+             '''
+ 		when:
+ 		// First generate sources
+-		def genSources = gradle.run(task: "genSources")
+-		genSources.task(":genSources").outcome == SUCCESS
++		def genSources = gradle.run(task: "genSourcesWithCfr")
++		genSources.task(":genSourcesWithCfr").outcome == SUCCESS
+ 
+ 		// Print out the source of the file
+ 		def lines = getClassSource(gradle, "net/minecraft/server/dedicated/ServerPropertiesLoader.java").lines().toList()

@@ -5,20 +5,21 @@ Subject: [PATCH] Remove annoying warning
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
-index 541fd489e57c300ae8d7e8ade033d9b607fc3467..12c0fbedd6c83a9ec6f8643afff3a660a4d109a6 100644
+index a6adf4e46b937de6a2786bf4d352e6f4bebdf180..c3a1d2f94c8665bd6efa30450b5109d103205525 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
-@@ -58,8 +58,6 @@ public record MojangMappingLayer(MinecraftVersionMeta.Download clientDownload,
+@@ -51,9 +51,6 @@ public record MojangMappingLayer(String minecraftVersion,
+ 	private static final Pattern SYNTHETIC_NAME_PATTERN = Pattern.compile("^(access|this|val\\$this|lambda\\$.*)\\$[0-9]+$");
+ 	@Override
+ 	public void visit(MappingVisitor mappingVisitor) throws IOException {
+-		if (!silenceLicense.isSilent()) {
+-			printMappingsLicense(clientMappings);
+-		}
  
- 		download(clientMappings, serverMappings);
- 
--		printMappingsLicense(clientMappings);
--
  		// Filter out field names matching the pattern
  		DstNameFilterMappingVisitor nameFilter = new DstNameFilterMappingVisitor(mappingVisitor, SYNTHETIC_NAME_PATTERN);
- 
-@@ -78,24 +76,6 @@ public record MojangMappingLayer(MinecraftVersionMeta.Download clientDownload,
- 		HashedDownloadUtil.downloadIfInvalid(new URL(serverDownload().url()), serverMappings.toFile(), serverDownload().sha1(), logger(), false);
+@@ -68,24 +65,6 @@ public record MojangMappingLayer(String minecraftVersion,
+ 		}
  	}
  
 -	private void printMappingsLicense(Path clientMappings) {
