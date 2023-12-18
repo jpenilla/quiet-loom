@@ -189,7 +189,7 @@ index ff2d328dd69f147313ddeaa693eb1f8ffacf5e3c..38d01a958b6e03a4d9ee91aad5d5b47c
  
  		getUseMixinAP().set(LoomGradleExtension.get(getProject()).getMixin().getUseLegacyMixinAp());
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index 54fbeeb0f5657d45336b7d78f5fed12a453caeed..69998b9c46776ee949c5ccbbab773a8511418103 100644
+index 251f626d9348de1a3e8e96c943bb698e30347a3a..4aecf343ebe52130a642129cf1c092cdfa6c8077 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -46,6 +46,7 @@ public class Constants {

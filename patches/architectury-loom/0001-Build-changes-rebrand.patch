@@ -19,7 +19,7 @@ index 36452a5b0cba931fd34b8179fc218c81b8208f03..9c62f78cffa160885fd599c0a4bf9e50
 +# These are explicitly windows files and should use crlf
 +*.bat           text eol=crlf
 diff --git a/build.gradle b/build.gradle
-index 287b0ce3db6ddcdb0d9184d67d02efabf09972cb..7284ef106748da25ae7c25a8cb02f49a3abd1206 100644
+index be71038b8c967be54f9adaf445a57d11bc4760f5..90cf3e716684970fff30bad017160a0f72554884 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,11 +5,10 @@ plugins {
@@ -62,7 +62,7 @@ index 287b0ce3db6ddcdb0d9184d67d02efabf09972cb..7284ef106748da25ae7c25a8cb02f49a
  
  logger.lifecycle(":building plugin v${version}")
  
-@@ -238,52 +235,12 @@ java {
+@@ -239,52 +236,12 @@ java {
  	targetCompatibility = JavaVersion.VERSION_17
  }
  
@@ -117,7 +117,7 @@ index 287b0ce3db6ddcdb0d9184d67d02efabf09972cb..7284ef106748da25ae7c25a8cb02f49a
  			implementationClass = 'net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap'
  		}
  	}
-@@ -331,7 +288,6 @@ import org.w3c.dom.Node
+@@ -332,7 +289,6 @@ import org.w3c.dom.Node
  
  publishing {
  	publications {
@@ -125,7 +125,7 @@ index 287b0ce3db6ddcdb0d9184d67d02efabf09972cb..7284ef106748da25ae7c25a8cb02f49a
  
  			// Also publish a snapshot so people can use the latest version if they wish
  			snapshot(MavenPublication) { publication ->
-@@ -344,8 +300,8 @@ publishing {
+@@ -345,8 +301,8 @@ publishing {
  
  		// Manually crate the plugin marker for snapshot versions
  		snapshotPlugin(MavenPublication) {
@@ -136,7 +136,7 @@ index 287b0ce3db6ddcdb0d9184d67d02efabf09972cb..7284ef106748da25ae7c25a8cb02f49a
  			version baseVersion + '-SNAPSHOT'
  
  			pom.withXml {
-@@ -365,13 +321,13 @@ publishing {
+@@ -366,13 +322,13 @@ publishing {
  	}
  
  	repositories {
@@ -157,7 +157,7 @@ index 287b0ce3db6ddcdb0d9184d67d02efabf09972cb..7284ef106748da25ae7c25a8cb02f49a
  			}
  		}
  	}
-@@ -403,10 +359,10 @@ task writeActionsTestMatrix() {
+@@ -404,10 +360,10 @@ task writeActionsTestMatrix() {
  					return
  				}
  
@@ -209,7 +209,7 @@ index 3f4833bc674ec44955425faa92d47541fb0b18b3..0e746e95f360f251f54407a4a96a5e8a
  
  		LibraryLocationLogger.logLibraryVersions();
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index 37b1ffafe8617793d51e7d533c434392dff72a87..54fbeeb0f5657d45336b7d78f5fed12a453caeed 100644
+index a9e3f313cd095bb84eca39be64041296c04ee130..251f626d9348de1a3e8e96c943bb698e30347a3a 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -27,7 +27,7 @@ package net.fabricmc.loom.util;

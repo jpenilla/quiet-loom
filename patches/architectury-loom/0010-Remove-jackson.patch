@@ -6,7 +6,7 @@ Subject: [PATCH] Remove jackson
 It's pointless to load two different json libraries when gson supports records now
 
 diff --git a/build.gradle b/build.gradle
-index 7284ef106748da25ae7c25a8cb02f49a3abd1206..6a0e01154d52b977ce194d2222070e5e9ab363ce 100644
+index 90cf3e716684970fff30bad017160a0f72554884..7adadc55698c220b1e71a5fe14e972c8e916922e 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -127,7 +127,7 @@ dependencies {
@@ -175,7 +175,7 @@ index b84557f3064151cf5e76e32d74eac0c762a0d2a6..40fa937d85f592c3856afdd00c985606
  		}
  
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index 69998b9c46776ee949c5ccbbab773a8511418103..124b805c141339994a8d28e0dddaad91600a0c43 100644
+index 4aecf343ebe52130a642129cf1c092cdfa6c8077..11bebb8fdf7fa9a85ee24940b3f46a4db54d2c7a 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -24,6 +24,9 @@
@@ -188,8 +188,8 @@ index 69998b9c46776ee949c5ccbbab773a8511418103..124b805c141339994a8d28e0dddaad91
  import org.objectweb.asm.Opcodes;
  
  public class Constants {
-@@ -151,6 +154,10 @@ public class Constants {
- 		public static final String LIBRARY_PROCESSORS = "fabric.loom.libraryProcessors";
+@@ -152,6 +155,10 @@ public class Constants {
+ 		public static final String ALLOW_MISMATCHED_PLATFORM_VERSION = "loom.allowMismatchedPlatformVersion";
  	}
  
 +	public static final class TypeTokens {
