@@ -5,7 +5,7 @@ Subject: [PATCH] Pass LinkOptions.NOFOLLOW_LINKS for exists checks
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
-index 024a35c8843e8f866f3885a1414124854bfe97ef..a560530a5673a178d12424906d22569abc3a1604 100644
+index 15822aca393bfed62e40fb279313eb69a92de891..2ec2e1edeee9caee1a3dadce6bdd930f3d2143d7 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
 @@ -28,6 +28,7 @@ import java.io.ByteArrayInputStream;
@@ -25,7 +25,7 @@ index 024a35c8843e8f866f3885a1414124854bfe97ef..a560530a5673a178d12424906d22569a
  				final var manifest = new Manifest(new ByteArrayInputStream(Files.readAllBytes(manifestPath)));
  				final Attributes mainAttributes = manifest.getMainAttributes();
  				final String value = mainAttributes.getValue(MANIFEST_REMAP_KEY);
-@@ -68,7 +69,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
+@@ -74,7 +75,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
  
  			final Path installerPath = fs.getPath(INSTALLER_PATH);
  
