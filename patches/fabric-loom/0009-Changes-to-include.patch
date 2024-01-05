@@ -9,7 +9,7 @@ Subject: [PATCH] Changes to include
   breaks platform dependencies needlessly.
 
 diff --git a/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java b/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
-index 3cf13e036183c212ad493a1643b3c144b898c22c..b602acbb2954800f6f7b5dea47a7605c3f0f5b8c 100644
+index 3cf13e036183c212ad493a1643b3c144b898c22c..dc16e725060d2ebbb7b8d2938eba51b64fffe082 100644
 --- a/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
 +++ b/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
 @@ -29,7 +29,9 @@ import java.io.IOException;
@@ -83,7 +83,7 @@ index 3cf13e036183c212ad493a1643b3c144b898c22c..b602acbb2954800f6f7b5dea47a7605c
 +						artifact.getClassifier()
 +				);
 +
-+				files.from(this.project.provider(() -> this.getNestableJar(artifact.getFile(), metadata)));
++				files.from(this.getNestableJar(artifact.getFile(), metadata));
 +			} else if (id instanceof ProjectComponentIdentifier projectId) {
 +				final ProjectDependency dependency = (ProjectDependency) this.project.getDependencies().project(Map.of("path", projectId.getProjectPath()));
 +
