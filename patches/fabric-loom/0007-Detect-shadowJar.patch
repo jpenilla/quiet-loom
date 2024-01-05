@@ -5,28 +5,33 @@ Subject: [PATCH] Detect shadowJar
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 2f48bbdfbf275d49edbcab62ca7c0f5ef1099081..a22122b2e82c12669ebc59e75ce9ce4b382168ff 100644
+index 6bfe5eb893e5edc2eb8d9a7161e88c78d91e33a3..0806c5dd5af2c712e15c20deef5d243364438ca5 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -95,6 +95,21 @@ public abstract class RemapTaskConfiguration implements Runnable {
- 			// task.getDestinationDirectory().set(new File(getProject().getBuildDir(), "devlibs")); // quiet - no
- 		});
- 
+@@ -93,6 +93,26 @@ public abstract class RemapTaskConfiguration implements Runnable {
+ 		} else {
+ 			getTasks().register(REMAP_JAR_TASK_NAME, RemapJarTask.class, remapJarTaskAction);
+ 		}
 +		// quiet start
-+		getProject().getPlugins().withId("com.github.johnrengelman.shadow", new org.gradle.api.Action<>() {
++		getProject().getPlugins().withId("com.github.johnrengelman.shadow", new Action<>() {
 +			@Override
 +			public void execute(final org.gradle.api.Plugin shadowPlugin) {
 +				final TaskProvider<AbstractArchiveTask> shadowJar = getTasks().named("shadowJar", AbstractArchiveTask.class);
-+				shadowJar.configure(new org.gradle.api.Action<>() {
++				shadowJar.configure(new Action<>() {
 +					@Override
 +					public void execute(final AbstractArchiveTask shadowJarTask) {
 +						shadowJarTask.getArchiveClassifier().convention("dev-all");
 +					}
 +				});
-+				remapJarTask.getInputFile().convention(shadowJar.flatMap(AbstractArchiveTask::getArchiveFile));
++				getTasks().named(REMAP_JAR_TASK_NAME, RemapJarTask.class).configure(new Action<>() {
++					@Override
++					public void execute(RemapJarTask remapJarTask) {
++						remapJarTask.getInputFile().convention(shadowJar.flatMap(AbstractArchiveTask::getArchiveFile));
++					}
++				});
 +			}
 +		});
 +		// quiet end
- 		getTasks().named(BasePlugin.ASSEMBLE_TASK_NAME).configure(task -> task.dependsOn(remapJarTask));
  
- 		trySetupSourceRemapping();
+ 		// Configure the default jar task
+ 		getTasks().named(JavaPlugin.JAR_TASK_NAME, AbstractArchiveTask.class).configure(task -> {

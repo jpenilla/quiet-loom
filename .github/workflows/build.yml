@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        buildDir: [ "quiet-fabric-loom", "quiet-architectury-loom" ]
+        buildDir: [ "quiet-fabric-loom" ]#, "quiet-architectury-loom" ]
         java: [ "17" ]
         os: [ "ubuntu-latest" ]
     # Only run on PRs if the source branch is on someone else's repo

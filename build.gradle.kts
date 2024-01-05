@@ -8,9 +8,9 @@ gitPatcher.patchedRepos {
     target = file("quiet-fabric-loom")
     patches = file("patches/fabric-loom")
   }
-  register("architecturyLoom") {
-    submodule = "upstreams/architectury-loom"
-    target = file("quiet-architectury-loom")
-    patches = file("patches/architectury-loom")
-  }
+  // register("architecturyLoom") {
+  //   submodule = "upstreams/architectury-loom"
+  //   target = file("quiet-architectury-loom")
+  //   patches = file("patches/architectury-loom")
+  // }
 }

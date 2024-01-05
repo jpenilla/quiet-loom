@@ -6,10 +6,10 @@ Subject: [PATCH] avoid reading the same jar multiple times during
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java b/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java
-index 7ff0fbc78dc242a82a925ca72dd85168116aa115..baf4e5305c1eb5009b651bdf353f53734101a531 100644
+index 1564e8bbb99baf71aa4df40479139fb6c254c7d8..29331d500e9451d9c8f4c4a28bf6d8fc8606db51 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java
-@@ -125,6 +125,7 @@ public class ModConfigurationRemapper {
+@@ -137,6 +137,7 @@ public class ModConfigurationRemapper {
  		// the installer data. The installer data has to be added before
  		// any mods are remapped since remapping needs the dependencies provided by that data.
  		final Map<Configuration, List<ModDependency>> dependenciesBySourceConfig = new HashMap<>();
@@ -17,25 +17,21 @@ index 7ff0fbc78dc242a82a925ca72dd85168116aa115..baf4e5305c1eb5009b651bdf353f5373
  		configsToRemap.forEach((sourceConfig, remappedConfig) -> {
  			/*
  			sourceConfig - The source configuration where the intermediary named artifacts come from. i.e "modApi"
-@@ -137,9 +138,15 @@ public class ModConfigurationRemapper {
+@@ -148,11 +149,13 @@ public class ModConfigurationRemapper {
+ 			for (ArtifactRef artifact : resolveArtifacts(project, sourceConfig)) {
  				final ArtifactMetadata artifactMetadata;
  
++				artifactMetadata = metaCache.computeIfAbsent(artifact, a -> {
  				try {
--					artifactMetadata = ArtifactMetadata.create(artifact);
--				} catch (IOException e) {
--					throw new UncheckedIOException("Failed to read metadata from" + artifact.path(), e);
-+					artifactMetadata = metaCache.computeIfAbsent(artifact, a -> {
-+						try {
-+							return ArtifactMetadata.create(a);
-+						} catch (final IOException e) {
-+							throw new UncheckedIOException(e);
-+						}
-+					});
-+				} catch (UncheckedIOException e) {
-+					throw new UncheckedIOException("Failed to read metadata from" + artifact.path(), e.getCause());
+-					artifactMetadata = ArtifactMetadata.create(artifact, LoomGradlePlugin.LOOM_VERSION);
++					return ArtifactMetadata.create(a, LoomGradlePlugin.LOOM_VERSION);
+ 				} catch (IOException e) {
+ 					throw ExceptionUtil.createDescriptiveWrapper(UncheckedIOException::new, "Failed to read metadata from " + artifact.path(), e);
  				}
++				});
  
  				if (artifactMetadata.installerData() != null) {
+ 					if (extension.getInstallerData() != null) {
 diff --git a/src/main/java/net/fabricmc/loom/configuration/processors/SpecContextImpl.java b/src/main/java/net/fabricmc/loom/configuration/processors/SpecContextImpl.java
 index 622a0a1c6766aed0f526019e7cf09b5042ed8bac..d61faddd12e89c37d886c6ed49dcd5c04028bbe9 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/processors/SpecContextImpl.java

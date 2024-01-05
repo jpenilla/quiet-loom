@@ -5,7 +5,7 @@ Subject: [PATCH] Pass LinkOptions.NOFOLLOW_LINKS for exists checks
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
-index 15822aca393bfed62e40fb279313eb69a92de891..2ec2e1edeee9caee1a3dadce6bdd930f3d2143d7 100644
+index 057cde42e019d890d7a9289bde235ff0efc35a7b..04b0d618359df5ce125647cef43cb56107974af6 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
 @@ -28,6 +28,7 @@ import java.io.ByteArrayInputStream;
@@ -14,18 +14,18 @@ index 15822aca393bfed62e40fb279313eb69a92de891..2ec2e1edeee9caee1a3dadce6bdd930f
  import java.nio.file.Files;
 +import java.nio.file.LinkOption;
  import java.nio.file.Path;
+ import java.util.Locale;
  import java.util.function.Predicate;
- import java.util.jar.Attributes;
-@@ -55,7 +56,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
+@@ -56,7 +57,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
  			isFabricMod = FabricModJsonFactory.containsMod(fs);
- 			final Path manifestPath = fs.getPath(MANIFEST_PATH);
+ 			final Path manifestPath = fs.getPath(Constants.Manifest.PATH);
  
 -			if (Files.exists(manifestPath)) {
 +			if (Files.exists(manifestPath, LinkOption.NOFOLLOW_LINKS)) {
  				final var manifest = new Manifest(new ByteArrayInputStream(Files.readAllBytes(manifestPath)));
  				final Attributes mainAttributes = manifest.getMainAttributes();
- 				final String value = mainAttributes.getValue(MANIFEST_REMAP_KEY);
-@@ -74,7 +75,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
+ 				final String remapValue = mainAttributes.getValue(Constants.Manifest.REMAP_KEY);
+@@ -83,7 +84,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
  
  			final Path installerPath = fs.getPath(INSTALLER_PATH);
  
@@ -56,7 +56,7 @@ index 0a097c8312e36f3fba32a378a72648253b4f2ee1..43e1a342e7cc4bb1ee84367c2a115541
  			} else {
  				throw new NoSuchFileException(fsPath.toString());
 diff --git a/src/main/java/net/fabricmc/loom/util/ZipUtils.java b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
-index f6214aed8a99b99af52dcca76d78a36c2cf29213..6295d92313f0720ea278329b56029c04d6b8cb8c 100644
+index 9b387ad9fecad3b5fe28c28ad79bdba6390d85d3..44898539e8e7b7f6a1a4de065253695bef962d12 100644
 --- a/src/main/java/net/fabricmc/loom/util/ZipUtils.java
 +++ b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
 @@ -31,6 +31,7 @@ import java.io.InputStreamReader;
