@@ -140,7 +140,7 @@ index 16d98b73eb90fef75c59fe976980ff6aa4293ab9..e1faa5c5e1c9c32a349746544877f187
  
  		register(Constants.Configurations.NAMED_ELEMENTS, Role.CONSUMABLE).configure(configuration -> {
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-index cb302af09fbbec0f512bf98224d0c7d70341610c..1baa74ba400955ff41675d5890e76fe0d1ff13b4 100644
+index 0948b353e3907f4b4113a5fe8005786aa197805b..f442a62ba7c978670d10f7315a4c14b231436dbc 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
 @@ -102,7 +102,9 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
