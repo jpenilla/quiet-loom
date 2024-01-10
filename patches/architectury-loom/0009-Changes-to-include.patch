@@ -189,10 +189,10 @@ index ff2d328dd69f147313ddeaa693eb1f8ffacf5e3c..38d01a958b6e03a4d9ee91aad5d5b47c
  
  		getUseMixinAP().set(LoomGradleExtension.get(getProject()).getMixin().getUseLegacyMixinAp());
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index 251f626d9348de1a3e8e96c943bb698e30347a3a..4aecf343ebe52130a642129cf1c092cdfa6c8077 100644
+index 689d763e6567546d8744e36171d7398ca708da2b..c12510bcf32cda9c0da04c9d287dc10b34c36ad3 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
-@@ -46,6 +46,7 @@ public class Constants {
+@@ -48,6 +48,7 @@ public class Constants {
  		public static final String MOD_COMPILE_CLASSPATH = "modCompileClasspath";
  		public static final String MOD_COMPILE_CLASSPATH_MAPPED = "modCompileClasspathMapped";
  		public static final String INCLUDE = "include";
