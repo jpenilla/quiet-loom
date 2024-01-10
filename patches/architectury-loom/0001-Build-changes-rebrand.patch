@@ -195,21 +195,20 @@ index 1856764627777899065d24f8ff6b936251afff54..cfbd37d74b37ce76f362c0a23dbb4930
  dependencyResolutionManagement {
  	versionCatalogs {
 diff --git a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
-index 3f4833bc674ec44955425faa92d47541fb0b18b3..0e746e95f360f251f54407a4a96a5e8aa4e45ae5 100644
+index 9ae6b3a5d5075cd10cca5a0b35da847716029bf0..35d0fc7ff5faee0044f590a00c0f105f7126c73a 100644
 --- a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
 +++ b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
-@@ -87,8 +87,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
+@@ -88,7 +88,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
  		if (!loggedVersions.contains(LOOM_VERSION)) {
  			loggedVersions.add(LOOM_VERSION);
  			System.setProperty("loom.printed.logged", String.join(",", loggedVersions));
 -			project.getLogger().lifecycle("Architectury Loom: " + LOOM_VERSION);
--			project.getLogger().lifecycle("This version of Architectury Loom is in beta! Please report any issues you encounter: https://github.com/architectury/architectury-loom/issues");
 +			project.getLogger().lifecycle("Quiet Architectury Loom: " + LOOM_VERSION); // quiet
- 		}
  
- 		LibraryLocationLogger.logLibraryVersions();
+ 			if (Constants.PLUGIN_BETA) {
+ 				project.getLogger().lifecycle("This version of Architectury Loom is in beta! Please report any issues you encounter: https://github.com/architectury/architectury-loom/issues");
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index a9e3f313cd095bb84eca39be64041296c04ee130..251f626d9348de1a3e8e96c943bb698e30347a3a 100644
+index dd7ccb5f52ead4bc8924daea871c63f0525c8a43..689d763e6567546d8744e36171d7398ca708da2b 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -27,7 +27,7 @@ package net.fabricmc.loom.util;
@@ -218,9 +217,9 @@ index a9e3f313cd095bb84eca39be64041296c04ee130..251f626d9348de1a3e8e96c943bb698e
  public class Constants {
 -	public static final String PLUGIN_ID = "dev.architectury.loom";
 +	public static final String PLUGIN_ID = "xyz.jpenilla.quiet-architectury-loom";
+ 	public static final boolean PLUGIN_BETA = false;
+ 	public static final boolean PLUGIN_DEPRECATED = false;
  	public static final String LIBRARIES_BASE = "https://libraries.minecraft.net/";
- 	public static final String RESOURCES_BASE = "https://resources.download.minecraft.net/";
- 	public static final String VERSION_MANIFESTS = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 index 7a4d82986e9a161908f76ebd88c6978846bace52..388bcb9ce44ec31eb46bf43068c6bdd04c821550 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy

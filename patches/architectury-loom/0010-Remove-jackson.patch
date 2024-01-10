@@ -19,7 +19,7 @@ index 90cf3e716684970fff30bad017160a0f72554884..7adadc55698c220b1e71a5fe14e972c8
  	implementation libs.bundles.asm
  
 diff --git a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
-index 0e746e95f360f251f54407a4a96a5e8aa4e45ae5..7b5d75b72a734ad8bda83f10d754fac84ef8f2ca 100644
+index 35d0fc7ff5faee0044f590a00c0f105f7126c73a..5a824d4009c4fafa758a786a000e21f0225715ae 100644
 --- a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
 +++ b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
 @@ -30,8 +30,6 @@ import java.util.Arrays;
@@ -31,7 +31,7 @@ index 0e746e95f360f251f54407a4a96a5e8aa4e45ae5..7b5d75b72a734ad8bda83f10d754fac8
  import com.google.common.collect.ImmutableMap;
  import com.google.gson.Gson;
  import com.google.gson.GsonBuilder;
-@@ -55,7 +53,6 @@ import net.fabricmc.loom.util.LibraryLocationLogger;
+@@ -56,7 +54,6 @@ import net.fabricmc.loom.util.LibraryLocationLogger;
  
  public class LoomGradlePlugin implements BootstrappedPlugin {
  	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -175,7 +175,7 @@ index b84557f3064151cf5e76e32d74eac0c762a0d2a6..40fa937d85f592c3856afdd00c985606
  		}
  
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index 4aecf343ebe52130a642129cf1c092cdfa6c8077..11bebb8fdf7fa9a85ee24940b3f46a4db54d2c7a 100644
+index c12510bcf32cda9c0da04c9d287dc10b34c36ad3..207acac050652fb92cf92bfa1b6f1f15ee7d0007 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -24,6 +24,9 @@
@@ -188,7 +188,7 @@ index 4aecf343ebe52130a642129cf1c092cdfa6c8077..11bebb8fdf7fa9a85ee24940b3f46a4d
  import org.objectweb.asm.Opcodes;
  
  public class Constants {
-@@ -152,6 +155,10 @@ public class Constants {
+@@ -154,6 +157,10 @@ public class Constants {
  		public static final String ALLOW_MISMATCHED_PLATFORM_VERSION = "loom.allowMismatchedPlatformVersion";
  	}
  
