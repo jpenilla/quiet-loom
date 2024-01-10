@@ -18,10 +18,10 @@ index ad865d735bab1094a77d172e6e96c5107ded8904..bf54a2e250369fde15c8ee32dd07ddf0
  				)
  		);
 diff --git a/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
-index d7ee6df6ef6904285f1ac30d471c14ffdc5e3f5c..0b92fe7a972b8f80d0d5b32ea1ae4387971c31cd 100644
+index 2b9b9b95c7c4ed86fb7cc60728168ffdce47a7d9..be3937fd5998907ff310eec8d767fc01c0a7923c 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
-@@ -71,7 +71,7 @@ public class SingleJarDecompileConfiguration extends DecompileConfiguration<Mapp
+@@ -78,7 +78,7 @@ public class SingleJarDecompileConfiguration extends DecompileConfiguration<Mapp
  			task.setDescription("Decompile minecraft using the default decompiler.");
  			task.setGroup(Constants.TaskGroup.FABRIC);
  
@@ -31,10 +31,10 @@ index d7ee6df6ef6904285f1ac30d471c14ffdc5e3f5c..0b92fe7a972b8f80d0d5b32ea1ae4387
  
  		// TODO: Support for env-only jars?
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
-index 23a099af43e007602a2cdd424f6a3b3aff5771b4..f8f0e3e1cf39a5c64caee70da95ad626eae1ea1c 100644
+index dd2203207296cfd4e8ba071b12270e2fd530bf8c..9fd6cb6238af66bc50fe175cec7bde96ac8b4b79 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
-@@ -83,8 +83,8 @@ class DebugLineNumbersTest extends Specification implements GradleProjectTestTra
+@@ -84,8 +84,8 @@ class DebugLineNumbersTest extends Specification implements GradleProjectTestTra
              '''
  		when:
  		// First generate sources

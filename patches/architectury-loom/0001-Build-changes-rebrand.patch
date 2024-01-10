@@ -4,22 +4,8 @@ Date: Thu, 1 Jul 2021 21:06:34 -0700
 Subject: [PATCH] Build changes & rebrand
 
 
-diff --git a/.gitattributes b/.gitattributes
-index 36452a5b0cba931fd34b8179fc218c81b8208f03..9c62f78cffa160885fd599c0a4bf9e50c089611a 100644
---- a/.gitattributes
-+++ b/.gitattributes
-@@ -36,3 +36,9 @@
- *.png           binary
- *.so            binary
- *.war           binary
-+
-+#
-+# https://help.github.com/articles/dealing-with-line-endings/
-+#
-+# These are explicitly windows files and should use crlf
-+*.bat           text eol=crlf
 diff --git a/build.gradle b/build.gradle
-index be71038b8c967be54f9adaf445a57d11bc4760f5..90cf3e716684970fff30bad017160a0f72554884 100644
+index 279d6d44980db9e001db6643ac082cab80f0b599..faf75f5af646a1bb5d3845e6234b0e6e45362e0a 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,11 +5,10 @@ plugins {
@@ -42,7 +28,7 @@ index be71038b8c967be54f9adaf445a57d11bc4760f5..90cf3e716684970fff30bad017160a0f
  
 -group = "dev.architectury"
 +group = "xyz.jpenilla" // quiet
- def baseVersion = '1.4'
+ def baseVersion = '1.5'
  
  def ENV = System.getenv()
 -def runNumber = ENV.GITHUB_RUN_NUMBER ?: "9999"
@@ -62,11 +48,13 @@ index be71038b8c967be54f9adaf445a57d11bc4760f5..90cf3e716684970fff30bad017160a0f
  
  logger.lifecycle(":building plugin v${version}")
  
-@@ -239,52 +236,12 @@ java {
+@@ -238,54 +235,12 @@ java {
  	targetCompatibility = JavaVersion.VERSION_17
  }
  
 -spotless {
+-	lineEndings = com.diffplug.spotless.LineEnding.UNIX
+-
 -	java {
 -		licenseHeaderFile(rootProject.file("HEADER")).yearSeparator("-")
 -		targetExclude("**/loom/util/DownloadUtil.java", "**/loom/util/FileSystemUtil.java")
@@ -117,7 +105,7 @@ index be71038b8c967be54f9adaf445a57d11bc4760f5..90cf3e716684970fff30bad017160a0f
  			implementationClass = 'net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap'
  		}
  	}
-@@ -332,7 +289,6 @@ import org.w3c.dom.Node
+@@ -333,7 +288,6 @@ import org.w3c.dom.Node
  
  publishing {
  	publications {
@@ -125,7 +113,7 @@ index be71038b8c967be54f9adaf445a57d11bc4760f5..90cf3e716684970fff30bad017160a0f
  
  			// Also publish a snapshot so people can use the latest version if they wish
  			snapshot(MavenPublication) { publication ->
-@@ -345,8 +301,8 @@ publishing {
+@@ -346,8 +300,8 @@ publishing {
  
  		// Manually crate the plugin marker for snapshot versions
  		snapshotPlugin(MavenPublication) {
@@ -136,7 +124,7 @@ index be71038b8c967be54f9adaf445a57d11bc4760f5..90cf3e716684970fff30bad017160a0f
  			version baseVersion + '-SNAPSHOT'
  
  			pom.withXml {
-@@ -366,13 +322,13 @@ publishing {
+@@ -367,13 +321,13 @@ publishing {
  	}
  
  	repositories {
@@ -157,7 +145,7 @@ index be71038b8c967be54f9adaf445a57d11bc4760f5..90cf3e716684970fff30bad017160a0f
  			}
  		}
  	}
-@@ -404,10 +360,10 @@ task writeActionsTestMatrix() {
+@@ -405,10 +359,10 @@ task writeActionsTestMatrix() {
  					return
  				}
  
@@ -195,10 +183,10 @@ index 1856764627777899065d24f8ff6b936251afff54..cfbd37d74b37ce76f362c0a23dbb4930
  dependencyResolutionManagement {
  	versionCatalogs {
 diff --git a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
-index 9ae6b3a5d5075cd10cca5a0b35da847716029bf0..35d0fc7ff5faee0044f590a00c0f105f7126c73a 100644
+index 40be7917a362360935de52e7c9364f2f4073187c..5a824d4009c4fafa758a786a000e21f0225715ae 100644
 --- a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
 +++ b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
-@@ -88,7 +88,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
+@@ -85,7 +85,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
  		if (!loggedVersions.contains(LOOM_VERSION)) {
  			loggedVersions.add(LOOM_VERSION);
  			System.setProperty("loom.printed.logged", String.join(",", loggedVersions));
@@ -208,7 +196,7 @@ index 9ae6b3a5d5075cd10cca5a0b35da847716029bf0..35d0fc7ff5faee0044f590a00c0f105f
  			if (Constants.PLUGIN_BETA) {
  				project.getLogger().lifecycle("This version of Architectury Loom is in beta! Please report any issues you encounter: https://github.com/architectury/architectury-loom/issues");
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index dd7ccb5f52ead4bc8924daea871c63f0525c8a43..689d763e6567546d8744e36171d7398ca708da2b 100644
+index ee76d7f989c3f6e71e952e506de1085dcbc8c758..c646772a6036908a34bba1276e8d9579127e0eb6 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -27,7 +27,7 @@ package net.fabricmc.loom.util;
@@ -217,32 +205,21 @@ index dd7ccb5f52ead4bc8924daea871c63f0525c8a43..689d763e6567546d8744e36171d7398c
  public class Constants {
 -	public static final String PLUGIN_ID = "dev.architectury.loom";
 +	public static final String PLUGIN_ID = "xyz.jpenilla.quiet-architectury-loom";
- 	public static final boolean PLUGIN_BETA = false;
+ 	public static final boolean PLUGIN_BETA = true;
  	public static final boolean PLUGIN_DEPRECATED = false;
  	public static final String LIBRARIES_BASE = "https://libraries.minecraft.net/";
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-index 7a4d82986e9a161908f76ebd88c6978846bace52..388bcb9ce44ec31eb46bf43068c6bdd04c821550 100644
+index beb818382ea6358c2f29e00cb5a07b8a4da62530..9eace53af74cca1becc4f28ae04f2837f9719abd 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-@@ -37,6 +37,7 @@ import static net.fabricmc.loom.test.LoomTestConstants.*
+@@ -38,6 +38,7 @@ import static net.fabricmc.loom.test.LoomTestConstants.*
  import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
  
  @Timeout(value = 30, unit = TimeUnit.MINUTES)
 +@spock.lang.Ignore
  class FabricAPITest extends Specification implements GradleProjectTestTrait {
- 	private static final String API_VERSION = "0.0.0+loom"
- 
-@@ -54,8 +55,8 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
- 
- 		// Set the version to something constant
- 		gradle.buildGradle.text = gradle.buildGradle.text.replace('project.version + "+" + (ENV.GITHUB_RUN_NUMBER ? "" : "local-") + getBranch()', "\"$API_VERSION\"")
--				.replace('id "fabric-loom" version "0.9.50"', 'id "dev.architectury.loom"')
--				.replace('"fabric-loom"', '"dev.architectury.loom"')
-+				.replaceAll('id "fabric-loom" version "([0-9.]+)"', 'id "xyz.jpenilla.quiet-architectury-loom"') // quiet
-+				.replace('"fabric-loom"', '"xyz.jpenilla.quiet-architectury-loom"') // quiet
- 
- 		def server = ServerRunner.create(gradle.projectDir, "23w33a")
- 				.withMod(gradle.getOutputFile("fabric-api-${API_VERSION}.jar"))
+ 	@Unroll
+ 	def "build and run (gradle #version, mixin ap disabled: #disableMixinAp)"() {
 diff --git a/src/test/resources/projects/accesswidener/build.gradle b/src/test/resources/projects/accesswidener/build.gradle
 index db62caeee6219cbac5a8e90e080ded4a04454cae..fe2d8c666c9eb486116d7b9d87edffaaa3866f9f 100644
 --- a/src/test/resources/projects/accesswidener/build.gradle
@@ -404,6 +381,17 @@ index 99d3cd63e4c73e552c18b8bc4ef61357376f82cd..57d4b0130e0548d5f1db87c5c752e377
  	id 'maven-publish'
  }
  
+diff --git a/src/test/resources/projects/includedJars/build.gradle b/src/test/resources/projects/includedJars/build.gradle
+index 5808e9a528be3a3ec57a506048debee521615bc7..55d93c4282180c8527860c64987a176f3a915d51 100644
+--- a/src/test/resources/projects/includedJars/build.gradle
++++ b/src/test/resources/projects/includedJars/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'fabric-loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ }
+ 
+ repositories {
 diff --git a/src/test/resources/projects/interfaceInjection/build.gradle b/src/test/resources/projects/interfaceInjection/build.gradle
 index 7d0a7c17e2693dabab246c42a5e0395ee3edb74d..fa92fbe46077c50ca7b171eb45ce2e462333fcc9 100644
 --- a/src/test/resources/projects/interfaceInjection/build.gradle
@@ -629,7 +617,7 @@ index c866b265579609e51d0c72273488477a21237716..2a72b6c0c7a5b37d98bef73f66ba49b3
  }
  
 diff --git a/src/test/resources/projects/runconfigs/build.gradle b/src/test/resources/projects/runconfigs/build.gradle
-index 2b146cee076db3751b4958e50a71c8e5bf3c608b..c9ef83f0e2805a00945fd2930bbb726508668a3a 100644
+index 679a3b236a153a1acef07307fe1a398462106b9a..dcecfc7023fb28141a89970330957e0867d80a4e 100644
 --- a/src/test/resources/projects/runconfigs/build.gradle
 +++ b/src/test/resources/projects/runconfigs/build.gradle
 @@ -1,5 +1,5 @@
@@ -651,7 +639,7 @@ index c5ff324eb4fc7af316df92a7805c4b45a06739a0..9cd2d5484c040fd347d7a9ef7502299f
  	id 'signing'
  }
 diff --git a/src/test/resources/projects/simple/build.gradle b/src/test/resources/projects/simple/build.gradle
-index d17c31340012d0dc06931efb4231897513de36fc..c5f94cb6ca01c497e7f4fee33cdd2456c50a9a06 100644
+index 22ef6bc62c4a0d39ba979bcef05dc815e6b4e23b..3fe2aa11c87d9f2243e46a6ee05e0490005e8ed8 100644
 --- a/src/test/resources/projects/simple/build.gradle
 +++ b/src/test/resources/projects/simple/build.gradle
 @@ -1,5 +1,5 @@

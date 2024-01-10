@@ -6,12 +6,12 @@ Subject: [PATCH] Use project directory instead of root project directory for
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java b/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
-index bdab49b4a85c339f27e00a5023b0c2b81e0378e3..8efdb0d1383bab5e978e141c1cc8c7939c737937 100644
+index 86e3ddfbdda7cf9683c2b517fdd9b336be860aba..d28a5655139c84840d37e3b259590377794cb433 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/ide/RunConfig.java
-@@ -174,7 +174,10 @@ public class RunConfig {
+@@ -178,7 +178,10 @@ public class RunConfig {
  		runConfig.configName = configName;
- 		populate(project, extension, runConfig, environment);
+ 		populate(project, extension, runConfig, environment, appendProjectPath);
  		runConfig.ideaModuleName = IdeaUtils.getIdeaModuleName(new SourceSetReference(sourceSet, project));
 -		runConfig.runDirIdeaUrl = "file://$PROJECT_DIR$/" + runDir;
 +		// quiet start

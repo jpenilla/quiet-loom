@@ -9,7 +9,7 @@ Subject: [PATCH] Changes to include
   breaks platform dependencies needlessly.
 
 diff --git a/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java b/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
-index 3466459c1524b99c87a6727f5ec193935ab8f601..0afe2aa14e292eee42987b0f96bc29ca0dbd8b40 100644
+index 41431b65b3ab9b229fb3ce5a96cefc49cf25d8c5..533d4eade71d05e1146e5fd201ce2cb5bd92d257 100644
 --- a/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
 +++ b/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
 @@ -34,6 +34,7 @@ import java.util.Collection;
@@ -146,24 +146,22 @@ index 3466459c1524b99c87a6727f5ec193935ab8f601..0afe2aa14e292eee42987b0f96bc29ca
  
  	private File getNestableJar(final File input, final Metadata metadata) {
 diff --git a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
-index bb2b17354738239a86666fb27d27949c575c295a..91d0515d41cb8a06a98820c5dffd006ab807240b 100644
+index 238a242eaaac092e22f9cb9f8e66e9c82b0d4ddd..a684a3bdada096cc526da6befd678eeceddd937e 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
-@@ -83,7 +83,8 @@ public abstract class LoomConfigurations implements Runnable {
- 		registerNonTransitive(Constants.Configurations.LOADER_DEPENDENCIES, Role.RESOLVABLE);
- 
+@@ -85,6 +85,7 @@ public abstract class LoomConfigurations implements Runnable {
  		registerNonTransitive(Constants.Configurations.MINECRAFT, Role.NONE);
--		registerNonTransitive(Constants.Configurations.INCLUDE, Role.RESOLVABLE);
-+		register(Constants.Configurations.INCLUDE, Role.RESOLVABLE);
+ 		// We don't need to make this non-transitive due to the way we resolve it. Also, doing so would break platform dependencies.
+ 		register(Constants.Configurations.INCLUDE, Role.RESOLVABLE);
 +		register(Constants.Configurations.TRANSITIVE_INCLUDE, Role.RESOLVABLE);
  		registerNonTransitive(Constants.Configurations.MAPPING_CONSTANTS, Role.RESOLVABLE);
  
  		register(Constants.Configurations.NAMED_ELEMENTS, Role.CONSUMABLE).configure(configuration -> {
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-index ff2d328dd69f147313ddeaa693eb1f8ffacf5e3c..38d01a958b6e03a4d9ee91aad5d5b47cef16a52f 100644
+index a62dcc995b6e9f0410b04b48a1773c3a28aa30ca..9ce2716228684fd0008410861b6fd64cc6680ab8 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-@@ -149,14 +149,23 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+@@ -153,14 +153,23 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
  
  		if (!LoomGradleExtension.get(getProject()).isForgeLike()) {
  			getNestedJars().from(factory.getNestedJars(includeConfiguration));
@@ -189,7 +187,7 @@ index ff2d328dd69f147313ddeaa693eb1f8ffacf5e3c..38d01a958b6e03a4d9ee91aad5d5b47c
  
  		getUseMixinAP().set(LoomGradleExtension.get(getProject()).getMixin().getUseLegacyMixinAp());
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index 689d763e6567546d8744e36171d7398ca708da2b..c12510bcf32cda9c0da04c9d287dc10b34c36ad3 100644
+index c646772a6036908a34bba1276e8d9579127e0eb6..6ea19d4d0f6b4567ac03daf831038b47cd8ca580 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -48,6 +48,7 @@ public class Constants {
@@ -200,16 +198,3 @@ index 689d763e6567546d8744e36171d7398ca708da2b..c12510bcf32cda9c0da04c9d287dc10b
  		public static final String MINECRAFT = "minecraft";
  
  		public static final String MINECRAFT_COMPILE_LIBRARIES = "minecraftLibraries";
-diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/MultiProjectTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/MultiProjectTest.groovy
-index da86621384189424e7a03ba0a9d6e3dcddc64e51..c5669df049673b8800bf9d1cd2b3e9638c20a47d 100644
---- a/src/test/groovy/net/fabricmc/loom/test/integration/MultiProjectTest.groovy
-+++ b/src/test/groovy/net/fabricmc/loom/test/integration/MultiProjectTest.groovy
-@@ -53,7 +53,7 @@ class MultiProjectTest extends Specification implements GradleProjectTestTrait {
- 
- 		gradle.hasOutputZipEntry("multiproject-1.0.0.jar", "META-INF/jars/example-1.0.0.jar")
- 		gradle.hasOutputZipEntry("multiproject-1.0.0.jar", "META-INF/jars/core-1.0.0.jar")
--		gradle.hasOutputZipEntry("multiproject-1.0.0.jar", "META-INF/jars/fabric-api-base-0.2.1+9354966b7d.jar")
-+		gradle.hasOutputZipEntry("multiproject-1.0.0.jar", "META-INF/jars/fabric-api-base-0.3.0+f74f7c7d7d.jar")
- 
- 		where:
- 		version << STANDARD_TEST_VERSIONS

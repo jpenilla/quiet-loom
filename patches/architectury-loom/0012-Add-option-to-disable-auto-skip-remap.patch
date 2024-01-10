@@ -1,0 +1,95 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Mon, 20 Nov 2023 09:53:20 -0700
+Subject: [PATCH] Add option to disable auto skip remap
+
+
+diff --git a/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java b/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
+index 498b1d25dc684d44bc4fad7d64d2c53b4894eaac..d6dbb0c23519d1c1e410ba1134b8ab0cf05868ce 100644
+--- a/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
++++ b/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
+@@ -112,6 +112,11 @@ public abstract class AbstractRemapJarTask extends Jar {
+ 	@ApiStatus.Internal
+ 	public abstract Property<String> getJarType();
+ 
++	@ApiStatus.Experimental
++	@Input
++	@Optional
++	public abstract Property<Boolean> getAutoSkipRemap();
++
+ 	private final Provider<JarManifestService> jarManifestServiceProvider;
+ 
+ 	@Inject
+@@ -126,6 +131,20 @@ public abstract class AbstractRemapJarTask extends Jar {
+ 		usesService(jarManifestServiceProvider);
+ 	}
+ 
++	protected final <P extends AbstractRemapParams> void autoSkipRemap(LoomGradleExtension extension, P params) {
++		if (getAutoSkipRemap().getOrElse(true) && shouldSkipRemap(extension)) {
++			params.getSourceNamespace().set(getTargetNamespace());
++		}
++	}
++
++	private boolean shouldSkipRemap(LoomGradleExtension extension) {
++		return extension.isNeoForge()
++				&& extension.getMappingConfiguration() instanceof FieldMigratedMappingConfiguration c
++				&& c.isMojangMappedProject()
++				&& MappingsNamespace.of(this.getSourceNamespace().get()) == MappingsNamespace.NAMED
++				&& MappingsNamespace.of(this.getTargetNamespace().get()) == MappingsNamespace.MOJANG;
++	}
++
+ 	public final <P extends AbstractRemapParams> void submitWork(Class<? extends AbstractRemapAction<P>> workAction, Action<P> action) {
+ 		final WorkQueue workQueue = getWorkerExecutor().noIsolation();
+ 
+@@ -160,15 +179,6 @@ public abstract class AbstractRemapJarTask extends Jar {
+ 
+ 	protected abstract List<String> getClientOnlyEntries(SourceSet sourceSet);
+ 
+-	@ApiStatus.Internal
+-	public boolean shouldSkipRemap(LoomGradleExtension extension) {
+-		return extension.isNeoForge()
+-				&& extension.getMappingConfiguration() instanceof FieldMigratedMappingConfiguration c
+-				&& c.isMojangMappedProject()
+-				&& MappingsNamespace.of(this.getSourceNamespace().get()) == MappingsNamespace.NAMED
+-				&& MappingsNamespace.of(this.getTargetNamespace().get()) == MappingsNamespace.MOJANG;
+-	}
+-
+ 	public interface AbstractRemapParams extends WorkParameters {
+ 		RegularFileProperty getInputFile();
+ 		RegularFileProperty getOutputFile();
+diff --git a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
+index ec726d07e6ded1fd1ae5e489dbad13adb2865770..5233bb0f1b6c45db7c9de1047459647515a7e0db 100644
+--- a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
++++ b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
+@@ -202,11 +202,9 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+ 	public void run() {
+ 		final LoomGradleExtension extension = LoomGradleExtension.get(getProject());
+ 
+-		if (shouldSkipRemap(extension)) {
+-			getSourceNamespace().convention(getTargetNamespace());
+-		}
+-
+ 		submitWork(RemapAction.class, params -> {
++			autoSkipRemap(extension, params);
++
+ 			if (getAddNestedDependencies().get()) {
+ 				params.getNestedJars().from(getNestedJars());
+ 
+diff --git a/src/main/java/net/fabricmc/loom/task/RemapSourcesJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapSourcesJarTask.java
+index 8d92d95276bd896da51ffbd885c05f42d17c553a..7dc7d9a2f83ecdb021ec434b4e0ac94eb1adaf47 100644
+--- a/src/main/java/net/fabricmc/loom/task/RemapSourcesJarTask.java
++++ b/src/main/java/net/fabricmc/loom/task/RemapSourcesJarTask.java
+@@ -61,11 +61,9 @@ public abstract class RemapSourcesJarTask extends AbstractRemapJarTask {
+ 	public void run() {
+ 		final LoomGradleExtension extension = LoomGradleExtension.get(getProject());
+ 
+-		if (shouldSkipRemap(extension)) {
+-			getSourceNamespace().convention(getTargetNamespace());
+-		}
+-
+ 		submitWork(RemapSourcesAction.class, params -> {
++			autoSkipRemap(extension, params);
++
+ 			if (!params.namespacesMatch()) {
+ 				params.getSourcesRemapperServiceUuid().set(UnsafeWorkQueueHelper.create(SourceRemapperService.create(serviceManagerProvider.get().get(), this)));
+ 			}

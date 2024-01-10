@@ -5,24 +5,24 @@ Subject: [PATCH] Use set instead of convention in some cases
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 919361287606c214952f3d328dac82c5a182126e..6c4060ee7cfb6b6033c20e2667f4ee7fa66c62df 100644
+index 89b98cffeff5ec9e006742a8f289eaa799b4c874..4cd30c828d93cdf5615b37f0b2d73429a0784d8b 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -107,7 +107,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
- 				shadowJar.configure(new org.gradle.api.Action<>() {
+@@ -106,7 +106,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
+ 				shadowJar.configure(new Action<>() {
  					@Override
  					public void execute(final AbstractArchiveTask shadowJarTask) {
 -						shadowJarTask.getArchiveClassifier().convention("dev-all");
 +						shadowJarTask.getArchiveClassifier().set("dev-all");
  					}
  				});
- 				remapJarTask.getInputFile().convention(shadowJar.flatMap(AbstractArchiveTask::getArchiveFile));
-@@ -175,7 +175,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
+ 				getTasks().named(REMAP_JAR_TASK_NAME, RemapJarTask.class).configure(new Action<>() {
+@@ -186,7 +186,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
  				return;
  			}
  
 -			sourcesJarTask.getArchiveClassifier().convention("dev-sources");
 +			sourcesJarTask.getArchiveClassifier().set("dev-sources");
- 			// sourcesJarTask.getDestinationDirectory().set(new File(getProject().getBuildDir(), "devlibs")); // quiet - no
+ 			// sourcesJarTask.getDestinationDirectory().set(getProject().getLayout().getBuildDirectory().map(directory -> directory.dir("devlibs"))); // quiet - no
  			task.getArchiveClassifier().convention("sources");
  
