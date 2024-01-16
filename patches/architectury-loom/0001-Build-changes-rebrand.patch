@@ -382,12 +382,12 @@ index 99d3cd63e4c73e552c18b8bc4ef61357376f82cd..57d4b0130e0548d5f1db87c5c752e377
  }
  
 diff --git a/src/test/resources/projects/includedJars/build.gradle b/src/test/resources/projects/includedJars/build.gradle
-index 5808e9a528be3a3ec57a506048debee521615bc7..55d93c4282180c8527860c64987a176f3a915d51 100644
+index 9e43712cb1e93c2fbdd65fce13fdc6902d684734..55d93c4282180c8527860c64987a176f3a915d51 100644
 --- a/src/test/resources/projects/includedJars/build.gradle
 +++ b/src/test/resources/projects/includedJars/build.gradle
 @@ -1,5 +1,5 @@
  plugins {
--	id 'fabric-loom'
+-	id 'dev.architectury.loom'
 +	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
  }
  
