@@ -1,0 +1,206 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Wed, 17 Jan 2024 15:38:27 -0700
+Subject: [PATCH] Download intermediary using Gradle
+
+
+diff --git a/src/main/java/net/fabricmc/loom/api/mappings/intermediate/IntermediateMappingsProvider.java b/src/main/java/net/fabricmc/loom/api/mappings/intermediate/IntermediateMappingsProvider.java
+index 594a74b8fad03e8dd1db706a86463d4d02072230..048619cafedce0d9b5af181275b5ba792d1160f4 100644
+--- a/src/main/java/net/fabricmc/loom/api/mappings/intermediate/IntermediateMappingsProvider.java
++++ b/src/main/java/net/fabricmc/loom/api/mappings/intermediate/IntermediateMappingsProvider.java
+@@ -29,6 +29,7 @@ import java.nio.file.Path;
+ import java.util.function.Function;
+ 
+ import org.gradle.api.Named;
++import org.gradle.api.Project;
+ import org.gradle.api.provider.Property;
+ import org.jetbrains.annotations.ApiStatus;
+ 
+@@ -48,5 +49,5 @@ public abstract class IntermediateMappingsProvider implements Named {
+ 	 * Generate or download a tinyv2 mapping file with intermediary and named namespaces.
+ 	 * @throws IOException
+ 	 */
+-	public abstract void provide(Path tinyMappings) throws IOException;
++	public abstract void provide(Path tinyMappings, Project project) throws IOException;
+ }
+diff --git a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
+index a684a3bdada096cc526da6befd678eeceddd937e..36ba6c502749a93586c6cdb33b8ba819aba3c05a 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
++++ b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
+@@ -95,6 +95,7 @@ public abstract class LoomConfigurations implements Runnable {
+ 		extendsFrom(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME, Constants.Configurations.MAPPING_CONSTANTS);
+ 
+ 		register(Constants.Configurations.MAPPINGS, Role.RESOLVABLE);
++		register(Constants.Configurations.INTERMEDIARY_MAPPINGS, Role.RESOLVABLE);
+ 		register(Constants.Configurations.MAPPINGS_FINAL, Role.RESOLVABLE);
+ 		register(Constants.Configurations.LOOM_DEVELOPMENT_DEPENDENCIES, Role.RESOLVABLE);
+ 		register(Constants.Configurations.UNPICK_CLASSPATH, Role.RESOLVABLE);
+diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/IntermediaryMappingsProvider.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/IntermediaryMappingsProvider.java
+index b56d93e8e8363e67e30fd6dd0f5136819447ae66..88aefa0ca9d8ef7f04a5abcd894d90b690a490fd 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/IntermediaryMappingsProvider.java
++++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/IntermediaryMappingsProvider.java
+@@ -27,14 +27,23 @@ package net.fabricmc.loom.configuration.providers.mappings;
+ import java.io.IOException;
+ import java.nio.file.Files;
+ import java.nio.file.Path;
++import java.nio.file.StandardCopyOption;
+ 
+ import com.google.common.net.UrlEscapers;
++import org.gradle.api.Action;
++import org.gradle.api.Project;
++import org.gradle.api.artifacts.Configuration;
++import org.gradle.api.artifacts.DependencyArtifact;
++import org.gradle.api.artifacts.DependencySet;
++import org.gradle.api.artifacts.ModuleDependency;
+ import org.gradle.api.provider.Property;
+ import org.jetbrains.annotations.NotNull;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ 
+ import net.fabricmc.loom.api.mappings.intermediate.IntermediateMappingsProvider;
++import net.fabricmc.loom.extension.LoomGradleExtensionApiImpl;
++import net.fabricmc.loom.util.Constants;
+ 
+ public abstract class IntermediaryMappingsProvider extends IntermediateMappingsProvider {
+ 	public static final String NAME = "intermediary-v2";
+@@ -45,7 +54,7 @@ public abstract class IntermediaryMappingsProvider extends IntermediateMappingsP
+ 	public abstract Property<Boolean> getRefreshDeps();
+ 
+ 	@Override
+-	public void provide(Path tinyMappings) throws IOException {
++	public void provide(Path tinyMappings, Project project) throws IOException {
+ 		if (Files.exists(tinyMappings) && !getRefreshDeps().get()) {
+ 			return;
+ 		}
+@@ -53,7 +62,32 @@ public abstract class IntermediaryMappingsProvider extends IntermediateMappingsP
+ 		// Download and extract intermediary
+ 		final Path intermediaryJarPath = Files.createTempFile(getName(), ".jar");
+ 		final String encodedMcVersion = UrlEscapers.urlFragmentEscaper().escape(getMinecraftVersion().get());
+-		final String url = getIntermediaryUrl().get().formatted(encodedMcVersion);
++		final String urlRaw = getIntermediaryUrl().get();
++		if (project != null && urlRaw.equals(LoomGradleExtensionApiImpl.DEFAULT_INTERMEDIARY_URL)) {
++			final Configuration config = project.getConfigurations()
++					.getByName(Constants.Configurations.INTERMEDIARY_MAPPINGS);
++			config.defaultDependencies(new Action<DependencySet>() {
++				@Override
++				public void execute(final DependencySet dependencySet) {
++					final ModuleDependency intermediaryDep = (ModuleDependency) project.getDependencies()
++							.create("net.fabricmc:intermediary:" + encodedMcVersion);
++					intermediaryDep.artifact(new Action<DependencyArtifact>() {
++						@Override
++						public void execute(final DependencyArtifact dependencyArtifact) {
++							dependencyArtifact.setClassifier("v2");
++						}
++					});
++					dependencySet.add(intermediaryDep);
++				}
++			});
++			Files.copy(
++					config.getIncoming().getArtifacts().getArtifactFiles().getSingleFile().toPath(),
++					intermediaryJarPath,
++					StandardCopyOption.REPLACE_EXISTING
++			);
++			Files.deleteIfExists(tinyMappings);
++		} else {
++		final String url = urlRaw.formatted(encodedMcVersion);
+ 
+ 		LOGGER.info("Downloading intermediary from {}", url);
+ 
+@@ -63,6 +97,7 @@ public abstract class IntermediaryMappingsProvider extends IntermediateMappingsP
+ 		getDownloader().get().apply(url)
+ 				.defaultCache()
+ 				.downloadPath(intermediaryJarPath);
++		}
+ 
+ 		MappingConfiguration.extractMappings(intermediaryJarPath, tinyMappings);
+ 	}
+diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/IntermediateMappingsService.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/IntermediateMappingsService.java
+index 80171fa160c3d91c7f289232f8970ab7074e9d8d..c50a1c769d55296ce4bbe182575525b901f2a4d4 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/IntermediateMappingsService.java
++++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/IntermediateMappingsService.java
+@@ -61,15 +61,15 @@ public final class IntermediateMappingsService implements SharedService {
+ 		final IntermediateMappingsProvider intermediateProvider = extension.getIntermediateMappingsProvider();
+ 		final String id = "IntermediateMappingsService:%s:%s".formatted(intermediateProvider.getName(), intermediateProvider.getMinecraftVersion().get());
+ 
+-		return sharedServiceManager.getOrCreateService(id, () -> create(intermediateProvider, minecraftProvider));
++		return sharedServiceManager.getOrCreateService(id, () -> create(intermediateProvider, minecraftProvider, project));
+ 	}
+ 
+ 	@VisibleForTesting
+-	public static IntermediateMappingsService create(IntermediateMappingsProvider intermediateMappingsProvider, MinecraftProvider minecraftProvider) {
++	public static IntermediateMappingsService create(IntermediateMappingsProvider intermediateMappingsProvider, MinecraftProvider minecraftProvider, Project project) {
+ 		final Path intermediaryTiny = minecraftProvider.file(intermediateMappingsProvider.getName() + ".tiny").toPath();
+ 
+ 		try {
+-			intermediateMappingsProvider.provide(intermediaryTiny);
++			intermediateMappingsProvider.provide(intermediaryTiny, project);
+ 		} catch (IOException e) {
+ 			try {
+ 				Files.deleteIfExists(intermediaryTiny);
+diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/NoOpIntermediateMappingsProvider.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/NoOpIntermediateMappingsProvider.java
+index 28ddfc637875241412f847fd9acdc87c79e32e0c..7fe148d9acc448a0bc356d0ed8aebd1df3187fee 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/NoOpIntermediateMappingsProvider.java
++++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/NoOpIntermediateMappingsProvider.java
+@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
+ import java.nio.file.Files;
+ import java.nio.file.Path;
+ 
++import org.gradle.api.Project;
+ import org.jetbrains.annotations.NotNull;
+ 
+ import net.fabricmc.loom.api.mappings.intermediate.IntermediateMappingsProvider;
+@@ -40,7 +41,7 @@ public abstract class NoOpIntermediateMappingsProvider extends IntermediateMappi
+ 	private static final String HEADER = "tiny\t2\t0\tofficial\tintermediary";
+ 
+ 	@Override
+-	public void provide(Path tinyMappings) throws IOException {
++	public void provide(Path tinyMappings, Project project) throws IOException {
+ 		Files.writeString(tinyMappings, HEADER, StandardCharsets.UTF_8);
+ 	}
+ 
+diff --git a/src/main/java/net/fabricmc/loom/extension/LoomGradleExtensionApiImpl.java b/src/main/java/net/fabricmc/loom/extension/LoomGradleExtensionApiImpl.java
+index 657f0748450b1d86e956226d9b2d50259e9b64b1..2cee2b134e6ea1c0f67e51216a24fe9e0b970c2e 100644
+--- a/src/main/java/net/fabricmc/loom/extension/LoomGradleExtensionApiImpl.java
++++ b/src/main/java/net/fabricmc/loom/extension/LoomGradleExtensionApiImpl.java
+@@ -115,6 +115,7 @@ public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionA
+ 
+ 	// A common mistake with layered mappings is to call the wrong `officialMojangMappings` method, use this to keep track of when we are building a layered mapping spec.
+ 	protected final ThreadLocal<Boolean> layeredSpecBuilderScope = ThreadLocal.withInitial(() -> false);
++	public static final String DEFAULT_INTERMEDIARY_URL = "https://maven.fabricmc.net/net/fabricmc/intermediary/%1$s/intermediary-%1$s-v2.jar";
+ 
+ 	// ===================
+ 	//  Architectury Loom
+@@ -144,7 +145,7 @@ public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionA
+ 				.convention(project.provider(() -> !isForgeLike()));
+ 		this.modProvidedJavadoc.finalizeValueOnRead();
+ 		this.intermediary = project.getObjects().property(String.class)
+-				.convention("https://maven.fabricmc.net/net/fabricmc/intermediary/%1$s/intermediary-%1$s-v2.jar");
++				.convention(DEFAULT_INTERMEDIARY_URL);
+ 
+ 		this.intermediateMappingsProvider = project.getObjects().property(IntermediateMappingsProvider.class);
+ 		this.intermediateMappingsProvider.finalizeValueOnRead();
+diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
+index 6ea19d4d0f6b4567ac03daf831038b47cd8ca580..0ddeb7b97ac5036629fa1310263042fa259711c1 100644
+--- a/src/main/java/net/fabricmc/loom/util/Constants.java
++++ b/src/main/java/net/fabricmc/loom/util/Constants.java
+@@ -71,6 +71,7 @@ public class Constants {
+ 		 */
+ 		public static final String MINECRAFT_NATIVES = "minecraftNatives";
+ 		public static final String MAPPINGS = "mappings";
++		public static final String INTERMEDIARY_MAPPINGS = "intermediaryMappings";
+ 		public static final String MAPPINGS_FINAL = "mappingsFinal";
+ 		public static final String LOADER_DEPENDENCIES = "loaderLibraries";
+ 		public static final String LOOM_DEVELOPMENT_DEPENDENCIES = "loomDevelopmentDependencies";
+diff --git a/src/test/groovy/net/fabricmc/loom/test/unit/layeredmappings/LayeredMappingsSpecification.groovy b/src/test/groovy/net/fabricmc/loom/test/unit/layeredmappings/LayeredMappingsSpecification.groovy
+index 629167e9b9a13568dc7b1294827b8e7a9dccf90d..ff2dd138b2c500bbd34209f2fa5377b09860ce29 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/unit/layeredmappings/LayeredMappingsSpecification.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/unit/layeredmappings/LayeredMappingsSpecification.groovy
+@@ -141,7 +141,7 @@ abstract class LayeredMappingsSpecification extends Specification implements Lay
+ 		@Override
+ 		Supplier<MemoryMappingTree> intermediaryTree() {
+ 			return {
+-				IntermediateMappingsService.create(LoomMocks.intermediaryMappingsProviderMock("test", intermediaryUrl), minecraftProvider()).memoryMappingTree
++				IntermediateMappingsService.create(LoomMocks.intermediaryMappingsProviderMock("test", intermediaryUrl), minecraftProvider(), null).memoryMappingTree
+ 			}
+ 		}
+ 
