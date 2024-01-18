@@ -36,7 +36,7 @@ index a684a3bdada096cc526da6befd678eeceddd937e..36ba6c502749a93586c6cdb33b8ba819
  		register(Constants.Configurations.LOOM_DEVELOPMENT_DEPENDENCIES, Role.RESOLVABLE);
  		register(Constants.Configurations.UNPICK_CLASSPATH, Role.RESOLVABLE);
 diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/IntermediaryMappingsProvider.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/IntermediaryMappingsProvider.java
-index b56d93e8e8363e67e30fd6dd0f5136819447ae66..2f5e0e9a8ed1112bcbb80546bc8a3acbe9f736ef 100644
+index b56d93e8e8363e67e30fd6dd0f5136819447ae66..88aefa0ca9d8ef7f04a5abcd894d90b690a490fd 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/IntermediaryMappingsProvider.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/IntermediaryMappingsProvider.java
 @@ -27,14 +27,23 @@ package net.fabricmc.loom.configuration.providers.mappings;
@@ -82,19 +82,19 @@ index b56d93e8e8363e67e30fd6dd0f5136819447ae66..2f5e0e9a8ed1112bcbb80546bc8a3acb
 +			final Configuration config = project.getConfigurations()
 +					.getByName(Constants.Configurations.INTERMEDIARY_MAPPINGS);
 +			config.defaultDependencies(new Action<DependencySet>() {
-+                @Override
-+                public void execute(final DependencySet dependencySet) {
-+                    final ModuleDependency intermediaryDep = (ModuleDependency) project.getDependencies()
-+                        .create("net.fabricmc:intermediary:" + encodedMcVersion);
-+                    intermediaryDep.artifact(new Action<DependencyArtifact>() {
-+                        @Override
-+                        public void execute(final DependencyArtifact dependencyArtifact) {
++				@Override
++				public void execute(final DependencySet dependencySet) {
++					final ModuleDependency intermediaryDep = (ModuleDependency) project.getDependencies()
++							.create("net.fabricmc:intermediary:" + encodedMcVersion);
++					intermediaryDep.artifact(new Action<DependencyArtifact>() {
++						@Override
++						public void execute(final DependencyArtifact dependencyArtifact) {
 +							dependencyArtifact.setClassifier("v2");
-+                        }
-+                    });
-+                    dependencySet.add(intermediaryDep);
-+                }
-+            });
++						}
++					});
++					dependencySet.add(intermediaryDep);
++				}
++			});
 +			Files.copy(
 +					config.getIncoming().getArtifacts().getArtifactFiles().getSingleFile().toPath(),
 +					intermediaryJarPath,

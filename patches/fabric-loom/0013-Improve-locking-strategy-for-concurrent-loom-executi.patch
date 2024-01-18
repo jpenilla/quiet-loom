@@ -7,7 +7,7 @@ This is especially useful for when IntelliJ decides to randomly sync the
 Gradle project while I am running Gradle from the command line already.
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
-index 041bc42db9e63c0973c13fdf6a28286f1d7f0437..71574cf143449ee374f6cea8e2be52c212ee2c60 100644
+index 041bc42db9e63c0973c13fdf6a28286f1d7f0437..54d6300037511bd5a8a24084b0746b38ec47a187 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
 @@ -35,7 +35,10 @@ import java.util.function.Consumer;
@@ -77,8 +77,8 @@ index 041bc42db9e63c0973c13fdf6a28286f1d7f0437..71574cf143449ee374f6cea8e2be52c2
 +		if (Files.exists(lockFile)) {
 +			long lockingProcessId;
 +			try {
-+                lockingProcessId = Long.parseLong(Files.readString(lockFile));
-+            } catch (final Exception e) {
++				lockingProcessId = Long.parseLong(Files.readString(lockFile));
++			} catch (final Exception e) {
 +				lockingProcessId = -1;
 +			}
 +			if (lockingProcessId == currentPid) {
@@ -97,15 +97,15 @@ index 041bc42db9e63c0973c13fdf6a28286f1d7f0437..71574cf143449ee374f6cea8e2be52c2
 +					try {
 +						Thread.sleep(100);
 +					} catch (final InterruptedException e) {
-+                        Thread.currentThread().interrupt();
-+                    }
-+                    sleptMs += 100;
++						Thread.currentThread().interrupt();
++					}
++					sleptMs += 100;
 +					if (sleptMs >= 1000 * 60 && sleptMs % (1000 * 60) == 0L) {
 +						logger.lifecycle(
-+                            """
-+                                Have been waiting on lock file '{}' held by pid '{}' for {} minute(s).
-+                                If this persists for an unreasonable length of time, kill this process, run './gradlew --stop' and then try again.
-+                                If the problem persists, the lock file may need to be deleted manually.""",
++								"""
++										Have been waiting on lock file '{}' held by pid '{}' for {} minute(s).
++										If this persists for an unreasonable length of time, kill this process, run './gradlew --stop' and then try again.
++										If the problem persists, the lock file may need to be deleted manually.""",
 +								lockFile, lockingProcessId, sleptMs / 1000 / 60
 +						);
 +					}

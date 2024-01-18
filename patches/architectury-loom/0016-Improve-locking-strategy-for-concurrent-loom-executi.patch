@@ -7,7 +7,7 @@ This is especially useful for when IntelliJ decides to randomly sync the
 Gradle project while I am running Gradle from the command line already.
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
-index fee77d0bfee9b4eb54bdf27ea9691fc5f06bc09f..0969cf6658c89965f6efbc9e83387d74f9aa02db 100644
+index fee77d0bfee9b4eb54bdf27ea9691fc5f06bc09f..b573987aa9aba7adb8849e9b788b9963553e5420 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
 @@ -35,8 +35,11 @@ import java.util.function.Consumer;
@@ -65,7 +65,7 @@ index fee77d0bfee9b4eb54bdf27ea9691fc5f06bc09f..0969cf6658c89965f6efbc9e83387d74
 +			return this.acquireProcessLockWaiting_(lockFile, timeoutMs);
 +		} catch (final IOException e) {
 +			throw new RuntimeException("Exception acquiring lock " + lockFile, e);
- 		}
++		}
 +	}
 +
 +	// Returns true if our process already owns the lock
@@ -85,8 +85,7 @@ index fee77d0bfee9b4eb54bdf27ea9691fc5f06bc09f..0969cf6658c89965f6efbc9e83387d74
 +			if (lockingProcessId == currentPid) {
 +				return LockResult.ACQUIRED_ALREADY_OWNED;
 +			}
- 
--		return false;
++
 +			logger.lifecycle("Lock file '{}' is currently held by pid '{}'.", lockFile, lockingProcessId);
 +			if (ProcessHandle.of(lockingProcessId).isEmpty()) {
 +				logger.lifecycle("Locking process does not exist, assuming abrupt termination and deleting lock file.");
@@ -99,15 +98,15 @@ index fee77d0bfee9b4eb54bdf27ea9691fc5f06bc09f..0969cf6658c89965f6efbc9e83387d74
 +					try {
 +						Thread.sleep(100);
 +					} catch (final InterruptedException e) {
-+                        Thread.currentThread().interrupt();
-+                    }
-+                    sleptMs += 100;
++						Thread.currentThread().interrupt();
++					}
++					sleptMs += 100;
 +					if (sleptMs >= 1000 * 60 && sleptMs % (1000 * 60) == 0L) {
 +						logger.lifecycle(
-+                            """
-+                                Have been waiting on lock file '{}' held by pid '{}' for {} minute(s).
-+                                If this persists for an unreasonable length of time, kill this process, run './gradlew --stop' and then try again.
-+                                If the problem persists, the lock file may need to be deleted manually.""",
++								"""
++										Have been waiting on lock file '{}' held by pid '{}' for {} minute(s).
++										If this persists for an unreasonable length of time, kill this process, run './gradlew --stop' and then try again.
++										If the problem persists, the lock file may need to be deleted manually.""",
 +								lockFile, lockingProcessId, sleptMs / 1000 / 60
 +						);
 +					}
@@ -117,8 +116,9 @@ index fee77d0bfee9b4eb54bdf27ea9691fc5f06bc09f..0969cf6658c89965f6efbc9e83387d74
 +					}
 +				}
 +			}
-+		}
-+
+ 		}
+ 
+-		return false;
 +		if (!Files.exists(lockFile.getParent())) {
 +			Files.createDirectories(lockFile.getParent());
 +		}
