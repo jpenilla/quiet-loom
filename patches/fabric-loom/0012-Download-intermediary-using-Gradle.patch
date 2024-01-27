@@ -167,7 +167,7 @@ index 28ddfc637875241412f847fd9acdc87c79e32e0c..7fe148d9acc448a0bc356d0ed8aebd1d
  	}
  
 diff --git a/src/main/java/net/fabricmc/loom/extension/LoomGradleExtensionApiImpl.java b/src/main/java/net/fabricmc/loom/extension/LoomGradleExtensionApiImpl.java
-index a48042b0cf686b565b39f10fb941afae2e6e5b58..da1a05756e3bb9fa3f9d8699bd18e251c386deaf 100644
+index d9abf760de2702aba006837748aa4d11aeb85a5f..c5a0318424714a589bba1effe7832d22e1341c73 100644
 --- a/src/main/java/net/fabricmc/loom/extension/LoomGradleExtensionApiImpl.java
 +++ b/src/main/java/net/fabricmc/loom/extension/LoomGradleExtensionApiImpl.java
 @@ -101,6 +101,7 @@ public abstract class LoomGradleExtensionApiImpl implements LoomGradleExtensionA

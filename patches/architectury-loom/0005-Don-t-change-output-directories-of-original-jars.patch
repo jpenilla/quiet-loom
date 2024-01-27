@@ -5,10 +5,10 @@ Subject: [PATCH] Don't change output directories of original jars
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index afb07dbc5be25a8f1cfca6f52676099b96bad318..07b475390039cd7d3abb7331ab11f931c5f0fdb2 100644
+index 03364b3ed8f08eb689308db93a565530d0cf8b06..ee33166f8e54e0e3d362d602a4066b30187e42a7 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -102,7 +102,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
+@@ -99,7 +99,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
  		// Configure the default jar task
  		getTasks().named(JavaPlugin.JAR_TASK_NAME, AbstractArchiveTask.class).configure(task -> {
  			task.getArchiveClassifier().convention("dev");
@@ -17,7 +17,7 @@ index afb07dbc5be25a8f1cfca6f52676099b96bad318..07b475390039cd7d3abb7331ab11f931
  		});
  
  		getTasks().named(BasePlugin.ASSEMBLE_TASK_NAME).configure(task -> task.dependsOn(getTasks().named(REMAP_JAR_TASK_NAME)));
-@@ -167,7 +167,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
+@@ -164,7 +164,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
  			}
  
  			sourcesJarTask.getArchiveClassifier().convention("dev-sources");

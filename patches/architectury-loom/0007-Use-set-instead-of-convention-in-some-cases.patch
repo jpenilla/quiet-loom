@@ -5,10 +5,10 @@ Subject: [PATCH] Use set instead of convention in some cases
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 89b98cffeff5ec9e006742a8f289eaa799b4c874..4cd30c828d93cdf5615b37f0b2d73429a0784d8b 100644
+index 8f5ffa16dccca8f33900fe0a332d9597b542df00..1d8a07fa237585d58353a21648c8ae8418d93577 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -106,7 +106,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
+@@ -103,7 +103,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
  				shadowJar.configure(new Action<>() {
  					@Override
  					public void execute(final AbstractArchiveTask shadowJarTask) {
@@ -17,7 +17,7 @@ index 89b98cffeff5ec9e006742a8f289eaa799b4c874..4cd30c828d93cdf5615b37f0b2d73429
  					}
  				});
  				getTasks().named(REMAP_JAR_TASK_NAME, RemapJarTask.class).configure(new Action<>() {
-@@ -186,7 +186,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
+@@ -183,7 +183,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
  				return;
  			}
  

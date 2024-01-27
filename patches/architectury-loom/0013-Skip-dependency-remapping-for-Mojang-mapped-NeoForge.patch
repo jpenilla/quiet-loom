@@ -5,7 +5,7 @@ Subject: [PATCH] Skip dependency remapping for Mojang-mapped NeoForge projects
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java b/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
-index ec1d8a697a122d6586fa4e2b4ac7615824534493..353a14d13c8d7b4c905a679aaf96206e98cfd7ba 100644
+index ddb38c2af2a6300956c7b827ecc511dc70bda1df..7a192994c523a4494ec365475b2c10eb88a298c2 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
 @@ -91,7 +91,6 @@ public class ModProcessor {
