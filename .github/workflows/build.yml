@@ -33,7 +33,7 @@ jobs:
       - name: "build"
         run: "cd ${{ matrix.buildDir }} && ./gradlew build -x check"
       - name: "publish"
-        if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/dev/') }}
+        if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/dev/') || startsWith(github.ref, 'refs/heads/exp/') }}
         run: "cd ${{ matrix.buildDir }} && ./gradlew publish -x check"
         env:
           JMP_REPO_USER: ${{ secrets.JMP_REPO_USER }}

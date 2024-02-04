@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index de84c29fa40819a31c2e55389d201f86456eda67..5756402b2be9ff1d87f73ce8d016eae5ce70836c 100644
+index 464c22179905420f73b29d868e0b1308c7fe6ebd..b167bce76f7c981961afa51bef3494d7e664febf 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,11 +5,10 @@ plugins {
@@ -23,7 +23,7 @@ index de84c29fa40819a31c2e55389d201f86456eda67..5756402b2be9ff1d87f73ce8d016eae5
  }
  
 @@ -53,8 +52,10 @@ group = 'net.fabricmc'
- def baseVersion = '1.5'
+ def baseVersion = '1.6'
  
  def ENV = System.getenv()
 -if (ENV.BUILD_NUMBER) {
@@ -285,13 +285,13 @@ index 018aeb560dad93d12ab7646fb1cd86c14cbc866d..0e26c2c957ff24bd7c2164a19fbcab01
  }
  
 diff --git a/src/test/resources/projects/kotlin/build.gradle.kts b/src/test/resources/projects/kotlin/build.gradle.kts
-index 7f2e0f5d28bd402223319574cf804cc7ddeabc62..ad6c5ecbc9ab0a39d2f3151a6cbfdb1550cff52a 100644
+index 75a1015d2a2129179afbe3b9ca9f274bd361d0bd..77da75cf78e4a04ccf0db726ddb8f999c434402c 100644
 --- a/src/test/resources/projects/kotlin/build.gradle.kts
 +++ b/src/test/resources/projects/kotlin/build.gradle.kts
-@@ -3,7 +3,7 @@ import java.util.Properties
+@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
  plugins {
- 	kotlin("jvm") version "1.7.22"
- 	kotlin("plugin.serialization") version "1.7.22"
+ 	kotlin("jvm") version "1.9.22"
+ 	kotlin("plugin.serialization") version "1.9.22"
 -	id("fabric-loom")
 +	id("quiet-fabric-loom") // quiet
  	`maven-publish`
