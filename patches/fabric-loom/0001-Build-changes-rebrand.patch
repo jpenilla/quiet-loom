@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index 464c22179905420f73b29d868e0b1308c7fe6ebd..b167bce76f7c981961afa51bef3494d7e664febf 100644
+index c15a009d3f802f882fbbfb4e50292ecf03e55d8c..b167bce76f7c981961afa51bef3494d7e664febf 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,11 +5,10 @@ plugins {
@@ -35,7 +35,7 @@ index 464c22179905420f73b29d868e0b1308c7fe6ebd..b167bce76f7c981961afa51bef3494d7
  } else {
  	version = baseVersion + '.local'
  }
-@@ -213,47 +214,12 @@ java {
+@@ -213,54 +214,12 @@ java {
  	targetCompatibility = JavaVersion.VERSION_17
  }
  
@@ -71,6 +71,13 @@ index 464c22179905420f73b29d868e0b1308c7fe6ebd..b167bce76f7c981961afa51bef3494d7
 -	toolVersion = libs.versions.checkstyle.get()
 -}
 -
+-// Workaround https://github.com/gradle/gradle/issues/27035
+-configurations.checkstyle {
+-	resolutionStrategy.capabilitiesResolution.withCapability("com.google.collections:google-collections") {
+-		select("com.google.guava:guava:0")
+-	}
+-}
+-
 -codenarc {
 -	toolVersion = libs.versions.codenarc.get()
 -	configFile = file("codenarc.groovy")
@@ -85,7 +92,7 @@ index 464c22179905420f73b29d868e0b1308c7fe6ebd..b167bce76f7c981961afa51bef3494d7
  			implementationClass = 'net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap'
  		}
  	}
-@@ -312,8 +278,10 @@ publishing {
+@@ -319,8 +278,10 @@ publishing {
  
  		// Manually crate the plugin marker for snapshot versions
  		snapshotPlugin(MavenPublication) { publication ->
@@ -98,7 +105,7 @@ index 464c22179905420f73b29d868e0b1308c7fe6ebd..b167bce76f7c981961afa51bef3494d7
  			version baseVersion + '-SNAPSHOT'
  
  			pom.withXml({
-@@ -325,7 +293,7 @@ publishing {
+@@ -332,7 +293,7 @@ publishing {
  				Node groupId = dependency.appendChild(document.createElement('groupId'))
  				groupId.setTextContent('net.fabricmc')
  				Node artifactId = dependency.appendChild(document.createElement('artifactId'))
@@ -107,7 +114,7 @@ index 464c22179905420f73b29d868e0b1308c7fe6ebd..b167bce76f7c981961afa51bef3494d7
  				Node version = dependency.appendChild(document.createElement('version'))
  				version.setTextContent(baseVersion + '-SNAPSHOT')
  			})
-@@ -333,13 +301,13 @@ publishing {
+@@ -340,13 +301,13 @@ publishing {
  	}
  	repositories {
  		maven {
