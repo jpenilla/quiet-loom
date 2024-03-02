@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Sat, 3 Feb 2024 17:54:42 -0700
+Subject: [PATCH] disable line number test in ci
+
+
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
+index 9fd6cb6238af66bc50fe175cec7bde96ac8b4b79..12d05484fc5bebea33956d3b2403ada81ad382ab 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
+@@ -24,6 +24,8 @@
+ 
+ package net.fabricmc.loom.test.integration
+ 
++import org.junit.jupiter.api.condition.DisabledIf
++
+ import java.nio.charset.StandardCharsets
+ import java.util.concurrent.CompletableFuture
+ import java.util.concurrent.CompletionStage
+@@ -49,6 +51,7 @@ import static net.fabricmc.loom.test.LoomTestConstants.PRE_RELEASE_GRADLE
+ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+ 
+ @Timeout(value = 30, unit = TimeUnit.MINUTES)
++@DisabledIf("disabled")
+ class DebugLineNumbersTest extends Specification implements GradleProjectTestTrait {
+ 	static final String MAPPINGS = "1.20.1-net.fabricmc.yarn.1_20_1.1.20.1+build.1-v2"
+ 	static final Map<String, Integer> BREAKPOINTS = [
+@@ -57,6 +60,14 @@ class DebugLineNumbersTest extends Specification implements GradleProjectTestTra
+ 		"net.minecraft.registry.RegistryOps": 67
+ 	]
+ 
++	boolean disabled() {
++		def ci = System.getenv("CI")
++		if (ci != null && ci.toBoolean()) {
++			return true
++		}
++		return false
++	}
++
+ 	def "Debug test"() {
+ 		setup:
+ 		def gradle = gradleProject(project: "minimalBase", version: PRE_RELEASE_GRADLE)

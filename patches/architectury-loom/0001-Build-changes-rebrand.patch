@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index 279d6d44980db9e001db6643ac082cab80f0b599..faf75f5af646a1bb5d3845e6234b0e6e45362e0a 100644
+index e34a591e5d2a899d5380b858d23ee553b2d98821..9bcaa5355f509642e26f67c84a6fe92d308e7f87 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,11 +5,10 @@ plugins {
@@ -28,7 +28,7 @@ index 279d6d44980db9e001db6643ac082cab80f0b599..faf75f5af646a1bb5d3845e6234b0e6e
  
 -group = "dev.architectury"
 +group = "xyz.jpenilla" // quiet
- def baseVersion = '1.5'
+ def baseVersion = '1.6'
  
  def ENV = System.getenv()
 -def runNumber = ENV.GITHUB_RUN_NUMBER ?: "9999"
@@ -48,7 +48,7 @@ index 279d6d44980db9e001db6643ac082cab80f0b599..faf75f5af646a1bb5d3845e6234b0e6e
  
  logger.lifecycle(":building plugin v${version}")
  
-@@ -238,54 +235,12 @@ java {
+@@ -238,61 +235,12 @@ java {
  	targetCompatibility = JavaVersion.VERSION_17
  }
  
@@ -91,6 +91,13 @@ index 279d6d44980db9e001db6643ac082cab80f0b599..faf75f5af646a1bb5d3845e6234b0e6e
 -	toolVersion = libs.versions.checkstyle.get()
 -}
 -
+-// Workaround https://github.com/gradle/gradle/issues/27035
+-configurations.checkstyle {
+-	resolutionStrategy.capabilitiesResolution.withCapability("com.google.collections:google-collections") {
+-		select("com.google.guava:guava:0")
+-	}
+-}
+-
 -codenarc {
 -	toolVersion = libs.versions.codenarc.get()
 -	configFile = file("codenarc.groovy")
@@ -105,7 +112,7 @@ index 279d6d44980db9e001db6643ac082cab80f0b599..faf75f5af646a1bb5d3845e6234b0e6e
  			implementationClass = 'net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap'
  		}
  	}
-@@ -333,7 +288,6 @@ import org.w3c.dom.Node
+@@ -340,7 +288,6 @@ import org.w3c.dom.Node
  
  publishing {
  	publications {
@@ -113,7 +120,7 @@ index 279d6d44980db9e001db6643ac082cab80f0b599..faf75f5af646a1bb5d3845e6234b0e6e
  
  			// Also publish a snapshot so people can use the latest version if they wish
  			snapshot(MavenPublication) { publication ->
-@@ -346,8 +300,8 @@ publishing {
+@@ -353,8 +300,8 @@ publishing {
  
  		// Manually crate the plugin marker for snapshot versions
  		snapshotPlugin(MavenPublication) {
@@ -124,7 +131,7 @@ index 279d6d44980db9e001db6643ac082cab80f0b599..faf75f5af646a1bb5d3845e6234b0e6e
  			version baseVersion + '-SNAPSHOT'
  
  			pom.withXml {
-@@ -367,13 +321,13 @@ publishing {
+@@ -374,13 +321,13 @@ publishing {
  	}
  
  	repositories {
@@ -145,7 +152,7 @@ index 279d6d44980db9e001db6643ac082cab80f0b599..faf75f5af646a1bb5d3845e6234b0e6e
  			}
  		}
  	}
-@@ -405,10 +359,10 @@ task writeActionsTestMatrix() {
+@@ -417,10 +364,10 @@ task writeActionsTestMatrix() {
  					return
  				}
  
@@ -417,13 +424,13 @@ index 707cdc682d7b44adbee0be9c836e80a0a2488cc0..07f00f1c391226c6e3682a942f2745b4
  }
  
 diff --git a/src/test/resources/projects/kotlin/build.gradle.kts b/src/test/resources/projects/kotlin/build.gradle.kts
-index f1b6bb71a642d19cc6ec94a23e9d05f732806bfa..254914bce80ca36c8ce6fc19e58f618f852f4819 100644
+index 90e74c355fc21208fb7fdbd8dff2a854414ba4dc..84c184a6ade6ecb527fc9e7fd83eb48a74c02d81 100644
 --- a/src/test/resources/projects/kotlin/build.gradle.kts
 +++ b/src/test/resources/projects/kotlin/build.gradle.kts
-@@ -3,7 +3,7 @@ import java.util.Properties
+@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
  plugins {
- 	kotlin("jvm") version "1.7.22"
- 	kotlin("plugin.serialization") version "1.7.22"
+ 	kotlin("jvm") version "1.9.22"
+ 	kotlin("plugin.serialization") version "1.9.22"
 -    id("dev.architectury.loom")
 +	id("xyz.jpenilla.quiet-architectury-loom") // quiet
  	`maven-publish`
