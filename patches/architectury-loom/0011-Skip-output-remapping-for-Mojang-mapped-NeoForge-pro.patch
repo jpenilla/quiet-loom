@@ -26,7 +26,7 @@ index 1c12be754836e3d3229a8a92a1754d923e0342d6..64ea773dcea7e6fb7e55feee9ce45b0a
  
  	@Override
 diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/LayeredMappingsFactory.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/LayeredMappingsFactory.java
-index 24058594db4e47c744596aec2e134742366a612d..22244279d63f1e4de14482a63c6497c151fd8de1 100644
+index 24058594db4e47c744596aec2e134742366a612d..0ffaa91b2de6e183d87e52db9422c8a56923a52e 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/LayeredMappingsFactory.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/LayeredMappingsFactory.java
 @@ -47,6 +47,8 @@ import net.fabricmc.loom.api.mappings.layered.MappingsNamespace;
@@ -44,27 +44,25 @@ index 24058594db4e47c744596aec2e134742366a612d..22244279d63f1e4de14482a63c6497c1
  	}
 +
 +	public boolean isMojangMappings() {
-+		return this.layeredMappingSpec.layers().stream()
++		return this.spec.layers().stream()
 +				.skip(1) // see LayeredMappingSpecBuilderImpl
 +				.allMatch(spec -> spec instanceof MojangMappingsSpec || spec instanceof ParchmentMappingsSpec);
 +	}
  }
 diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
-index e10db1c5daa9498a8238af8115ce6bb613d988b8..46d4812fe61ac06868a60f48defe05bc1c6c9855 100644
+index e10db1c5daa9498a8238af8115ce6bb613d988b8..87b33c97c318ec3eae86896cba4289f6aa39f94e 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
-@@ -144,7 +144,15 @@ public class MappingConfiguration {
+@@ -144,7 +144,13 @@ public class MappingConfiguration {
  		MappingConfiguration mappingConfiguration;
  
  		if (extension.isForgeLike()) {
 -			mappingConfiguration = new FieldMigratedMappingConfiguration(mappingsIdentifier, workingDir);
-+			final boolean mojmap;
-+
-+			if (dependency.getDependency() instanceof LayeredMappingsDependency layered) {
-+				mojmap = layered.isMojangMappings();
-+			} else {
-+				mojmap = false;
-+			}
++			final boolean mojmap = extension.getLayeredMappingFactories().stream()
++					.filter(factory -> factory.spec().getVersion().equals(dependency.getDependency().getVersion()))
++					.findFirst()
++					.map(LayeredMappingsFactory::isMojangMappings)
++					.orElse(false);
 +
 +			mappingConfiguration = new FieldMigratedMappingConfiguration(mappingsIdentifier, workingDir, mojmap);
  		} else {
