@@ -140,11 +140,11 @@ index 16d98b73eb90fef75c59fe976980ff6aa4293ab9..e1faa5c5e1c9c32a349746544877f187
  
  		register(Constants.Configurations.NAMED_ELEMENTS, Role.CONSUMABLE).configure(configuration -> {
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-index 0948b353e3907f4b4113a5fe8005786aa197805b..f442a62ba7c978670d10f7315a4c14b231436dbc 100644
+index 54dd46bba803235aaa2a2fe7b71d449ed169f8df..07f132e9df22885a945290312fe38c39036dbc3e 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-@@ -102,7 +102,9 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
- 		getAddNestedDependencies().convention(true).finalizeValueOnRead();
+@@ -112,7 +112,9 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+ 		getOptimizeFabricModJson().convention(false).finalizeValueOnRead();
  
  		Configuration includeConfiguration = configurations.getByName(Constants.Configurations.INCLUDE);
 -		getNestedJars().from(new IncludedJarFactory(getProject()).getNestedJars(includeConfiguration));
