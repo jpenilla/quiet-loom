@@ -35,7 +35,7 @@ index 057cde42e019d890d7a9289bde235ff0efc35a7b..04b0d618359df5ce125647cef43cb561
  				installerData = new InstallerData(artifact.version(), jsonObject);
  			}
 diff --git a/src/main/java/net/fabricmc/loom/util/FileSystemUtil.java b/src/main/java/net/fabricmc/loom/util/FileSystemUtil.java
-index 0a097c8312e36f3fba32a378a72648253b4f2ee1..43e1a342e7cc4bb1ee84367c2a1155416f462b97 100644
+index 07fe08cf42b681d47a8d92f060efa0ff509b4545..f37f7e58b368ac271473531965f4cacc90d42e2e 100644
 --- a/src/main/java/net/fabricmc/loom/util/FileSystemUtil.java
 +++ b/src/main/java/net/fabricmc/loom/util/FileSystemUtil.java
 @@ -31,6 +31,7 @@ import java.net.URI;
@@ -46,7 +46,7 @@ index 0a097c8312e36f3fba32a378a72648253b4f2ee1..43e1a342e7cc4bb1ee84367c2a115541
  import java.nio.file.NoSuchFileException;
  import java.nio.file.Path;
  import java.util.function.Supplier;
-@@ -46,7 +47,7 @@ public final class FileSystemUtil {
+@@ -50,7 +51,7 @@ public final class FileSystemUtil {
  		public byte[] readAllBytes(String path) throws IOException {
  			Path fsPath = getPath(path);
  
@@ -56,7 +56,7 @@ index 0a097c8312e36f3fba32a378a72648253b4f2ee1..43e1a342e7cc4bb1ee84367c2a115541
  			} else {
  				throw new NoSuchFileException(fsPath.toString());
 diff --git a/src/main/java/net/fabricmc/loom/util/ZipUtils.java b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
-index 8fdf1fd6bab8577787fc7b27db3a0b0d83f6bf4c..017ae29a705bee42524e02675e9f5e9cc5bb3f5c 100644
+index 714dce833423ee40df3adc80b19a8d4691ddc3c0..19e4c22ebe2e630081ccb1b714e81978488dea9e 100644
 --- a/src/main/java/net/fabricmc/loom/util/ZipUtils.java
 +++ b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
 @@ -31,6 +31,7 @@ import java.io.InputStreamReader;
@@ -77,7 +77,7 @@ index 8fdf1fd6bab8577787fc7b27db3a0b0d83f6bf4c..017ae29a705bee42524e02675e9f5e9c
  			throw new UncheckedIOException("Failed to check file from zip", e);
  		}
 diff --git a/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java b/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java
-index 4bdeb403dd8f623b05495ca1467403a82e1e9a1e..1cce8752e4b629da337bbf1135abd93ef5515d5c 100644
+index b672aa6d406bdb71ea20a4155926578e389a83b5..aa8a21a7d030e80bd0c860b5184eceb25d8cfa89 100644
 --- a/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java
 +++ b/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java
 @@ -32,6 +32,7 @@ import java.io.Reader;
@@ -88,7 +88,7 @@ index 4bdeb403dd8f623b05495ca1467403a82e1e9a1e..1cce8752e4b629da337bbf1135abd93e
  import java.nio.file.Path;
  import java.util.Optional;
  
-@@ -127,6 +128,6 @@ public final class FabricModJsonFactory {
+@@ -137,6 +138,6 @@ public final class FabricModJsonFactory {
  	}
  
  	public static boolean containsMod(FileSystemUtil.Delegate fs) {

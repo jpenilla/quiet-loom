@@ -18,7 +18,7 @@ index ad865d735bab1094a77d172e6e96c5107ded8904..bf54a2e250369fde15c8ee32dd07ddf0
  				)
  		);
 diff --git a/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
-index 6965a0bf521d30bf581819f5ceb07a025238abe1..69a8b4b1fdf7567479aa6ee29d4e34262a75078f 100644
+index e7ffd658d47ac81d677a4eaafc6ce93e467c3bbf..5843dc517dc90c25520240fb4ea01d18b6a4399a 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
 @@ -75,7 +75,7 @@ public class SingleJarDecompileConfiguration extends DecompileConfiguration<Mapp
@@ -31,16 +31,16 @@ index 6965a0bf521d30bf581819f5ceb07a025238abe1..69a8b4b1fdf7567479aa6ee29d4e3426
  	}
  }
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
-index dd2203207296cfd4e8ba071b12270e2fd530bf8c..9fd6cb6238af66bc50fe175cec7bde96ac8b4b79 100644
+index e7eda02b6b08fcb33df13bb7a5dee7fe158569b4..d48130f0936efb47c244adb692e14780e38f71c3 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
 @@ -84,8 +84,8 @@ class DebugLineNumbersTest extends Specification implements GradleProjectTestTra
              '''
  		when:
  		// First generate sources
--		def genSources = gradle.run(task: "genSources")
+-		def genSources = gradle.run(task: "genSources", args: ["--info"])
 -		genSources.task(":genSources").outcome == SUCCESS
-+		def genSources = gradle.run(task: "genSourcesWithCfr")
++		def genSources = gradle.run(task: "genSourcesWithCfr", args: ["--info"])
 +		genSources.task(":genSourcesWithCfr").outcome == SUCCESS
  
  		// Print out the source of the file

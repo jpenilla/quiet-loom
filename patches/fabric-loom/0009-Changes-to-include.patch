@@ -9,7 +9,7 @@ Subject: [PATCH] Changes to include
   breaks platform dependencies needlessly.
 
 diff --git a/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java b/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
-index 3cf13e036183c212ad493a1643b3c144b898c22c..dc16e725060d2ebbb7b8d2938eba51b64fffe082 100644
+index 43bffc29378f65c40fb46b4c23adecc44428c0ee..a886fa11575e79f75a7db3e071f2155e6f7a2250 100644
 --- a/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
 +++ b/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
 @@ -29,7 +29,9 @@ import java.io.IOException;
@@ -20,9 +20,9 @@ index 3cf13e036183c212ad493a1643b3c144b898c22c..dc16e725060d2ebbb7b8d2938eba51b6
  import java.util.Locale;
 +import java.util.Map;
  import java.util.Set;
- 
- import com.google.common.collect.Sets;
-@@ -44,7 +46,11 @@ import org.gradle.api.artifacts.ProjectDependency;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+@@ -46,7 +48,11 @@ import org.gradle.api.artifacts.ProjectDependency;
  import org.gradle.api.artifacts.ResolvedArtifact;
  import org.gradle.api.artifacts.ResolvedConfiguration;
  import org.gradle.api.artifacts.ResolvedDependency;
@@ -34,7 +34,7 @@ index 3cf13e036183c212ad493a1643b3c144b898c22c..dc16e725060d2ebbb7b8d2938eba51b6
  import org.gradle.api.plugins.JavaPlugin;
  import org.gradle.api.provider.Provider;
  import org.gradle.api.tasks.bundling.AbstractArchiveTask;
-@@ -53,6 +59,7 @@ import org.jetbrains.annotations.Nullable;
+@@ -57,6 +63,7 @@ import org.slf4j.LoggerFactory;
  import net.fabricmc.loom.LoomGradleExtension;
  import net.fabricmc.loom.LoomGradlePlugin;
  import net.fabricmc.loom.task.RemapTaskConfiguration;
@@ -42,7 +42,7 @@ index 3cf13e036183c212ad493a1643b3c144b898c22c..dc16e725060d2ebbb7b8d2938eba51b6
  import net.fabricmc.loom.util.ZipReprocessorUtil;
  import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
  
-@@ -75,6 +82,54 @@ public final class IncludedJarFactory {
+@@ -82,6 +89,54 @@ public final class IncludedJarFactory {
  		});
  	}
  
@@ -97,7 +97,7 @@ index 3cf13e036183c212ad493a1643b3c144b898c22c..dc16e725060d2ebbb7b8d2938eba51b6
  	private ConfigurableFileCollection getFileDeps(Configuration configuration, Set<String> visited) {
  		final ConfigurableFileCollection files = project.files();
  
-@@ -106,8 +161,16 @@ public final class IncludedJarFactory {
+@@ -113,8 +168,16 @@ public final class IncludedJarFactory {
  
  		for (Dependency dependency : configuration.getDependencies()) {
  			if (dependency instanceof ProjectDependency projectDependency) {
@@ -116,7 +116,7 @@ index 3cf13e036183c212ad493a1643b3c144b898c22c..dc16e725060d2ebbb7b8d2938eba51b6
  				}
  
  				// Get the outputs of the project
-@@ -136,10 +199,6 @@ public final class IncludedJarFactory {
+@@ -143,10 +206,6 @@ public final class IncludedJarFactory {
  						throw new UnsupportedOperationException("Cannot nest none AbstractArchiveTask task: " + task.getName());
  					}
  				}
@@ -155,10 +155,10 @@ index 54dd46bba803235aaa2a2fe7b71d449ed169f8df..07f132e9df22885a945290312fe38c39
  		getUseMixinAP().set(LoomGradleExtension.get(getProject()).getMixin().getUseLegacyMixinAp());
  
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index 100835711ceb553290db67f79dc503849aeb529d..de1ca95fb42226f3535ed5654fa8f831bb90f1f8 100644
+index c148ccb4fe2a375380b0964a28f7d1207b050f35..69b7128c3d17d33f2409614971e47bab39d0fb8f 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
-@@ -45,6 +45,7 @@ public class Constants {
+@@ -46,6 +46,7 @@ public class Constants {
  		public static final String MOD_COMPILE_CLASSPATH = "modCompileClasspath";
  		public static final String MOD_COMPILE_CLASSPATH_MAPPED = "modCompileClasspathMapped";
  		public static final String INCLUDE = "include";

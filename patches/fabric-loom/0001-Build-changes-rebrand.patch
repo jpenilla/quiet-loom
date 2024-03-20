@@ -481,7 +481,7 @@ index 08c393f887b92c81a02841ad72ea90a8a0f1d0ab..6821d2171bc947b513cd5a0b0450d873
  }
  
 diff --git a/src/test/resources/projects/runconfigs/build.gradle b/src/test/resources/projects/runconfigs/build.gradle
-index c9ce061387448c4e56ec57950564d7df6d8b1b43..de53456b7c7e837e0291fe1a3917ce1a01d050b5 100644
+index 76a3db448e22d3efe450ac73bbee13f77557ccf7..2964ae8c24ce5b058ba410d32da88e472adfe6ed 100644
 --- a/src/test/resources/projects/runconfigs/build.gradle
 +++ b/src/test/resources/projects/runconfigs/build.gradle
 @@ -1,5 +1,5 @@
