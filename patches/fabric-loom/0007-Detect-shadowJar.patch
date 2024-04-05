@@ -5,7 +5,7 @@ Subject: [PATCH] Detect shadowJar
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 40a0bf780e105a294fcf819defe9a75e931faf8d..8e719eb3eb3fb119051d8a831099e55229ddcdd8 100644
+index 7c4ebc1d6ad7437209ca242c727b5016a8e32b00..a0bcef08ca975fa6a6edd357f99946b2c7f78e06 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 @@ -90,6 +90,26 @@ public abstract class RemapTaskConfiguration implements Runnable {

@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index e34a591e5d2a899d5380b858d23ee553b2d98821..9bcaa5355f509642e26f67c84a6fe92d308e7f87 100644
+index 0360efd5e59a090b098310807eb01df8ad249f1a..c56cb992cc7442f0abdb0f5ced740aafe050e5f4 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,11 +5,10 @@ plugins {
@@ -48,7 +48,7 @@ index e34a591e5d2a899d5380b858d23ee553b2d98821..9bcaa5355f509642e26f67c84a6fe92d
  
  logger.lifecycle(":building plugin v${version}")
  
-@@ -238,61 +235,12 @@ java {
+@@ -239,61 +236,12 @@ java {
  	targetCompatibility = JavaVersion.VERSION_17
  }
  
@@ -112,7 +112,7 @@ index e34a591e5d2a899d5380b858d23ee553b2d98821..9bcaa5355f509642e26f67c84a6fe92d
  			implementationClass = 'net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap'
  		}
  	}
-@@ -340,7 +288,6 @@ import org.w3c.dom.Node
+@@ -341,7 +289,6 @@ import org.w3c.dom.Node
  
  publishing {
  	publications {
@@ -120,7 +120,7 @@ index e34a591e5d2a899d5380b858d23ee553b2d98821..9bcaa5355f509642e26f67c84a6fe92d
  
  			// Also publish a snapshot so people can use the latest version if they wish
  			snapshot(MavenPublication) { publication ->
-@@ -353,8 +300,8 @@ publishing {
+@@ -354,8 +301,8 @@ publishing {
  
  		// Manually crate the plugin marker for snapshot versions
  		snapshotPlugin(MavenPublication) {
@@ -131,7 +131,7 @@ index e34a591e5d2a899d5380b858d23ee553b2d98821..9bcaa5355f509642e26f67c84a6fe92d
  			version baseVersion + '-SNAPSHOT'
  
  			pom.withXml {
-@@ -374,13 +321,13 @@ publishing {
+@@ -375,13 +322,13 @@ publishing {
  	}
  
  	repositories {
@@ -152,7 +152,7 @@ index e34a591e5d2a899d5380b858d23ee553b2d98821..9bcaa5355f509642e26f67c84a6fe92d
  			}
  		}
  	}
-@@ -417,10 +364,10 @@ task writeActionsTestMatrix() {
+@@ -418,10 +365,10 @@ task writeActionsTestMatrix() {
  					return
  				}
  
@@ -203,7 +203,7 @@ index 40be7917a362360935de52e7c9364f2f4073187c..5a824d4009c4fafa758a786a000e21f0
  			if (Constants.PLUGIN_BETA) {
  				project.getLogger().lifecycle("This version of Architectury Loom is in beta! Please report any issues you encounter: https://github.com/architectury/architectury-loom/issues");
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index ee76d7f989c3f6e71e952e506de1085dcbc8c758..c646772a6036908a34bba1276e8d9579127e0eb6 100644
+index 68f275572753618f4d67174cb28f2284beb1546d..e9dbaeffc8f34daf232571f9ae4ce174cc6b0267 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -27,7 +27,7 @@ package net.fabricmc.loom.util;
@@ -624,7 +624,7 @@ index c866b265579609e51d0c72273488477a21237716..2a72b6c0c7a5b37d98bef73f66ba49b3
  }
  
 diff --git a/src/test/resources/projects/runconfigs/build.gradle b/src/test/resources/projects/runconfigs/build.gradle
-index 679a3b236a153a1acef07307fe1a398462106b9a..dcecfc7023fb28141a89970330957e0867d80a4e 100644
+index c32435a4e4cc8a2bb02c91a6b0cb43a70e52a34b..8cddfe5f49132cb507e6699462f56b3ef565a734 100644
 --- a/src/test/resources/projects/runconfigs/build.gradle
 +++ b/src/test/resources/projects/runconfigs/build.gradle
 @@ -1,5 +1,5 @@

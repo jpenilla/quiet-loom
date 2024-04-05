@@ -50,7 +50,7 @@ index 24058594db4e47c744596aec2e134742366a612d..0ffaa91b2de6e183d87e52db9422c8a5
 +	}
  }
 diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
-index e10db1c5daa9498a8238af8115ce6bb613d988b8..87b33c97c318ec3eae86896cba4289f6aa39f94e 100644
+index a081405dead657aa88bdb31619c4062f9e753c31..a4061165759369529214318d17bb4afa056f37f1 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
 @@ -144,7 +144,13 @@ public class MappingConfiguration {
@@ -97,10 +97,10 @@ index 6caeb92f620fa3354f534857542fad53ffab95be..498b1d25dc684d44bc4fad7d64d2c53b
  		RegularFileProperty getInputFile();
  		RegularFileProperty getOutputFile();
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-index 9ce2716228684fd0008410861b6fd64cc6680ab8..ec726d07e6ded1fd1ae5e489dbad13adb2865770 100644
+index 0573ca7dcff32a1d65e9f5b78f3e47e54b53ae68..345242702784029c5457e53f71043b8a5053e073 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-@@ -202,6 +202,10 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+@@ -212,6 +212,10 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
  	public void run() {
  		final LoomGradleExtension extension = LoomGradleExtension.get(getProject());
  

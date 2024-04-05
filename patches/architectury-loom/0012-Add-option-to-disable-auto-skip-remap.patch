@@ -58,10 +58,10 @@ index 498b1d25dc684d44bc4fad7d64d2c53b4894eaac..d6dbb0c23519d1c1e410ba1134b8ab0c
  		RegularFileProperty getInputFile();
  		RegularFileProperty getOutputFile();
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-index ec726d07e6ded1fd1ae5e489dbad13adb2865770..5233bb0f1b6c45db7c9de1047459647515a7e0db 100644
+index 345242702784029c5457e53f71043b8a5053e073..d55a1797f2fbe9a91cc39b08f07fbd65bc4b5cd4 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-@@ -202,11 +202,9 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+@@ -212,11 +212,9 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
  	public void run() {
  		final LoomGradleExtension extension = LoomGradleExtension.get(getProject());
  
