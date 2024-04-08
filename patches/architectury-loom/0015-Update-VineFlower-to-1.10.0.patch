@@ -5,7 +5,7 @@ Subject: [PATCH] Update VineFlower to 1.10.0
 
 
 diff --git a/gradle/runtime.libs.versions.toml b/gradle/runtime.libs.versions.toml
-index 8befb1d703687d09ca6add0852564c12b002576b..ff45e87da07e3a69981ca9b653c9e1d0266e88ce 100644
+index d1e4b11c3a71f075ce2c5390ae4c318e52224993..5be7b2041c5c8d09a7c9fa666eeb9210b534014e 100644
 --- a/gradle/runtime.libs.versions.toml
 +++ b/gradle/runtime.libs.versions.toml
 @@ -2,7 +2,7 @@
