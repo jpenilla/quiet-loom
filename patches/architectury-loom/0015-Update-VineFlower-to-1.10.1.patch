@@ -1,11 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
 Date: Sat, 6 Apr 2024 11:40:29 -0700
-Subject: [PATCH] Update VineFlower to 1.10.0
+Subject: [PATCH] Update VineFlower to 1.10.1
 
 
 diff --git a/gradle/runtime.libs.versions.toml b/gradle/runtime.libs.versions.toml
-index d1e4b11c3a71f075ce2c5390ae4c318e52224993..5be7b2041c5c8d09a7c9fa666eeb9210b534014e 100644
+index d1e4b11c3a71f075ce2c5390ae4c318e52224993..76c8f2a06b782c4a1cb7e361f00409e41599a3d6 100644
 --- a/gradle/runtime.libs.versions.toml
 +++ b/gradle/runtime.libs.versions.toml
 @@ -2,7 +2,7 @@
@@ -13,7 +13,7 @@ index d1e4b11c3a71f075ce2c5390ae4c318e52224993..5be7b2041c5c8d09a7c9fa666eeb9210
  fernflower = "2.0.0"
  cfr = "0.2.2"
 -vineflower = "1.9.3"
-+vineflower = "1.10.0"
++vineflower = "1.10.1"
  
  # Runtime depedencies
  mixin-compile-extensions = "0.6.0"
