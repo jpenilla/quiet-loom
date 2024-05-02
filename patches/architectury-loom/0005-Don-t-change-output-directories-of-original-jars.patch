@@ -5,7 +5,7 @@ Subject: [PATCH] Don't change output directories of original jars
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index eb9dbc6eaf35d7fa9df6c9b30ce23243d0e9d97e..e7bfdbb3704effb81b198e82c4d005f04fbf1d0e 100644
+index 42b15aa855cd537d2583694e811475931776b0a8..20e47c1a45f8d056a30bbeab740214849144bad4 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 @@ -99,7 +99,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
@@ -17,15 +17,15 @@ index eb9dbc6eaf35d7fa9df6c9b30ce23243d0e9d97e..e7bfdbb3704effb81b198e82c4d005f0
  		});
  
  		getTasks().named(BasePlugin.ASSEMBLE_TASK_NAME).configure(task -> task.dependsOn(getTasks().named(REMAP_JAR_TASK_NAME)));
-@@ -164,7 +164,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
- 			}
+@@ -179,7 +179,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
+ 				final Jar sourcesJarTask = (Jar) sourcesTask;
  
- 			sourcesJarTask.getArchiveClassifier().convention("dev-sources");
--			sourcesJarTask.getDestinationDirectory().set(getProject().getLayout().getBuildDirectory().map(directory -> directory.dir("devlibs")));
-+			// sourcesJarTask.getDestinationDirectory().set(getProject().getLayout().getBuildDirectory().map(directory -> directory.dir("devlibs"))); // quiet - no
- 			task.getArchiveClassifier().convention("sources");
+ 				sourcesJarTask.getArchiveClassifier().convention("dev-sources");
+-				sourcesJarTask.getDestinationDirectory().set(getProject().getLayout().getBuildDirectory().map(directory -> directory.dir("devlibs")));
++				// sourcesJarTask.getDestinationDirectory().set(getProject().getLayout().getBuildDirectory().map(directory -> directory.dir("devlibs"))); // quiet - no
+ 				task.getArchiveClassifier().convention("sources");
  
- 			task.dependsOn(sourcesJarTask);
+ 				task.dependsOn(sourcesJarTask);
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/MixinApSimpleTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/MixinApSimpleTest.groovy
 index ed0aaa9b29c3c8eee94757318f71340a4a165ea2..8d596334dea63ec9457ccdca131a5054df4360f9 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/MixinApSimpleTest.groovy

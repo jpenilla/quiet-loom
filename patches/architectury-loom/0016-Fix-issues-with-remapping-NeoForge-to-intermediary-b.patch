@@ -6,10 +6,10 @@ Subject: [PATCH] Fix issues with remapping NeoForge to intermediary by not
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
-index a4f95d2891e3b780a1bc8f53987325e7b13d9a3f..fa607cdd5f6d7c94c0b434b2a51b71c0f75053f2 100644
+index 5451ddf796373138915277ad9c4e8262a64955d4..3ebd57b8280be7ea754a655550e142b9db15fbcf 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
-@@ -257,8 +257,12 @@ public abstract class CompileConfiguration implements Runnable {
+@@ -258,8 +258,12 @@ public abstract class CompileConfiguration implements Runnable {
  
  		final var provideContext = new AbstractMappedMinecraftProvider.ProvideContext(true, extension.refreshDeps(), configContext);
  

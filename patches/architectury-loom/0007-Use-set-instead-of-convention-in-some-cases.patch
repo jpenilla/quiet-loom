@@ -5,7 +5,7 @@ Subject: [PATCH] Use set instead of convention in some cases
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index db6704d6c8feee140ae7e067ad881519d77e5e28..9576ea87f84b7a92d3129d3b18f5628711f442e0 100644
+index d37e23284de456b8c24392b5c3251731d87da102..97ad6c855b5d38a30b2dd498dc1dd04d52210b13 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 @@ -103,7 +103,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
@@ -17,12 +17,12 @@ index db6704d6c8feee140ae7e067ad881519d77e5e28..9576ea87f84b7a92d3129d3b18f56287
  					}
  				});
  				getTasks().named(REMAP_JAR_TASK_NAME, RemapJarTask.class).configure(new Action<>() {
-@@ -183,7 +183,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
- 				return;
- 			}
+@@ -198,7 +198,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
  
--			sourcesJarTask.getArchiveClassifier().convention("dev-sources");
-+			sourcesJarTask.getArchiveClassifier().set("dev-sources");
- 			// sourcesJarTask.getDestinationDirectory().set(getProject().getLayout().getBuildDirectory().map(directory -> directory.dir("devlibs"))); // quiet - no
- 			task.getArchiveClassifier().convention("sources");
+ 				final Jar sourcesJarTask = (Jar) sourcesTask;
+ 
+-				sourcesJarTask.getArchiveClassifier().convention("dev-sources");
++				sourcesJarTask.getArchiveClassifier().set("dev-sources");
+ 				// sourcesJarTask.getDestinationDirectory().set(getProject().getLayout().getBuildDirectory().map(directory -> directory.dir("devlibs"))); // quiet - no
+ 				task.getArchiveClassifier().convention("sources");
  
