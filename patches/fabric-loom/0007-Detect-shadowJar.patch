@@ -5,15 +5,19 @@ Subject: [PATCH] Detect shadowJar
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 9136b46d180b8e1106a629d59e25b0bfe3c1e43a..d23182ae2a9c1c1af90410a5d3deaea8878451d5 100644
+index 9136b46d180b8e1106a629d59e25b0bfe3c1e43a..6be7278e413ff759566f2b9d04b6f8b3cfb2b3a6 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -90,6 +90,26 @@ public abstract class RemapTaskConfiguration implements Runnable {
+@@ -90,6 +90,30 @@ public abstract class RemapTaskConfiguration implements Runnable {
  		// must not be lazy to ensure that the prepare tasks get setup for other projects to depend on.
  		// Being lazy also breaks maven publishing, see: https://github.com/FabricMC/fabric-loom/issues/1023
  		getTasks().create(REMAP_JAR_TASK_NAME, RemapJarTask.class, remapJarTaskAction);
 +		// quiet start
-+		getProject().getPlugins().withId("com.github.johnrengelman.shadow", new Action<>() {
++		java.util.List<String> shadowIds = java.util.List.of(
++				"com.github.johnrengelman.shadow",
++				"io.github.goooler.shadow"
++		);
++		shadowIds.forEach(id -> getProject().getPlugins().withId(id, new Action<>() {
 +			@Override
 +			public void execute(final org.gradle.api.Plugin shadowPlugin) {
 +				final TaskProvider<AbstractArchiveTask> shadowJar = getTasks().named("shadowJar", AbstractArchiveTask.class);
@@ -30,7 +34,7 @@ index 9136b46d180b8e1106a629d59e25b0bfe3c1e43a..d23182ae2a9c1c1af90410a5d3deaea8
 +					}
 +				});
 +			}
-+		});
++		}));
 +		// quiet end
  
  		// Configure the default jar task
