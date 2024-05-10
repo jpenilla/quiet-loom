@@ -5,10 +5,10 @@ Subject: [PATCH] Add option to disable auto skip remap
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java b/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
-index 498b1d25dc684d44bc4fad7d64d2c53b4894eaac..d6dbb0c23519d1c1e410ba1134b8ab0cf05868ce 100644
+index 9374d7ed4b2297b10b8e04033e4480ec27759d39..4124bddbca729a4bc89da89750283862119c8021 100644
 --- a/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
-@@ -112,6 +112,11 @@ public abstract class AbstractRemapJarTask extends Jar {
+@@ -111,6 +111,11 @@ public abstract class AbstractRemapJarTask extends Jar {
  	@ApiStatus.Internal
  	public abstract Property<String> getJarType();
  
@@ -20,7 +20,7 @@ index 498b1d25dc684d44bc4fad7d64d2c53b4894eaac..d6dbb0c23519d1c1e410ba1134b8ab0c
  	private final Provider<JarManifestService> jarManifestServiceProvider;
  
  	@Inject
-@@ -126,6 +131,20 @@ public abstract class AbstractRemapJarTask extends Jar {
+@@ -125,6 +130,20 @@ public abstract class AbstractRemapJarTask extends Jar {
  		usesService(jarManifestServiceProvider);
  	}
  
@@ -32,7 +32,7 @@ index 498b1d25dc684d44bc4fad7d64d2c53b4894eaac..d6dbb0c23519d1c1e410ba1134b8ab0c
 +
 +	private boolean shouldSkipRemap(LoomGradleExtension extension) {
 +		return extension.isNeoForge()
-+				&& extension.getMappingConfiguration() instanceof FieldMigratedMappingConfiguration c
++				&& extension.getMappingConfiguration() instanceof net.fabricmc.loom.configuration.providers.forge.ForgeMigratedMappingConfiguration c
 +				&& c.isMojangMappedProject()
 +				&& MappingsNamespace.of(this.getSourceNamespace().get()) == MappingsNamespace.NAMED
 +				&& MappingsNamespace.of(this.getTargetNamespace().get()) == MappingsNamespace.MOJANG;
@@ -41,14 +41,14 @@ index 498b1d25dc684d44bc4fad7d64d2c53b4894eaac..d6dbb0c23519d1c1e410ba1134b8ab0c
  	public final <P extends AbstractRemapParams> void submitWork(Class<? extends AbstractRemapAction<P>> workAction, Action<P> action) {
  		final WorkQueue workQueue = getWorkerExecutor().noIsolation();
  
-@@ -160,15 +179,6 @@ public abstract class AbstractRemapJarTask extends Jar {
+@@ -159,15 +178,6 @@ public abstract class AbstractRemapJarTask extends Jar {
  
  	protected abstract List<String> getClientOnlyEntries(SourceSet sourceSet);
  
 -	@ApiStatus.Internal
 -	public boolean shouldSkipRemap(LoomGradleExtension extension) {
 -		return extension.isNeoForge()
--				&& extension.getMappingConfiguration() instanceof FieldMigratedMappingConfiguration c
+-				&& extension.getMappingConfiguration() instanceof net.fabricmc.loom.configuration.providers.forge.ForgeMigratedMappingConfiguration c
 -				&& c.isMojangMappedProject()
 -				&& MappingsNamespace.of(this.getSourceNamespace().get()) == MappingsNamespace.NAMED
 -				&& MappingsNamespace.of(this.getTargetNamespace().get()) == MappingsNamespace.MOJANG;
