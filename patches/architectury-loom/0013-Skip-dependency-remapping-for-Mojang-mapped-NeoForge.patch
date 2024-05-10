@@ -5,7 +5,7 @@ Subject: [PATCH] Skip dependency remapping for Mojang-mapped NeoForge projects
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java b/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
-index ddb38c2af2a6300956c7b827ecc511dc70bda1df..7a192994c523a4494ec365475b2c10eb88a298c2 100644
+index ddb38c2af2a6300956c7b827ecc511dc70bda1df..00e68e679d1b70ad70601458ab2934191c223f3e 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
 @@ -91,7 +91,6 @@ public class ModProcessor {
@@ -20,7 +20,7 @@ index ddb38c2af2a6300956c7b827ecc511dc70bda1df..7a192994c523a4494ec365475b2c10eb
  	private void remapJars(List<ModDependency> remapList) throws IOException {
  		final LoomGradleExtension extension = LoomGradleExtension.get(project);
  		final MappingConfiguration mappingConfiguration = extension.getMappingConfiguration();
-+		boolean skipRemap = mappingConfiguration instanceof net.fabricmc.loom.configuration.providers.forge.FieldMigratedMappingConfiguration m
++		boolean skipRemap = mappingConfiguration instanceof net.fabricmc.loom.configuration.providers.forge.ForgeMigratedMappingConfiguration m
 +				&& m.isMojangMappedProject()
 +				&& IntermediaryNamespaces.intermediaryNamespace(project) == MappingsNamespace.MOJANG;
 +		if (!skipRemap) {
@@ -83,7 +83,7 @@ index ddb38c2af2a6300956c7b827ecc511dc70bda1df..7a192994c523a4494ec365475b2c10eb
  					// NeoForge: Fully map ATs
  					NeoForgeModDependencies.remapAts(output, mappings, fromM, toM);
 diff --git a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
-index f8010b18398e749f2d13145498741756f52ccffc..0ee3f2630b6b89804cb6ebaf71d5e9c057d88997 100644
+index f8010b18398e749f2d13145498741756f52ccffc..b16c1ea0e17d44ff4c8f4175b42aa826c9f4e370 100644
 --- a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
 +++ b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
 @@ -113,6 +113,15 @@ public class SourceRemapper {
@@ -91,7 +91,7 @@ index f8010b18398e749f2d13145498741756f52ccffc..0ee3f2630b6b89804cb6ebaf71d5e9c0
  
  	private void remapSourcesInner(File source, File destination) throws Exception {
 +		if (source.isFile()) {
-+			boolean skipRemap = LoomGradleExtension.get(project).getMappingConfiguration() instanceof net.fabricmc.loom.configuration.providers.forge.FieldMigratedMappingConfiguration m
++			boolean skipRemap = LoomGradleExtension.get(project).getMappingConfiguration() instanceof net.fabricmc.loom.configuration.providers.forge.ForgeMigratedMappingConfiguration m
 +					&& m.isMojangMappedProject()
 +					&& IntermediaryNamespaces.intermediaryNamespace(project) == MappingsNamespace.MOJANG;
 +			if (skipRemap) {

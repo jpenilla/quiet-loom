@@ -6,7 +6,7 @@ Subject: [PATCH] Fix issues with remapping NeoForge to intermediary by not
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
-index 5451ddf796373138915277ad9c4e8262a64955d4..3ebd57b8280be7ea754a655550e142b9db15fbcf 100644
+index 5451ddf796373138915277ad9c4e8262a64955d4..20e3202bbfebb97b14cacfbd7e1568811b9be40c 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
 @@ -258,8 +258,12 @@ public abstract class CompileConfiguration implements Runnable {
@@ -16,7 +16,7 @@ index 5451ddf796373138915277ad9c4e8262a64955d4..3ebd57b8280be7ea754a655550e142b9
 -		extension.setIntermediaryMinecraftProvider(intermediaryMinecraftProvider);
 -		intermediaryMinecraftProvider.provide(provideContext);
 +		if (!(extension.isNeoForge()
-+				&& mappingConfiguration instanceof net.fabricmc.loom.configuration.providers.forge.FieldMigratedMappingConfiguration c
++				&& mappingConfiguration instanceof net.fabricmc.loom.configuration.providers.forge.ForgeMigratedMappingConfiguration c
 +				&& c.isMojangMappedProject())) {
 +			extension.setIntermediaryMinecraftProvider(intermediaryMinecraftProvider);
 +			intermediaryMinecraftProvider.provide(provideContext);
