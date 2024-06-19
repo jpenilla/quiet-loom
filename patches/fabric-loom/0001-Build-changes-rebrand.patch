@@ -208,6 +208,17 @@ index af697460cc9366f08ac6084c7d5dba1244426dca..1c3b783fe004c25788c5796a6cf9ddc2
  	id 'maven-publish'
  }
  
+diff --git a/src/test/resources/projects/compositeBuild/build.gradle b/src/test/resources/projects/compositeBuild/build.gradle
+index 0fd841a28d00ae3b665f7f27c7ec44000addee8b..0f0890cd2d2211ed785664a4ba35d3504864bfdb 100644
+--- a/src/test/resources/projects/compositeBuild/build.gradle
++++ b/src/test/resources/projects/compositeBuild/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'fabric-loom'
++	id 'quiet-fabric-loom' // quiet
+ }
+ 
+ repositories {
 diff --git a/src/test/resources/projects/decompile/build.gradle b/src/test/resources/projects/decompile/build.gradle
 index 993ac667071e4e3e2b1a8301121e817950663d61..b38fc44fb5f10c691e2d01b6d1b1e97575ec5f38 100644
 --- a/src/test/resources/projects/decompile/build.gradle
