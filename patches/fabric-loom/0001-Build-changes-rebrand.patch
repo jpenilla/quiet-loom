@@ -5,29 +5,32 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index 8c426029a312fc3da0b7c9093263f0fc24ceb0e6..6c996be9ce0c7929e6f73b210d129df3ab1159f7 100644
+index 9645293b93e8090bcc633e3d218bae787a7dc0dc..3e8063f149af627503f40e7403caa2ac9a2d62d9 100644
 --- a/build.gradle
 +++ b/build.gradle
-@@ -5,11 +5,10 @@ plugins {
+@@ -5,10 +5,9 @@ plugins {
  	id 'idea'
  	id 'eclipse'
  	id 'groovy'
 -	id 'checkstyle'
-+	// quiet - remove checkstyle
- 	id 'jacoco'
 -	id 'codenarc'
++	// quiet - remove checkstyle
  	alias(libs.plugins.kotlin) apply false // Delay this so we can perform magic 🪄 first.
 -	alias(libs.plugins.spotless)
 +	// quiet - remove checkstyle
  	alias(libs.plugins.retry)
  }
  
-@@ -53,8 +52,10 @@ group = 'net.fabricmc'
- def baseVersion = '1.6'
+@@ -52,12 +51,10 @@ group = 'net.fabricmc'
+ def baseVersion = '1.7'
  
  def ENV = System.getenv()
 -if (ENV.BUILD_NUMBER) {
--	version = baseVersion + '.' + ENV.BUILD_NUMBER
+-	if (ENV.EXPERIMENTAL) {
+-		version = baseVersion + '.0-alpha.' + ENV.BUILD_NUMBER
+-	} else {
+-		version = baseVersion + '.' + ENV.BUILD_NUMBER
+-	}
 +// quiet start
 +if (ENV.GITHUB_RUN_NUMBER) {
 +	version = baseVersion + '.' + ENV.GITHUB_RUN_NUMBER
@@ -35,7 +38,7 @@ index 8c426029a312fc3da0b7c9093263f0fc24ceb0e6..6c996be9ce0c7929e6f73b210d129df3
  } else {
  	version = baseVersion + '.local'
  }
-@@ -214,54 +215,12 @@ java {
+@@ -223,54 +220,12 @@ java {
  	targetCompatibility = JavaVersion.VERSION_17
  }
  
@@ -92,29 +95,29 @@ index 8c426029a312fc3da0b7c9093263f0fc24ceb0e6..6c996be9ce0c7929e6f73b210d129df3
  			implementationClass = 'net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap'
  		}
  	}
-@@ -320,8 +279,10 @@ publishing {
+@@ -326,8 +281,10 @@ publishing {
  
- 		// Manually crate the plugin marker for snapshot versions
- 		snapshotPlugin(MavenPublication) { publication ->
--			groupId 'fabric-loom'
--			artifactId 'fabric-loom.gradle.plugin'
-+			// quiet start
-+			groupId 'quiet-fabric-loom'
-+			artifactId 'quiet-fabric-loom.gradle.plugin'
-+			// quiet end
- 			version baseVersion + '-SNAPSHOT'
+ 			// Manually crate the plugin marker for snapshot versions
+ 			snapshotPlugin(MavenPublication) { publication ->
+-				groupId 'fabric-loom'
+-				artifactId 'fabric-loom.gradle.plugin'
++				// quiet start
++				groupId 'quiet-fabric-loom'
++				artifactId 'quiet-fabric-loom.gradle.plugin'
++				// quiet end
+ 				version baseVersion + '-SNAPSHOT'
  
- 			pom.withXml({
-@@ -333,7 +294,7 @@ publishing {
- 				Node groupId = dependency.appendChild(document.createElement('groupId'))
- 				groupId.setTextContent('net.fabricmc')
- 				Node artifactId = dependency.appendChild(document.createElement('artifactId'))
--				artifactId.setTextContent('fabric-loom')
-+				artifactId.setTextContent('quiet-fabric-loom') // quiet
- 				Node version = dependency.appendChild(document.createElement('version'))
- 				version.setTextContent(baseVersion + '-SNAPSHOT')
- 			})
-@@ -341,13 +302,13 @@ publishing {
+ 				pom.withXml({
+@@ -339,7 +296,7 @@ publishing {
+ 					Node groupId = dependency.appendChild(document.createElement('groupId'))
+ 					groupId.setTextContent('net.fabricmc')
+ 					Node artifactId = dependency.appendChild(document.createElement('artifactId'))
+-					artifactId.setTextContent('fabric-loom')
++					artifactId.setTextContent('quiet-fabric-loom') // quiet
+ 					Node version = dependency.appendChild(document.createElement('version'))
+ 					version.setTextContent(baseVersion + '-SNAPSHOT')
+ 				})
+@@ -348,13 +305,13 @@ publishing {
  	}
  	repositories {
  		maven {
@@ -157,10 +160,10 @@ index 039a49da24b9cbae596a5d27ff04d13ef76e104e..2bc847c77078162e40f0ced0af0379f1
  dependencyResolutionManagement {
  	versionCatalogs {
 diff --git a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
-index 71248d2d72437815aecbee42d01ee4ec62589a65..bd43efc8d35e8dadfbe06e5e81eca5a439ad2a60 100644
+index dabc1c773f4c1206f58a1aa736d5f0b0e2c8cd14..6d88c4009be0c3cb02c9b0851dd5cbf6d29cc2e3 100644
 --- a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
 +++ b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
-@@ -76,7 +76,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
+@@ -78,7 +78,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
  	}
  
  	public void apply(Project project) {
@@ -183,11 +186,11 @@ index dbe9144276405ca3206c88f19dae49d643ee163f..105b8e60ef0cc56196ebfc9df214194e
  
  	public static Provider<Boolean> getBooleanPropertyProvider(Project project, String key) {
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-index 6107dc647036c08a3f9d879b115fff7408c59b71..0dee0e0d36972d986954ae1c62def2623cbff8db 100644
+index 8d94b6aad70cf3cf29a44a76978f8b47845f6451..ba730f9d81131cab1a1500b94eae524954095577 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 @@ -63,6 +63,7 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
- 		def minecraftVersion = "23w51b"
+ 		def minecraftVersion = "1.21"
  		def server = ServerRunner.create(gradle.projectDir, minecraftVersion)
  				.withMod(gradle.getOutputFile("fabric-api-999.0.0.jar"))
 +		gradle.buildGradle.write(gradle.buildGradle.text.replace("fabric-loom", "quiet-fabric-loom")) // quiet
@@ -373,16 +376,16 @@ index f3dc73941bc7331e8292466b924f4a769ae55a01..8fdbe5cd5ba9db93ba06dfd2ffe4f5df
  }
  
 diff --git a/src/test/resources/projects/mixinApAutoRefmap/build.gradle b/src/test/resources/projects/mixinApAutoRefmap/build.gradle
-index 058aef168b3bcb720935aac393c36b6c52a3538b..e21cddde5c444801a985ef57f61abc612b4efb30 100644
+index d7bad2b277c9a7ddcc0d06701c7a056e82a49678..1f9491bb8ec9a42b2cfdb792b70e56d00a031c80 100644
 --- a/src/test/resources/projects/mixinApAutoRefmap/build.gradle
 +++ b/src/test/resources/projects/mixinApAutoRefmap/build.gradle
 @@ -1,5 +1,5 @@
  plugins {
 -	id 'fabric-loom'
 +	id 'quiet-fabric-loom' // quiet
- 	id 'com.github.johnrengelman.shadow' version '7.0.0'
  	id 'maven-publish'
  }
+ 
 diff --git a/src/test/resources/projects/mixinApSimple/build.gradle b/src/test/resources/projects/mixinApSimple/build.gradle
 index 68b48e9c25d51cd96e7149243e911949262b5917..7bcb04ab1f048858e3fec4bd6a2ab79282ecef3a 100644
 --- a/src/test/resources/projects/mixinApSimple/build.gradle
@@ -481,7 +484,7 @@ index 08c393f887b92c81a02841ad72ea90a8a0f1d0ab..6821d2171bc947b513cd5a0b0450d873
  }
  
 diff --git a/src/test/resources/projects/runconfigs/build.gradle b/src/test/resources/projects/runconfigs/build.gradle
-index 76a3db448e22d3efe450ac73bbee13f77557ccf7..2964ae8c24ce5b058ba410d32da88e472adfe6ed 100644
+index bc59e2d4ea635c2cddcc43d66a97fb0396ac3728..c13920990b176dd5dcaff43a1be8ca0e2fa1d29b 100644
 --- a/src/test/resources/projects/runconfigs/build.gradle
 +++ b/src/test/resources/projects/runconfigs/build.gradle
 @@ -1,5 +1,5 @@

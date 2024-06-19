@@ -5,7 +5,7 @@ Subject: [PATCH] Pass LinkOptions.NOFOLLOW_LINKS for exists checks
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
-index 057cde42e019d890d7a9289bde235ff0efc35a7b..04b0d618359df5ce125647cef43cb56107974af6 100644
+index 6fc3ac75598687c29eeb3c93f1837ec48dd53cbb..b7a7cacce65ba5b35e3c2f1f2f14e3dc715ea4be 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
 @@ -28,6 +28,7 @@ import java.io.ByteArrayInputStream;
@@ -14,9 +14,9 @@ index 057cde42e019d890d7a9289bde235ff0efc35a7b..04b0d618359df5ce125647cef43cb561
  import java.nio.file.Files;
 +import java.nio.file.LinkOption;
  import java.nio.file.Path;
- import java.util.Locale;
- import java.util.function.Predicate;
-@@ -56,7 +57,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
+ import java.util.ArrayList;
+ import java.util.Collections;
+@@ -60,7 +61,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
  			isFabricMod = FabricModJsonFactory.containsMod(fs);
  			final Path manifestPath = fs.getPath(Constants.Manifest.PATH);
  
@@ -25,7 +25,7 @@ index 057cde42e019d890d7a9289bde235ff0efc35a7b..04b0d618359df5ce125647cef43cb561
  				final var manifest = new Manifest(new ByteArrayInputStream(Files.readAllBytes(manifestPath)));
  				final Attributes mainAttributes = manifest.getMainAttributes();
  				final String remapValue = mainAttributes.getValue(Constants.Manifest.REMAP_KEY);
-@@ -83,7 +84,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
+@@ -92,7 +93,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
  
  			final Path installerPath = fs.getPath(INSTALLER_PATH);
  
@@ -35,18 +35,18 @@ index 057cde42e019d890d7a9289bde235ff0efc35a7b..04b0d618359df5ce125647cef43cb561
  				installerData = new InstallerData(artifact.version(), jsonObject);
  			}
 diff --git a/src/main/java/net/fabricmc/loom/util/FileSystemUtil.java b/src/main/java/net/fabricmc/loom/util/FileSystemUtil.java
-index 07fe08cf42b681d47a8d92f060efa0ff509b4545..f37f7e58b368ac271473531965f4cacc90d42e2e 100644
+index 3d457766becaba709a1adc0401bf26e177d723c1..860ce0e9a0ce64681bf776d690c61c64a2fee171 100644
 --- a/src/main/java/net/fabricmc/loom/util/FileSystemUtil.java
 +++ b/src/main/java/net/fabricmc/loom/util/FileSystemUtil.java
-@@ -31,6 +31,7 @@ import java.net.URI;
- import java.nio.charset.StandardCharsets;
- import java.nio.file.FileSystem;
+@@ -34,6 +34,7 @@ import java.nio.file.FileSystem;
+ import java.nio.file.FileSystemNotFoundException;
+ import java.nio.file.FileSystems;
  import java.nio.file.Files;
 +import java.nio.file.LinkOption;
  import java.nio.file.NoSuchFileException;
  import java.nio.file.Path;
  import java.util.function.Supplier;
-@@ -50,7 +51,7 @@ public final class FileSystemUtil {
+@@ -53,7 +54,7 @@ public final class FileSystemUtil {
  		public byte[] readAllBytes(String path) throws IOException {
  			Path fsPath = getPath(path);
  
@@ -77,7 +77,7 @@ index 714dce833423ee40df3adc80b19a8d4691ddc3c0..19e4c22ebe2e630081ccb1b714e81978
  			throw new UncheckedIOException("Failed to check file from zip", e);
  		}
 diff --git a/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java b/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java
-index b672aa6d406bdb71ea20a4155926578e389a83b5..aa8a21a7d030e80bd0c860b5184eceb25d8cfa89 100644
+index 8c64cecbe7b7a40e7ebc1b47a16eafb419443f7e..7d60c69ebfc608b82767e2ce61af875c5558467f 100644
 --- a/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java
 +++ b/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java
 @@ -32,6 +32,7 @@ import java.io.Reader;
@@ -88,7 +88,7 @@ index b672aa6d406bdb71ea20a4155926578e389a83b5..aa8a21a7d030e80bd0c860b5184eceb2
  import java.nio.file.Path;
  import java.util.Optional;
  
-@@ -137,6 +138,6 @@ public final class FabricModJsonFactory {
+@@ -133,6 +134,6 @@ public final class FabricModJsonFactory {
  	}
  
  	public static boolean containsMod(FileSystemUtil.Delegate fs) {

@@ -5,10 +5,10 @@ Subject: [PATCH] Use set instead of convention in some cases
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 6be7278e413ff759566f2b9d04b6f8b3cfb2b3a6..fdac9e9ffd2d825b9ccfbf557b512e179c9cd2c7 100644
+index 99c92e4f05e0af475b14df6dae29e2370198d16a..2f35abc98d2e6df1a55f5053083ad1b662ad3871 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -102,7 +102,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
+@@ -109,7 +109,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
  				shadowJar.configure(new Action<>() {
  					@Override
  					public void execute(final AbstractArchiveTask shadowJarTask) {
@@ -17,7 +17,7 @@ index 6be7278e413ff759566f2b9d04b6f8b3cfb2b3a6..fdac9e9ffd2d825b9ccfbf557b512e17
  					}
  				});
  				getTasks().named(REMAP_JAR_TASK_NAME, RemapJarTask.class).configure(new Action<>() {
-@@ -179,7 +179,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
+@@ -186,7 +186,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
  
  				final Jar sourcesJarTask = (Jar) sourcesTask;
  

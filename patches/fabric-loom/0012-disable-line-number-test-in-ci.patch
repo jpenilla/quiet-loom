@@ -5,7 +5,7 @@ Subject: [PATCH] disable line number test in ci
 
 
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
-index 358fd0f0e6a55cecc9c23475bad461f1d55c77fb..969beaacb072097e263679387c5cd3ffe3bc8cc1 100644
+index ee791785a486d3f9798a6aab93b6f6cf0e9df72a..e57753ef91fbdd15484575c73336d4dcc968eb7b 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
 @@ -24,6 +24,8 @@
