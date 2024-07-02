@@ -8,192 +8,103 @@ Subject: [PATCH] Changes to include
   jars are resolved means we don't need to, and doing so
   breaks platform dependencies needlessly.
 
-diff --git a/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java b/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
-index 58451554d210fff911c5895eefd23eca48a809d2..4da239508f2fbeb46becc2b6094c8256293c59a0 100644
---- a/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
-+++ b/src/main/java/net/fabricmc/loom/build/nesting/IncludedJarFactory.java
-@@ -34,6 +34,7 @@ import java.util.Collection;
- import java.util.HashSet;
- import java.util.List;
- import java.util.Locale;
-+import java.util.Map;
- import java.util.Set;
- import java.util.function.Supplier;
- import java.util.regex.Matcher;
-@@ -51,7 +52,11 @@ import org.gradle.api.artifacts.ProjectDependency;
- import org.gradle.api.artifacts.ResolvedArtifact;
- import org.gradle.api.artifacts.ResolvedConfiguration;
- import org.gradle.api.artifacts.ResolvedDependency;
-+import org.gradle.api.artifacts.component.ComponentIdentifier;
-+import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
-+import org.gradle.api.artifacts.component.ProjectComponentIdentifier;
- import org.gradle.api.file.ConfigurableFileCollection;
-+import org.gradle.api.internal.artifacts.repositories.resolver.MavenUniqueSnapshotComponentIdentifier;
- import org.gradle.api.plugins.JavaPlugin;
- import org.gradle.api.provider.Provider;
- import org.gradle.api.tasks.TaskDependency;
-@@ -63,6 +68,7 @@ import org.slf4j.LoggerFactory;
- import net.fabricmc.loom.LoomGradleExtension;
- import net.fabricmc.loom.LoomGradlePlugin;
- import net.fabricmc.loom.task.RemapTaskConfiguration;
-+import net.fabricmc.loom.util.Constants;
- import net.fabricmc.loom.util.Pair;
- import net.fabricmc.loom.util.ZipReprocessorUtil;
- import net.fabricmc.loom.util.fmj.FabricModJsonFactory;
-@@ -90,6 +96,74 @@ public final class IncludedJarFactory {
- 		});
- 	}
- 
-+	public Provider<ConfigurableFileCollection> transitiveNestedJars() {
-+		return this.project.provider(() -> {
-+			final ConfigurableFileCollection files = this.project.files();
-+			final Set<Task> builtBy = Sets.newHashSet();
-+
-+			final Configuration config = this.project.getConfigurations().getByName(Constants.Configurations.TRANSITIVE_INCLUDE);
-+			files.from(artifacts(config, builtBy).stream().map(LazyNestedFile::file).toArray());
-+			files.builtBy(config.getBuildDependencies());
-+			return files;
-+		});
-+	}
-+
-+	private List<LazyNestedFile> artifacts(final Configuration config, final Set<Task> builtBy) {
-+		final Set<String> seen = new HashSet<>();
-+
-+		final List<LazyNestedFile> files = new ArrayList<>();
-+
-+		final ResolvedConfiguration resolvedConfiguration = config.getResolvedConfiguration();
-+		for (final ResolvedArtifact artifact : resolvedConfiguration.getResolvedArtifacts()) {
-+			final ComponentIdentifier id = artifact.getId().getComponentIdentifier();
-+			if (id instanceof ModuleComponentIdentifier module) {
-+				final String version;
-+				if (module instanceof MavenUniqueSnapshotComponentIdentifier snapshot) {
-+					// vanilla loom doesn't use the timestamp
-+					version = snapshot.getSnapshotVersion();
-+				} else {
-+					version = module.getVersion();
-+				}
-+				if (!seen.add(module.getGroup() + ":" + module.getModule() + ":" + version)) {
-+					continue;
-+				}
-+				final Metadata metadata = new Metadata(
-+						module.getGroup(),
-+						module.getModule(),
-+						version,
-+						artifact.getClassifier()
-+				);
-+
-+				files.add(new LazyNestedFile(
-+						this.project,
-+						metadata,
-+						() -> this.getNestableJar(artifact.getFile(), metadata)
-+				));
-+			} else if (id instanceof ProjectComponentIdentifier projectId) {
-+				final ProjectDependency dependency = (ProjectDependency) this.project.getDependencies().project(Map.of("path", projectId.getProjectPath()));
-+
-+				this.addProjectDependency(files, dependency, seen, builtBy);
-+			}
-+		}
-+
-+		return files;
-+	}
-+
-+	public Provider<Pair<List<LazyNestedFile>, TaskDependency>> forgeTransitiveNestedJars() {
-+		return this.project.provider(() -> {
-+            final Set<Task> builtBy = Sets.newHashSet();
-+
-+			final Configuration config = this.project.getConfigurations().getByName(Constants.Configurations.TRANSITIVE_INCLUDE);
-+
-+			return new Pair<>(artifacts(config, builtBy), task -> {
-+				TaskDependency dependencies = config.getBuildDependencies();
-+				Set<Task> tasks = new HashSet<>(dependencies.getDependencies(task));
-+				tasks.addAll(builtBy);
-+				return tasks;
-+			});
-+		});
-+	}
-+
- 	public Provider<Pair<List<LazyNestedFile>, TaskDependency>> getForgeNestedJars(final Configuration configuration) {
- 		return project.provider(() -> {
- 			final List<LazyNestedFile> files = new ArrayList<>();
-@@ -138,8 +212,16 @@ public final class IncludedJarFactory {
- 
- 		for (Dependency dependency : configuration.getDependencies()) {
- 			if (dependency instanceof ProjectDependency projectDependency) {
--				if (!visited.add(dependency.getGroup() + ":" + dependency.getName() + ":" + dependency.getVersion())) {
--					continue;
-+				this.addProjectDependency(files, projectDependency, visited, builtBy);
-+			}
-+		}
-+
-+		return files;
-+	}
-+
-+	private void addProjectDependency(final List<LazyNestedFile> files, final ProjectDependency projectDependency, final Set<String> visited, final Set<Task> builtBy) {
-+				if (!visited.add(projectDependency.getGroup() + ":" + projectDependency.getName() + ":" + projectDependency.getVersion())) {
-+					return;
- 				}
- 
- 				// Get the outputs of the project
-@@ -168,10 +250,6 @@ public final class IncludedJarFactory {
- 						throw new UnsupportedOperationException("Cannot nest none AbstractArchiveTask task: " + task.getName());
- 					}
- 				}
--			}
--		}
--
--		return files;
- 	}
- 
- 	private File getNestableJar(final File input, final Metadata metadata) {
 diff --git a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
-index 238a242eaaac092e22f9cb9f8e66e9c82b0d4ddd..a684a3bdada096cc526da6befd678eeceddd937e 100644
+index 6d220b914da52bb3d15dda4230da11a6bb84f5de..fd09e17187fbfaf5fcae8cd62cdc63907c5387b7 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
-@@ -85,6 +85,7 @@ public abstract class LoomConfigurations implements Runnable {
+@@ -95,36 +95,10 @@ public abstract class LoomConfigurations implements Runnable {
  		registerNonTransitive(Constants.Configurations.MINECRAFT, Role.NONE);
- 		// We don't need to make this non-transitive due to the way we resolve it. Also, doing so would break platform dependencies.
- 		register(Constants.Configurations.INCLUDE, Role.RESOLVABLE);
-+		register(Constants.Configurations.TRANSITIVE_INCLUDE, Role.RESOLVABLE);
+ 
+ 		Provider<Configuration> include = register(Constants.Configurations.INCLUDE, Role.NONE);
++		Provider<Configuration> transitiveInclude = register(Constants.Configurations.TRANSITIVE_INCLUDE, Role.NONE);
+ 		register(Constants.Configurations.INCLUDE_INTERNAL, Role.RESOLVABLE).configure(configuration -> {
+-			configuration.getDependencies().addAllLater(getProject().provider(() -> {
+-				List<Dependency> dependencies = new ArrayList<>();
+-
+-				for (Dependency dependency : include.get().getIncoming().getDependencies()) {
+-					if (dependency instanceof HasConfigurableAttributes<?> hasAttributes) {
+-						Category category = hasAttributes.getAttributes().getAttribute(Category.CATEGORY_ATTRIBUTE);
+-
+-						if (category != null && (category.getName().equals(Category.ENFORCED_PLATFORM) || category.getName().equals(Category.REGULAR_PLATFORM))) {
+-							dependencies.add(dependency);
+-							continue;
+-						} else if (dependency instanceof ModuleDependency moduleDependency) {
+-							ModuleDependency copy = moduleDependency.copy();
+-							copy.setTransitive(false);
+-							dependencies.add(copy);
+-							continue;
+-						}
+-					}
+-
+-					dependencies.add(dependency);
+-				}
+-
+-				return dependencies;
+-			}));
+-			configuration.attributes(attributes -> {
+-				attributes.attribute(Usage.USAGE_ATTRIBUTE, getProject().getObjects().named(Usage.class, Usage.JAVA_RUNTIME));
+-				attributes.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, getProject().getObjects().named(LibraryElements.class, LibraryElements.JAR));
+-				attributes.attribute(Category.CATEGORY_ATTRIBUTE, getProject().getObjects().named(Category.class, Category.LIBRARY));
+-				attributes.attribute(Bundling.BUNDLING_ATTRIBUTE, getProject().getObjects().named(Bundling.class, Bundling.EXTERNAL));
+-			});
++			configureIncludeInternal(configuration, include, false);
++			configureIncludeInternal(configuration, transitiveInclude, true);
+ 		});
+ 
  		registerNonTransitive(Constants.Configurations.MAPPING_CONSTANTS, Role.RESOLVABLE);
- 
- 		register(Constants.Configurations.NAMED_ELEMENTS, Role.CONSUMABLE).configure(configuration -> {
-diff --git a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-index e3d6fbbd9d56042fab0812060ab7077139c8a988..0573ca7dcff32a1d65e9f5b78f3e47e54b53ae68 100644
---- a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-+++ b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-@@ -163,14 +163,23 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
- 
- 		if (!LoomGradleExtension.get(getProject()).isForgeLike()) {
- 			getNestedJars().from(factory.getNestedJars(includeConfiguration));
-+			getNestedJars().from(factory.transitiveNestedJars());
- 		} else {
- 			Provider<Pair<List<LazyNestedFile>, TaskDependency>> forgeNestedJars = factory.getForgeNestedJars(includeConfiguration);
--			getForgeNestedJars().value(forgeNestedJars.map(Pair::left).map(pairs -> {
-+			getForgeNestedJars().addAll(forgeNestedJars.map(Pair::left).map(pairs -> {
- 				return pairs.stream()
- 						.map(LazyNestedFile::resolve)
- 						.toList();
- 			}));
- 			getNestedJars().builtBy(forgeNestedJars.map(Pair::right));
-+
-+			Provider<Pair<List<LazyNestedFile>, TaskDependency>> forgeTransitiveNestedJars = factory.forgeTransitiveNestedJars();
-+			getForgeNestedJars().addAll(forgeTransitiveNestedJars.map(Pair::left).map(pairs -> {
-+				return pairs.stream()
-+						.map(LazyNestedFile::resolve)
-+						.toList();
-+			}));
-+			getNestedJars().builtBy(forgeTransitiveNestedJars.map(Pair::right));
+@@ -213,6 +187,44 @@ public abstract class LoomConfigurations implements Runnable {
  		}
+ 	}
  
- 		getUseMixinAP().set(LoomGradleExtension.get(getProject()).getMixin().getUseLegacyMixinAp());
++	private void configureIncludeInternal(
++			Configuration configuration,
++			Provider<Configuration> include,
++			boolean transitive
++	) {
++		configuration.getDependencies().addAllLater(getProject().provider(() -> {
++			List<Dependency> dependencies = new ArrayList<>();
++
++			for (Dependency dependency : include.get().getIncoming().getDependencies()) {
++				if (dependency instanceof HasConfigurableAttributes<?> hasAttributes) {
++					Category category = hasAttributes.getAttributes().getAttribute(Category.CATEGORY_ATTRIBUTE);
++
++					if (category != null && (category.getName().equals(Category.ENFORCED_PLATFORM) || category.getName().equals(Category.REGULAR_PLATFORM))) {
++						dependencies.add(dependency);
++						continue;
++					} else if (dependency instanceof ModuleDependency moduleDependency) {
++						ModuleDependency copy = moduleDependency.copy();
++						if (!transitive) {
++							copy.setTransitive(false);
++						}
++						dependencies.add(copy);
++						continue;
++					}
++				}
++
++				dependencies.add(dependency);
++			}
++
++			return dependencies;
++		}));
++		configuration.attributes(attributes -> {
++			attributes.attribute(Usage.USAGE_ATTRIBUTE, getProject().getObjects().named(Usage.class, Usage.JAVA_RUNTIME));
++			attributes.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, getProject().getObjects().named(LibraryElements.class, LibraryElements.JAR));
++			attributes.attribute(Category.CATEGORY_ATTRIBUTE, getProject().getObjects().named(Category.class, Category.LIBRARY));
++			attributes.attribute(Bundling.BUNDLING_ATTRIBUTE, getProject().getObjects().named(Bundling.class, Bundling.EXTERNAL));
++		});
++	}
++
+ 	private NamedDomainObjectProvider<Configuration> register(String name, Role role) {
+ 		return getConfigurations().register(name, role::apply);
+ 	}
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index e9dbaeffc8f34daf232571f9ae4ce174cc6b0267..30553f3501c974511251a9e0bab711e6b6dda79f 100644
+index e82993ccecc9e780a8c19ffb88596e3834ca354c..9077f9a110518ad1e09813e4a89a51ca87ef27aa 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
-@@ -49,6 +49,7 @@ public class Constants {
- 		public static final String MOD_COMPILE_CLASSPATH = "modCompileClasspath";
+@@ -51,6 +51,7 @@ public class Constants {
  		public static final String MOD_COMPILE_CLASSPATH_MAPPED = "modCompileClasspathMapped";
  		public static final String INCLUDE = "include";
+ 		public static final String INCLUDE_INTERNAL = "includeInternal";
 +		public static final String TRANSITIVE_INCLUDE = "transitiveInclude";
  		public static final String MINECRAFT = "minecraft";
  

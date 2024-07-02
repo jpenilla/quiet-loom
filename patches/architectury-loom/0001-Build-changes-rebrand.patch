@@ -5,30 +5,29 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index 0360efd5e59a090b098310807eb01df8ad249f1a..c56cb992cc7442f0abdb0f5ced740aafe050e5f4 100644
+index 7d8d3e98b5aba9efa4bcf6eada441d1dc1dbd106..014e6eed25632cd96821e414579b19e9da256d8a 100644
 --- a/build.gradle
 +++ b/build.gradle
-@@ -5,11 +5,10 @@ plugins {
+@@ -5,10 +5,9 @@ plugins {
  	id 'idea'
  	id 'eclipse'
  	id 'groovy'
 -	id 'checkstyle'
-+	// quiet - remove checkstyle
- 	id 'jacoco'
 -	id 'codenarc'
++	// quiet - remove checkstyle
  	alias(libs.plugins.kotlin) apply false // Delay this so we can perform magic 🪄 first.
 -	alias(libs.plugins.spotless)
 +	// quiet - remove checkstyle
  	alias(libs.plugins.retry)
  }
  
-@@ -49,19 +48,17 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+@@ -48,19 +47,17 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
  	}
  }
  
 -group = "dev.architectury"
 +group = "xyz.jpenilla" // quiet
- def baseVersion = '1.6'
+ def baseVersion = '1.7'
  
  def ENV = System.getenv()
 -def runNumber = ENV.GITHUB_RUN_NUMBER ?: "9999"
@@ -48,7 +47,7 @@ index 0360efd5e59a090b098310807eb01df8ad249f1a..c56cb992cc7442f0abdb0f5ced740aaf
  
  logger.lifecycle(":building plugin v${version}")
  
-@@ -239,61 +236,12 @@ java {
+@@ -244,61 +241,12 @@ java {
  	targetCompatibility = JavaVersion.VERSION_17
  }
  
@@ -112,26 +111,27 @@ index 0360efd5e59a090b098310807eb01df8ad249f1a..c56cb992cc7442f0abdb0f5ced740aaf
  			implementationClass = 'net.fabricmc.loom.bootstrap.LoomGradlePluginBootstrap'
  		}
  	}
-@@ -341,7 +289,6 @@ import org.w3c.dom.Node
+@@ -342,7 +290,7 @@ import org.w3c.dom.Node
  
  publishing {
  	publications {
--		if (isSnapshot) return
- 
+-		if (!isSnapshot && !ENV.EXPERIMENTAL) {
++		if (!ENV.EXPERIMENTAL) {
  			// Also publish a snapshot so people can use the latest version if they wish
  			snapshot(MavenPublication) { publication ->
-@@ -354,8 +301,8 @@ publishing {
+ 				groupId project.group
+@@ -354,8 +302,8 @@ publishing {
  
- 		// Manually crate the plugin marker for snapshot versions
- 		snapshotPlugin(MavenPublication) {
--			groupId 'dev.architectury.loom'
--			artifactId 'dev.architectury.loom.gradle.plugin'
-+			groupId 'xyz.jpenilla.quiet-architectury-loom' // quiet
-+			artifactId 'xyz.jpenilla.quiet-architectury-loom.gradle.plugin' // quiet
- 			version baseVersion + '-SNAPSHOT'
+ 			// Manually crate the plugin marker for snapshot versions
+ 			snapshotPlugin(MavenPublication) {
+-				groupId 'dev.architectury.loom'
+-				artifactId 'dev.architectury.loom.gradle.plugin'
++				groupId 'xyz.jpenilla.quiet-architectury-loom' // quiet
++				artifactId 'xyz.jpenilla.quiet-architectury-loom.gradle.plugin' // quiet
+ 				version baseVersion + '-SNAPSHOT'
  
- 			pom.withXml {
-@@ -375,13 +322,13 @@ publishing {
+ 				pom.withXml({
+@@ -376,13 +324,13 @@ publishing {
  	}
  
  	repositories {
@@ -152,7 +152,7 @@ index 0360efd5e59a090b098310807eb01df8ad249f1a..c56cb992cc7442f0abdb0f5ced740aaf
  			}
  		}
  	}
-@@ -418,10 +365,10 @@ task writeActionsTestMatrix() {
+@@ -419,10 +367,10 @@ tasks.register('writeActionsTestMatrix') {
  					return
  				}
  
@@ -190,10 +190,10 @@ index 1856764627777899065d24f8ff6b936251afff54..cfbd37d74b37ce76f362c0a23dbb4930
  dependencyResolutionManagement {
  	versionCatalogs {
 diff --git a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
-index 40be7917a362360935de52e7c9364f2f4073187c..5a824d4009c4fafa758a786a000e21f0225715ae 100644
+index 060241b5d7e0ff31a92c9068c6e1fcd3fd1ea4b8..a35fdf866ccf1005daf319d5cca421e87c4794a7 100644
 --- a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
 +++ b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
-@@ -85,7 +85,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
+@@ -87,7 +87,7 @@ public class LoomGradlePlugin implements BootstrappedPlugin {
  		if (!loggedVersions.contains(LOOM_VERSION)) {
  			loggedVersions.add(LOOM_VERSION);
  			System.setProperty("loom.printed.logged", String.join(",", loggedVersions));
@@ -203,10 +203,10 @@ index 40be7917a362360935de52e7c9364f2f4073187c..5a824d4009c4fafa758a786a000e21f0
  			if (Constants.PLUGIN_BETA) {
  				project.getLogger().lifecycle("This version of Architectury Loom is in beta! Please report any issues you encounter: https://github.com/architectury/architectury-loom/issues");
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index 68f275572753618f4d67174cb28f2284beb1546d..e9dbaeffc8f34daf232571f9ae4ce174cc6b0267 100644
+index 14530ddac1285798229a7d8fcae0cf93c62952ae..e82993ccecc9e780a8c19ffb88596e3834ca354c 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
-@@ -27,7 +27,7 @@ package net.fabricmc.loom.util;
+@@ -28,7 +28,7 @@ import org.jetbrains.annotations.ApiStatus;
  import org.objectweb.asm.Opcodes;
  
  public class Constants {
@@ -216,7 +216,7 @@ index 68f275572753618f4d67174cb28f2284beb1546d..e9dbaeffc8f34daf232571f9ae4ce174
  	public static final boolean PLUGIN_DEPRECATED = false;
  	public static final String LIBRARIES_BASE = "https://libraries.minecraft.net/";
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-index beb818382ea6358c2f29e00cb5a07b8a4da62530..9eace53af74cca1becc4f28ae04f2837f9719abd 100644
+index 3b84c8cd4a1a1ad3370aa060d6065234af6f138d..8bab0fa637ee47cd6dadb1e3a9ed3f2f97fe147b 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 @@ -38,6 +38,7 @@ import static net.fabricmc.loom.test.LoomTestConstants.*
@@ -238,6 +238,17 @@ index db62caeee6219cbac5a8e90e080ded4a04454cae..fe2d8c666c9eb486116d7b9d87edffaa
  	id 'maven-publish'
  }
  
+diff --git a/src/test/resources/projects/compositeBuild/build.gradle b/src/test/resources/projects/compositeBuild/build.gradle
+index 224f1291778fe78c93b23c1f6a4c6656cb994a0e..95de7999f1a389854bdabb1635f4d9d37c1488e8 100644
+--- a/src/test/resources/projects/compositeBuild/build.gradle
++++ b/src/test/resources/projects/compositeBuild/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ }
+ 
+ repositories {
 diff --git a/src/test/resources/projects/decompile/build.gradle b/src/test/resources/projects/decompile/build.gradle
 index 103c113738bc0117729ba0ea8e5b8f94e6cfbc25..3d078858c526d88535867d43ca09339546390ecc 100644
 --- a/src/test/resources/projects/decompile/build.gradle
@@ -289,6 +300,17 @@ index fda5e86c677601656e9f3161feb9bac4d3cb885d..e66e0efe4bbb99e4a5a9d099b686a04e
  }
  
  dependencyResolutionManagement {
+diff --git a/src/test/resources/projects/forge/1206/build.gradle b/src/test/resources/projects/forge/1206/build.gradle
+index 36bc2f7ba939a4c97cb9100db62f6c6539e5b408..010d5a9b452f4d684bec51b1ade7eb9634034553 100644
+--- a/src/test/resources/projects/forge/1206/build.gradle
++++ b/src/test/resources/projects/forge/1206/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
 diff --git a/src/test/resources/projects/forge/accessTransformer/build.gradle b/src/test/resources/projects/forge/accessTransformer/build.gradle
 index cecc62d242b6460535e84a99e23626d81de45988..6fb51255ea7886a2c7f3606f31dc6bd2e4c9a9a4 100644
 --- a/src/test/resources/projects/forge/accessTransformer/build.gradle
@@ -505,16 +527,16 @@ index dbe70455d45756ae2c7011578e80301a78c4d45d..249142a23b8ede823fc588515c2286ba
  }
  
 diff --git a/src/test/resources/projects/mixinApAutoRefmap/build.gradle b/src/test/resources/projects/mixinApAutoRefmap/build.gradle
-index ae698037c6fde1959b2e8ee170f3ee72f2212a92..d0c86f034be70e1f75dfb1b57501baf143e1abd1 100644
+index 1aba76068e25bfb5c01d35e5eaeb9510bcb62dc4..da475d776e1559e0c5b4f81e4278e4529fe1cbc1 100644
 --- a/src/test/resources/projects/mixinApAutoRefmap/build.gradle
 +++ b/src/test/resources/projects/mixinApAutoRefmap/build.gradle
 @@ -1,5 +1,5 @@
  plugins {
 -	id 'dev.architectury.loom'
 +	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
- 	id 'com.github.johnrengelman.shadow' version '7.0.0'
  	id 'maven-publish'
  }
+ 
 diff --git a/src/test/resources/projects/mixinApSimple/build.gradle b/src/test/resources/projects/mixinApSimple/build.gradle
 index d368d500e90a92daaa0ba0e0404f1c55f8531382..5ae2f8d368eb9d0d7c747850ef40eabb0b05ee17 100644
 --- a/src/test/resources/projects/mixinApSimple/build.gradle
@@ -590,6 +612,17 @@ index 9786856226c636e2c8fe63ef18dafcafc494f13d..7002f39c015d9613dbca610be51ac543
  
  	version = "1.0.0"
  
+diff --git a/src/test/resources/projects/neoforge/1206/build.gradle b/src/test/resources/projects/neoforge/1206/build.gradle
+index 5ab5071ca819c4af45d5c8d02296dfd372f7e675..ef3f677ac6df35d1ab06bfb487a46d69313762bb 100644
+--- a/src/test/resources/projects/neoforge/1206/build.gradle
++++ b/src/test/resources/projects/neoforge/1206/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'dev.architectury.loom'
++	id 'xyz.jpenilla.quiet-architectury-loom' // quiet
+ 	id 'maven-publish'
+ }
+ 
 diff --git a/src/test/resources/projects/neoforge/simple/build.gradle b/src/test/resources/projects/neoforge/simple/build.gradle
 index 03a3d7c10f7e99fe6e83c9dd4ac1b9c0bb0b02c9..843d6abc9e995f27189bc1bc0fd98e7beaaaaea2 100644
 --- a/src/test/resources/projects/neoforge/simple/build.gradle
@@ -624,7 +657,7 @@ index c866b265579609e51d0c72273488477a21237716..2a72b6c0c7a5b37d98bef73f66ba49b3
  }
  
 diff --git a/src/test/resources/projects/runconfigs/build.gradle b/src/test/resources/projects/runconfigs/build.gradle
-index c32435a4e4cc8a2bb02c91a6b0cb43a70e52a34b..8cddfe5f49132cb507e6699462f56b3ef565a734 100644
+index 304aa890d85042203dc32d22dd1b82eb490a961b..a7d59c90c9de23d45a827cd29357971c19687375 100644
 --- a/src/test/resources/projects/runconfigs/build.gradle
 +++ b/src/test/resources/projects/runconfigs/build.gradle
 @@ -1,5 +1,5 @@

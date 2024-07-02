@@ -5,10 +5,10 @@ Subject: [PATCH] Detect shadowJar
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 20e47c1a45f8d056a30bbeab740214849144bad4..3bf277fb3e585c37a6cc7bc942f14d2356fb3b28 100644
+index 35b614caad8f691e798949913592368282c453dd..1b3f616ae25dbfa01885595cf3d28fcf87208bd3 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -95,6 +95,30 @@ public abstract class RemapTaskConfiguration implements Runnable {
+@@ -102,6 +102,30 @@ public abstract class RemapTaskConfiguration implements Runnable {
  		// must not be lazy to ensure that the prepare tasks get setup for other projects to depend on.
  		// Being lazy also breaks maven publishing, see: https://github.com/FabricMC/fabric-loom/issues/1023
  		getTasks().create(REMAP_JAR_TASK_NAME, RemapJarTask.class, remapJarTaskAction);

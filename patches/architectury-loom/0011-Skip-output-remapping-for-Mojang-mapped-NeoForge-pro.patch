@@ -26,7 +26,7 @@ index b2a9aba4e5d09be0cb0fae1dbaea2183e6f46e42..3c1cef7b8e7b160f4965ffec03a5b1fd
  
  	@Override
 diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/LayeredMappingsFactory.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/LayeredMappingsFactory.java
-index 24058594db4e47c744596aec2e134742366a612d..0ffaa91b2de6e183d87e52db9422c8a56923a52e 100644
+index d34c46665f7833fe33628c9a2773ce96db4f8980..6d0d2b3095a494c98fe1c5dc9a9bdab3edbe2cf5 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/LayeredMappingsFactory.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/LayeredMappingsFactory.java
 @@ -47,6 +47,8 @@ import net.fabricmc.loom.api.mappings.layered.MappingsNamespace;
@@ -38,7 +38,7 @@ index 24058594db4e47c744596aec2e134742366a612d..0ffaa91b2de6e183d87e52db9422c8a5
  import net.fabricmc.loom.configuration.providers.mappings.utils.AddConstructorMappingVisitor;
  import net.fabricmc.loom.util.ZipUtils;
  import net.fabricmc.mappingio.adapter.MappingDstNsReorder;
-@@ -149,4 +151,10 @@ public record LayeredMappingsFactory(LayeredMappingSpec spec) {
+@@ -151,4 +153,10 @@ public record LayeredMappingsFactory(LayeredMappingSpec spec) {
  		ZipUtils.add(mappingsFile, "extras/definitions.unpick", unpickData.definitions());
  		ZipUtils.add(mappingsFile, "extras/unpick.json", unpickData.metadata().asJson());
  	}
@@ -50,7 +50,7 @@ index 24058594db4e47c744596aec2e134742366a612d..0ffaa91b2de6e183d87e52db9422c8a5
 +	}
  }
 diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
-index 9f795b3e3f5f49e24fb1bd370ff48ce920bdecb0..40f09ccb04b5c0737382b9bf9547efaffa54421f 100644
+index 2e52b85ba6dacee2b5f527ce885e10b131389576..4e2c033313a14557747d1ca0bf8bbebe9b05d0c8 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
 @@ -144,7 +144,13 @@ public class MappingConfiguration {
@@ -69,7 +69,7 @@ index 9f795b3e3f5f49e24fb1bd370ff48ce920bdecb0..40f09ccb04b5c0737382b9bf9547efaf
  			mappingConfiguration = new MappingConfiguration(mappingsIdentifier, workingDir);
  		}
 diff --git a/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java b/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
-index 6caeb92f620fa3354f534857542fad53ffab95be..9374d7ed4b2297b10b8e04033e4480ec27759d39 100644
+index 3cb42ee3cb1bf446e4d60ee1b227e9a1ee623f7b..196b33be4d7a8eca94bfdf3139cac714ae444f1f 100644
 --- a/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
 @@ -159,6 +159,15 @@ public abstract class AbstractRemapJarTask extends Jar {
@@ -89,10 +89,10 @@ index 6caeb92f620fa3354f534857542fad53ffab95be..9374d7ed4b2297b10b8e04033e4480ec
  		RegularFileProperty getInputFile();
  		RegularFileProperty getOutputFile();
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-index 0573ca7dcff32a1d65e9f5b78f3e47e54b53ae68..345242702784029c5457e53f71043b8a5053e073 100644
+index 946c01ec998ade0bd6ef412c5e6be2d7ac9088ae..93fac91db95b8f3cdf37991e6059ba99f306e909 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-@@ -212,6 +212,10 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+@@ -185,6 +185,10 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
  	public void run() {
  		final LoomGradleExtension extension = LoomGradleExtension.get(getProject());
  

@@ -5,7 +5,7 @@ Subject: [PATCH] Add option to disable auto skip remap
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java b/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
-index 9374d7ed4b2297b10b8e04033e4480ec27759d39..4124bddbca729a4bc89da89750283862119c8021 100644
+index 196b33be4d7a8eca94bfdf3139cac714ae444f1f..e3cbde0830f50ff6d2383db31a07dc6043e8b0b0 100644
 --- a/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/AbstractRemapJarTask.java
 @@ -111,6 +111,11 @@ public abstract class AbstractRemapJarTask extends Jar {
@@ -58,10 +58,10 @@ index 9374d7ed4b2297b10b8e04033e4480ec27759d39..4124bddbca729a4bc89da89750283862
  		RegularFileProperty getInputFile();
  		RegularFileProperty getOutputFile();
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-index 345242702784029c5457e53f71043b8a5053e073..d55a1797f2fbe9a91cc39b08f07fbd65bc4b5cd4 100644
+index 93fac91db95b8f3cdf37991e6059ba99f306e909..52ca81791079f8624ea8f09bb522ce0ed6ed478c 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapJarTask.java
-@@ -212,11 +212,9 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
+@@ -185,11 +185,9 @@ public abstract class RemapJarTask extends AbstractRemapJarTask {
  	public void run() {
  		final LoomGradleExtension extension = LoomGradleExtension.get(getProject());
  
@@ -74,7 +74,7 @@ index 345242702784029c5457e53f71043b8a5053e073..d55a1797f2fbe9a91cc39b08f07fbd65
 +
  			if (getAddNestedDependencies().get()) {
  				params.getNestedJars().from(getNestedJars());
- 
+ 			}
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapSourcesJarTask.java b/src/main/java/net/fabricmc/loom/task/RemapSourcesJarTask.java
 index 8d92d95276bd896da51ffbd885c05f42d17c553a..7dc7d9a2f83ecdb021ec434b4e0ac94eb1adaf47 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapSourcesJarTask.java

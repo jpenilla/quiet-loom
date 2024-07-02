@@ -17,31 +17,3 @@ index ad865d735bab1094a77d172e6e96c5107ded8904..bf54a2e250369fde15c8ee32dd07ddf0
  					IFabricJavadocProvider.PROPERTY_NAME, new TinyJavadocProvider(context.javaDocs().toFile())
  				)
  		);
-diff --git a/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
-index 6ba464006ebf793ddf133d5c681ce4c983304291..aeef9157f2859bc7d44533eedfabaaaefb41baeb 100644
---- a/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
-+++ b/src/main/java/net/fabricmc/loom/configuration/decompile/SingleJarDecompileConfiguration.java
-@@ -78,7 +78,7 @@ public class SingleJarDecompileConfiguration extends DecompileConfiguration<Mapp
- 			task.setDescription("Decompile minecraft using the default decompiler.");
- 			task.setGroup(Constants.TaskGroup.FABRIC);
- 
--			task.dependsOn(project.getTasks().named("genSourcesWithCfr"));
-+			task.dependsOn(project.getTasks().named("genSourcesWithVineflower")); // quiet
- 		});
- 
- 		// TODO: Support for env-only jars?
-diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
-index ee791785a486d3f9798a6aab93b6f6cf0e9df72a..358fd0f0e6a55cecc9c23475bad461f1d55c77fb 100644
---- a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
-+++ b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
-@@ -84,8 +84,8 @@ class DebugLineNumbersTest extends Specification implements GradleProjectTestTra
-             '''
- 		when:
- 		// First generate sources
--		def genSources = gradle.run(task: "genSources", args: ["--info"])
--		genSources.task(":genSources").outcome == SUCCESS
-+		def genSources = gradle.run(task: "genSourcesWithCfr", args: ["--info"])
-+		genSources.task(":genSourcesWithCfr").outcome == SUCCESS
- 
- 		// Print out the source of the file
- 		def lines = getClassSource(gradle, "net/minecraft/server/dedicated/ServerPropertiesLoader.java").lines().toList()

@@ -5,7 +5,7 @@ Subject: [PATCH] Skip dependency remapping for Mojang-mapped NeoForge projects
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java b/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
-index ddb38c2af2a6300956c7b827ecc511dc70bda1df..00e68e679d1b70ad70601458ab2934191c223f3e 100644
+index b79e1a3b65982db5194999481fa08e5d3df99e42..7386a70b5d75e12026e36628df0d4d8ba38695c4 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
 @@ -91,7 +91,6 @@ public class ModProcessor {
@@ -34,10 +34,10 @@ index ddb38c2af2a6300956c7b827ecc511dc70bda1df..00e68e679d1b70ad70601458ab293419
 +		}
 +	}
 +	private void remapJars_(LoomGradleExtension extension, MappingConfiguration mappingConfiguration, List<ModDependency> remapList) throws IOException {
- 		String fromM = IntermediaryNamespaces.intermediary(project);
- 
+ 		String fromM = IntermediaryNamespaces.runtimeIntermediary(project);
  		Stopwatch stopwatch = Stopwatch.createStarted();
-@@ -273,20 +286,41 @@ public class ModProcessor {
+ 		Set<String> knownIndyBsms = new HashSet<>(extension.getKnownIndyBsms().get());
+@@ -278,20 +291,41 @@ public class ModProcessor {
  
  		project.getLogger().lifecycle(":remapped {} mods ({} -> {}) in {}", remapList.size(), fromM, toM, stopwatch.stop());
  
@@ -83,7 +83,7 @@ index ddb38c2af2a6300956c7b827ecc511dc70bda1df..00e68e679d1b70ad70601458ab293419
  					// NeoForge: Fully map ATs
  					NeoForgeModDependencies.remapAts(output, mappings, fromM, toM);
 diff --git a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
-index f8010b18398e749f2d13145498741756f52ccffc..b16c1ea0e17d44ff4c8f4175b42aa826c9f4e370 100644
+index ed4d718f527d2ca974416135c320baa54cdbbf52..fa2bfad22e816f37d3a3516cfc2da9a763a9bcce 100644
 --- a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
 +++ b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
 @@ -113,6 +113,15 @@ public class SourceRemapper {
