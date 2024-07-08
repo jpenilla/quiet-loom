@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Sun, 7 Jul 2024 17:46:44 -0700
+Subject: [PATCH] Use correct namespace in remap classpath generation task
+
+
+diff --git a/src/main/java/net/fabricmc/loom/task/launch/GenerateRemapClasspathTask.java b/src/main/java/net/fabricmc/loom/task/launch/GenerateRemapClasspathTask.java
+index 8a9263a1373a075a2f3744aef9e2bd7b4e2e0559..d435691ed53afdaaa02c591617a90233b2074d9f 100644
+--- a/src/main/java/net/fabricmc/loom/task/launch/GenerateRemapClasspathTask.java
++++ b/src/main/java/net/fabricmc/loom/task/launch/GenerateRemapClasspathTask.java
+@@ -60,7 +60,7 @@ public abstract class GenerateRemapClasspathTask extends AbstractLoomTask {
+ 				.map(configurations::named)
+ 				.forEach(getRemapClasspath()::from);
+ 
+-		for (Path minecraftJar : getExtension().getMinecraftJars(MappingsNamespace.INTERMEDIARY)) {
++		for (Path minecraftJar : getExtension().getMinecraftJars(net.fabricmc.loom.build.IntermediaryNamespaces.runtimeIntermediaryNamespace(getProject()))) {
+ 			getRemapClasspath().from(minecraftJar.toFile());
+ 		}
+ 
