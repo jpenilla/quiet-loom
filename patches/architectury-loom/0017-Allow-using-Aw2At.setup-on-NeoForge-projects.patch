@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Sun, 4 Aug 2024 15:11:40 -0700
+Subject: [PATCH] Allow using Aw2At.setup on NeoForge projects
+
+
+diff --git a/src/main/java/net/fabricmc/loom/util/aw2at/Aw2At.java b/src/main/java/net/fabricmc/loom/util/aw2at/Aw2At.java
+index 72662d5157d7bbc637e15777ff07a300d9cd676e..58ffa83ad131f3dae8a92eb7000d46b4b5f0db6c 100644
+--- a/src/main/java/net/fabricmc/loom/util/aw2at/Aw2At.java
++++ b/src/main/java/net/fabricmc/loom/util/aw2at/Aw2At.java
+@@ -78,7 +78,9 @@ public final class Aw2At {
+ 			remapJar.getAtAccessWideners().add(awName);
+ 		}
+ 
++		if (extension.isForge()) {
+ 		remapJar.getAtAccessWideners().addAll(extension.getForge().getExtraAccessWideners());
++		}
+ 	}
+ 
+ 	/**
