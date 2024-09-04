@@ -76,10 +76,10 @@ index 7795978c951009e81739eeafcb3f8722176364d2..8c70df722f3c291f2de24e7cbe06799d
  
  	@Override
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index be4f5249b17bd1dc0b5925d269ddb1b47aa41e0e..70d825c0f534d8b8bb88ab6036ac2f3c84e7c632 100644
+index 16cb1716710fcdf4339884f534fa779adbea73bb..edad065338bc4456319eabbd22ac0e76d1dc927b 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -138,11 +138,16 @@ public abstract class RemapTaskConfiguration implements Runnable {
+@@ -139,11 +139,16 @@ public abstract class RemapTaskConfiguration implements Runnable {
  		trySetupSourceRemapping();
  
  		getProject().afterEvaluate(p -> {
