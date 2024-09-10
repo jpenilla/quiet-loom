@@ -5,7 +5,7 @@ Subject: [PATCH] Pass LinkOptions.NOFOLLOW_LINKS for exists checks
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
-index 6fc3ac75598687c29eeb3c93f1837ec48dd53cbb..b7a7cacce65ba5b35e3c2f1f2f14e3dc715ea4be 100644
+index 4ee3c72d800648fadd174dd72535906183744a88..b9d38f41b322013e771a861e75c7030e03bf97af 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
 @@ -28,6 +28,7 @@ import java.io.ByteArrayInputStream;
