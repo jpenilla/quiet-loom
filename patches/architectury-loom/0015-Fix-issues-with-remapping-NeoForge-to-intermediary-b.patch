@@ -6,7 +6,7 @@ Subject: [PATCH] Fix issues with remapping NeoForge to intermediary by not
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
-index 37053c9a8e97b5c7e827b1e0972d36eed6aa22a6..3f99db50e6fcaa6685bb5d3c03b5504e11eddd06 100644
+index 6b527d0c162b7c649161c6530b91b48fdfd37afe..b3912624ba62b2d8daa11aca27381c6a7a16860f 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/CompileConfiguration.java
 @@ -258,8 +258,12 @@ public abstract class CompileConfiguration implements Runnable {

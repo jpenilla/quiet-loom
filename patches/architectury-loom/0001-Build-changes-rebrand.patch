@@ -203,7 +203,7 @@ index 060241b5d7e0ff31a92c9068c6e1fcd3fd1ea4b8..a35fdf866ccf1005daf319d5cca421e8
  			if (Constants.PLUGIN_BETA) {
  				project.getLogger().lifecycle("This version of Architectury Loom is in beta! Please report any issues you encounter: https://github.com/architectury/architectury-loom/issues");
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index 14530ddac1285798229a7d8fcae0cf93c62952ae..e82993ccecc9e780a8c19ffb88596e3834ca354c 100644
+index 237678f3be7fc8af93901e59373e66f120680aa0..a47f4c84288d662d395f7520bada5bc6122407a6 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -28,7 +28,7 @@ import org.jetbrains.annotations.ApiStatus;
@@ -301,7 +301,7 @@ index fda5e86c677601656e9f3161feb9bac4d3cb885d..e66e0efe4bbb99e4a5a9d099b686a04e
  
  dependencyResolutionManagement {
 diff --git a/src/test/resources/projects/forge/1206/build.gradle b/src/test/resources/projects/forge/1206/build.gradle
-index 36bc2f7ba939a4c97cb9100db62f6c6539e5b408..010d5a9b452f4d684bec51b1ade7eb9634034553 100644
+index e398cfbf69c8196925e5804771912524ea078df2..71ed9647834aaf51d94af229d0be4d0e8f0994ce 100644
 --- a/src/test/resources/projects/forge/1206/build.gradle
 +++ b/src/test/resources/projects/forge/1206/build.gradle
 @@ -1,5 +1,5 @@

@@ -50,10 +50,10 @@ index d34c46665f7833fe33628c9a2773ce96db4f8980..6d0d2b3095a494c98fe1c5dc9a9bdab3
 +	}
  }
 diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
-index 2e52b85ba6dacee2b5f527ce885e10b131389576..4e2c033313a14557747d1ca0bf8bbebe9b05d0c8 100644
+index e9b4b9e8b0610c2f14fc3904f8cb7ef032d18260..77aaa88628f3873791b25fb171877d287d89d0b4 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/MappingConfiguration.java
-@@ -144,7 +144,13 @@ public class MappingConfiguration {
+@@ -149,7 +149,13 @@ public class MappingConfiguration {
  		MappingConfiguration mappingConfiguration;
  
  		if (extension.isForgeLike()) {
