@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Tue, 22 Oct 2024 21:39:14 -0700
+Subject: [PATCH] Disable loom version validation
+
+
+diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
+index d0be355de5e5e9316f3b123d30fdbbc6e18398a3..ad5b047427101aecae884ddf94b2edb253964b90 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
++++ b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
+@@ -100,7 +100,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
+ 				}
+ 
+ 				if (loomVersion != null && refmapRemapType == MixinRemapType.STATIC) {
+-					validateLoomVersion(loomVersion, currentLoomVersion);
++					// validateLoomVersion(loomVersion, currentLoomVersion);
+ 				}
+ 
+ 				if (knownIndyBsmsValue != null) {
