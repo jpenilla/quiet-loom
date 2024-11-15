@@ -5,15 +5,15 @@ Subject: [PATCH] Disable loom version validation
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
-index d0be355de5e5e9316f3b123d30fdbbc6e18398a3..ad5b047427101aecae884ddf94b2edb253964b90 100644
+index 56026a6e8db877904c3405a729d04f714e2a0ae5..0fb240554f37ed561c08739600be2f051939b138 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
-@@ -100,7 +100,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
+@@ -102,7 +102,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
  				}
  
  				if (loomVersion != null && refmapRemapType == MixinRemapType.STATIC) {
--					validateLoomVersion(loomVersion, currentLoomVersion);
-+					// validateLoomVersion(loomVersion, currentLoomVersion);
+-					validateLoomVersion(loomVersion, currentLoomVersion, GradleUtils.getBooleanProperty(project, Constants.Properties.IGNORE_DEPENDENCY_LOOM_VERSION_VALIDATION));
++					// validateLoomVersion(loomVersion, currentLoomVersion, GradleUtils.getBooleanProperty(project, Constants.Properties.IGNORE_DEPENDENCY_LOOM_VERSION_VALIDATION));
  				}
  
  				if (knownIndyBsmsValue != null) {

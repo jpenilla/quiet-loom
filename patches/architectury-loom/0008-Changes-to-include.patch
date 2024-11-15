@@ -98,7 +98,7 @@ index 6d220b914da52bb3d15dda4230da11a6bb84f5de..fd09e17187fbfaf5fcae8cd62cdc6390
  		return getConfigurations().register(name, role::apply);
  	}
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index a47f4c84288d662d395f7520bada5bc6122407a6..008333be11e0add82fab90f4436a92b0234e7c73 100644
+index 9e0c51cf27d5c1fab02a570ef19070d7c4c4e7c0..95cb44bc90f09cb45808ceff334a15893ae03919 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -51,6 +51,7 @@ public class Constants {

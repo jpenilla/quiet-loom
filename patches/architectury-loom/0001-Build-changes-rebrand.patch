@@ -203,7 +203,7 @@ index 060241b5d7e0ff31a92c9068c6e1fcd3fd1ea4b8..a35fdf866ccf1005daf319d5cca421e8
  			if (Constants.PLUGIN_BETA) {
  				project.getLogger().lifecycle("This version of Architectury Loom is in beta! Please report any issues you encounter: https://github.com/architectury/architectury-loom/issues");
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index 237678f3be7fc8af93901e59373e66f120680aa0..a47f4c84288d662d395f7520bada5bc6122407a6 100644
+index f23e1a0706ed97b0e9284828bd5ac2b25f606b4f..9e0c51cf27d5c1fab02a570ef19070d7c4c4e7c0 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -28,7 +28,7 @@ import org.jetbrains.annotations.ApiStatus;
