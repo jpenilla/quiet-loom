@@ -56,7 +56,7 @@ index 3d457766becaba709a1adc0401bf26e177d723c1..860ce0e9a0ce64681bf776d690c61c64
  			} else {
  				throw new NoSuchFileException(fsPath.toString());
 diff --git a/src/main/java/net/fabricmc/loom/util/ZipUtils.java b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
-index 714dce833423ee40df3adc80b19a8d4691ddc3c0..19e4c22ebe2e630081ccb1b714e81978488dea9e 100644
+index 9d73a4c24bc02d075165bf1a6f59fb85d6c05ce2..2de4439cbc652ecff6a6873f710b84569a65da68 100644
 --- a/src/main/java/net/fabricmc/loom/util/ZipUtils.java
 +++ b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
 @@ -31,6 +31,7 @@ import java.io.InputStreamReader;

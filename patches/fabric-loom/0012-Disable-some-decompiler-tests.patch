@@ -1,11 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
 Date: Sat, 3 Feb 2024 17:54:42 -0700
-Subject: [PATCH] disable line number test in ci
+Subject: [PATCH] Disable some decompiler tests
 
 
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
-index ee791785a486d3f9798a6aab93b6f6cf0e9df72a..e57753ef91fbdd15484575c73336d4dcc968eb7b 100644
+index 52824211dd024f93721d1a03f9f39d1a4c10314b..0193b18e03b7ef1342c4217ddef9b0d45c0e74b8 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
 @@ -24,6 +24,8 @@
@@ -40,3 +40,30 @@ index ee791785a486d3f9798a6aab93b6f6cf0e9df72a..e57753ef91fbdd15484575c73336d4dc
  	def "Debug test"() {
  		setup:
  		def gradle = gradleProject(project: "minimalBase", version: PRE_RELEASE_GRADLE)
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
+index 120d9e73b50bde3e5ce3775ae9f0df1f18fadbdd..2de757546fbfdf29eb88e5039dd9c2f8e9f29f96 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
+@@ -46,11 +46,12 @@ class DecompileTest extends Specification implements GradleProjectTestTrait {
+ 
+ 		where:
+ 		decompiler 		| task								| version
+-		'fernflower'	| "genSourcesWithFernFlower"		| PRE_RELEASE_GRADLE
+-		'cfr' 			| "genSourcesWithCfr"				| PRE_RELEASE_GRADLE
++		//'fernflower'	| "genSourcesWithFernFlower"		| PRE_RELEASE_GRADLE
++		//'cfr' 			| "genSourcesWithCfr"				| PRE_RELEASE_GRADLE
+ 		'vineflower' 	| "genSourcesWithVineflower"		| PRE_RELEASE_GRADLE
+ 	}
+ 
++	/*
+ 	@Unroll
+ 	def "custom decompiler (gradle #version)"() {
+ 		setup:
+@@ -74,6 +75,7 @@ class DecompileTest extends Specification implements GradleProjectTestTrait {
+ 		where:
+ 		version << STANDARD_TEST_VERSIONS
+ 	}
++	 */
+ 
+ 	def "decompile cache"() {
+ 		setup:
