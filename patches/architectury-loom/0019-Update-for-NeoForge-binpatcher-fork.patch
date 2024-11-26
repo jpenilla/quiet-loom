@@ -5,28 +5,10 @@ Subject: [PATCH] Update for NeoForge binpatcher fork
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/forge/MinecraftPatchedProvider.java b/src/main/java/net/fabricmc/loom/configuration/providers/forge/MinecraftPatchedProvider.java
-index e2b684bdddd4f05ec1c8bc4feec47c7efc0ee675..ef2b20be0ba2233f133ace28f2cec9318f6e62ba 100644
+index e2b684bdddd4f05ec1c8bc4feec47c7efc0ee675..5c39247fa7128916516f5256a4480c768af66172 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/providers/forge/MinecraftPatchedProvider.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/providers/forge/MinecraftPatchedProvider.java
-@@ -30,7 +30,9 @@ import java.io.IOException;
- import java.io.InputStream;
- import java.io.OutputStream;
- import java.io.UncheckedIOException;
-+import java.net.URI;
- import java.nio.file.FileSystem;
-+import java.nio.file.FileSystems;
- import java.nio.file.Files;
- import java.nio.file.Path;
- import java.nio.file.StandardCopyOption;
-@@ -38,6 +40,7 @@ import java.nio.file.StandardOpenOption;
- import java.util.ArrayList;
- import java.util.Arrays;
- import java.util.Collections;
-+import java.util.HashMap;
- import java.util.List;
- import java.util.Objects;
- import java.util.concurrent.CompletableFuture;
-@@ -56,6 +59,7 @@ import dev.architectury.loom.forge.UserdevConfig;
+@@ -56,6 +56,7 @@ import dev.architectury.loom.forge.UserdevConfig;
  import dev.architectury.loom.util.MappingOption;
  import dev.architectury.loom.util.TempFiles;
  import org.gradle.api.Project;
@@ -34,45 +16,56 @@ index e2b684bdddd4f05ec1c8bc4feec47c7efc0ee675..ef2b20be0ba2233f133ace28f2cec931
  import org.gradle.api.logging.LogLevel;
  import org.gradle.api.logging.Logger;
  import org.objectweb.asm.ClassReader;
-@@ -464,8 +468,39 @@ public class MinecraftPatchedProvider {
+@@ -464,8 +465,9 @@ public class MinecraftPatchedProvider {
  	private void patchJars(Path clean, Path output, Path patches) {
  		ForgeToolExecutor.exec(project, spec -> {
  			UserdevConfig.BinaryPatcherConfig config = getExtension().getForgeUserdevProvider().getConfig().binpatcher();
 -			spec.classpath(DependencyDownloader.download(project, config.dependency()));
 -			spec.getMainClass().set("net.minecraftforge.binarypatcher.ConsoleTool");
-+			String mainClass = null;
-+			IOException ex = null;
 +			final FileCollection download = DependencyDownloader.download(project, config.dependency());
-+			for (File file : download) {
-+				if (file.getName().endsWith(".jar")) {
-+					try (final FileSystem fs = FileSystems.newFileSystem(URI.create("jar:" + file.toPath().toUri()), new HashMap<>())) {
-+						final Path mfPath = fs.getPath("META-INF/MANIFEST.MF");
-+						if (Files.exists(mfPath)) {
-+							try (final InputStream in = Files.newInputStream(mfPath)) {
-+								mainClass = new Manifest(in).getMainAttributes().getValue("Main-Class");
-+							}
-+						}
-+					} catch (final IOException e) {
-+						if (ex == null) {
-+							ex = e;
-+						} else {
-+							ex.addSuppressed(e);
-+						}
-+					}
-+					if (mainClass != null) {
-+						break;
-+					}
-+				}
-+			}
-+			if (mainClass == null) {
-+				if (ex != null) {
-+					throw new UncheckedIOException(ex);
-+				} else {
-+					throw new RuntimeException("Failed to find main class");
-+				}
-+			}
 +			spec.classpath(download);
-+			spec.getMainClass().set(mainClass);
++			spec.getMainClass().set(getMainClass(download));
  
  			for (String arg : config.args()) {
  				String actual = switch (arg) {
+@@ -479,6 +481,40 @@ public class MinecraftPatchedProvider {
+ 		});
+ 	}
+ 
++	private static String getMainClass(final Iterable<File> files) {
++		String mainClass = null;
++		IOException ex = null;
++		for (File file : files) {
++			if (file.getName().endsWith(".jar")) {
++				try (final FileSystemUtil.Delegate fs = FileSystemUtil.getJarFileSystem(file.toPath())) {
++					final Path mfPath = fs.getPath("META-INF/MANIFEST.MF");
++					if (Files.exists(mfPath)) {
++						try (final InputStream in = Files.newInputStream(mfPath)) {
++							mainClass = new Manifest(in).getMainAttributes().getValue("Main-Class");
++						}
++					}
++				} catch (final IOException e) {
++					if (ex == null) {
++						ex = e;
++					} else {
++						ex.addSuppressed(e);
++					}
++				}
++				if (mainClass != null) {
++					break;
++				}
++			}
++		}
++		if (mainClass == null) {
++			if (ex != null) {
++				throw new UncheckedIOException(ex);
++			} else {
++				throw new RuntimeException("Failed to find main class");
++			}
++		}
++		return mainClass;
++	}
++
+ 	private void walkFileSystems(Path source, Path target, Predicate<Path> filter, Function<FileSystem, Iterable<Path>> toWalk, FsPathConsumer action)
+ 			throws IOException {
+ 		try (FileSystemUtil.Delegate sourceFs = FileSystemUtil.getJarFileSystem(source, false);
