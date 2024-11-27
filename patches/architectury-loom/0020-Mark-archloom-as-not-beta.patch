@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Tue, 26 Nov 2024 17:44:42 -0700
+Subject: [PATCH] Mark archloom as not beta
+
+Stops printing log message to report issues upstream
+
+diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
+index 95cb44bc90f09cb45808ceff334a15893ae03919..b9b89d612fbb8c82fd9c1e0358da5641985c71f1 100644
+--- a/src/main/java/net/fabricmc/loom/util/Constants.java
++++ b/src/main/java/net/fabricmc/loom/util/Constants.java
+@@ -29,7 +29,7 @@ import org.objectweb.asm.Opcodes;
+ 
+ public class Constants {
+ 	public static final String PLUGIN_ID = "xyz.jpenilla.quiet-architectury-loom";
+-	public static final boolean PLUGIN_BETA = true;
++	public static final boolean PLUGIN_BETA = false;
+ 	public static final boolean PLUGIN_DEPRECATED = false;
+ 	public static final String LIBRARIES_BASE = "https://libraries.minecraft.net/";
+ 	public static final String RESOURCES_BASE = "https://resources.download.minecraft.net/";
