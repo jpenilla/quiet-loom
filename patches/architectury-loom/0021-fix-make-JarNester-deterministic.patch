@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ashhhleyyy <ash@ashhhleyyy.dev>
+Date: Sun, 20 Oct 2024 14:06:38 +0100
+Subject: [PATCH] fix: make JarNester deterministic
+
+Sorts the list of jars to nest before adding them to fabric.mod.json to ensure the ordering is deterministic.
+
+diff --git a/src/main/java/net/fabricmc/loom/build/nesting/JarNester.java b/src/main/java/net/fabricmc/loom/build/nesting/JarNester.java
+index 2ec61a283dce8aa84a4aaf9b149fa6f99e60f942..845106f3acf54cf7ab3a43b01f3121f6996762a2 100644
+--- a/src/main/java/net/fabricmc/loom/build/nesting/JarNester.java
++++ b/src/main/java/net/fabricmc/loom/build/nesting/JarNester.java
+@@ -28,6 +28,7 @@ import java.io.File;
+ import java.io.IOException;
+ import java.nio.file.Files;
+ import java.util.Collection;
++import java.util.Comparator;
+ import java.util.stream.Collectors;
+ import java.util.stream.Stream;
+ 
+@@ -54,8 +55,11 @@ public class JarNester {
+ 
+ 		Preconditions.checkArgument(FabricModJsonFactory.isNestableModJar(modJar, platform), "Cannot nest jars into none mod jar " + modJar.getName());
+ 
++		// Ensure deterministic ordering of entries in fabric.mod.json
++		Collection<File> sortedJars = jars.stream().sorted(Comparator.comparing(File::getName)).toList();
++
+ 		try {
+-			ZipUtils.add(modJar.toPath(), jars.stream().map(file -> {
++			ZipUtils.add(modJar.toPath(), sortedJars.stream().map(file -> {
+ 				try {
+ 					return new Pair<>("META-INF/jars/" + file.getName(), Files.readAllBytes(file.toPath()));
+ 				} catch (IOException e) {
+@@ -75,7 +79,7 @@ public class JarNester {
+ 					nestedJars = new JsonArray();
+ 				}
+ 
+-				for (File file : jars) {
++				for (File file : sortedJars) {
+ 					String nestedJarPath = "META-INF/jars/" + file.getName();
+ 					Preconditions.checkArgument(FabricModJsonFactory.isNestableModJar(file, platform), "Cannot nest none mod jar: " + file.getName());
+ 
