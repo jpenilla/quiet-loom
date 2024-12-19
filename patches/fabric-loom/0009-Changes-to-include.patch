@@ -57,7 +57,7 @@ index 9d26544316c998dedf25699705b4e81a9d2e9a62..295febcc367a7b1b1dff5d7b88c415a5
  			configuration.getDependencies().addAllLater(getProject().provider(() -> {
  				List<Dependency> dependencies = new ArrayList<>();
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 64bff85415ef8225ec097ef7aa5f7eb4a7721536..cd12c084882c8d31437c718a788d910e97f2eab7 100644
+index 10e9f31649a5f1cf598252691842912eed4a61e0..c5f5068984357613f0bbeec518ff8b4530ba5c30 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 @@ -73,8 +73,10 @@ public abstract class RemapTaskConfiguration implements Runnable {
@@ -72,7 +72,7 @@ index 64bff85415ef8225ec097ef7aa5f7eb4a7721536..cd12c084882c8d31437c718a788d910e
  		});
  
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index b03c6a21c4eeffec0298febd31ffb5670a7cc316..758d564d2ad245c61a389ae130d715d1b949d4aa 100644
+index b197ee99259b57918b8edffa18ec3ea0bf920569..f75322cf6a09194498e65704cbdd874b6bde0fdf 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -48,6 +48,7 @@ public class Constants {
