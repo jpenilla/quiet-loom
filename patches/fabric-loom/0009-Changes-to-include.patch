@@ -45,7 +45,7 @@ index acf221ad360bb2b6a78179c8dfb8efe8269cfec2..46e4c2b2475819ff49ba7f3f67e4cc9e
  
  	// Generates a barebones mod for a dependency
 diff --git a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
-index 9d26544316c998dedf25699705b4e81a9d2e9a62..295febcc367a7b1b1dff5d7b88c415a5c85135b2 100644
+index 21a7ae7ecab24809190c0b1eb38c50f729032847..9fb03d600b52a2582b25db40d01f4de2adf927f8 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
 @@ -94,6 +94,7 @@ public abstract class LoomConfigurations implements Runnable {
@@ -57,7 +57,7 @@ index 9d26544316c998dedf25699705b4e81a9d2e9a62..295febcc367a7b1b1dff5d7b88c415a5
  			configuration.getDependencies().addAllLater(getProject().provider(() -> {
  				List<Dependency> dependencies = new ArrayList<>();
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 10e9f31649a5f1cf598252691842912eed4a61e0..c5f5068984357613f0bbeec518ff8b4530ba5c30 100644
+index cbc9ec22ce691b309846e9401269a96f9da54956..2450929bd6c6461fb4e0e6c02442d119a9a39288 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 @@ -73,8 +73,10 @@ public abstract class RemapTaskConfiguration implements Runnable {
@@ -72,7 +72,7 @@ index 10e9f31649a5f1cf598252691842912eed4a61e0..c5f5068984357613f0bbeec518ff8b45
  		});
  
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index b197ee99259b57918b8edffa18ec3ea0bf920569..f75322cf6a09194498e65704cbdd874b6bde0fdf 100644
+index 8a7a9c08506f02015c4007a84ec55aa8b9836e00..4f44ad378a204506b3738f2f55fdf5da8e2ecd93 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -48,6 +48,7 @@ public class Constants {

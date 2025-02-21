@@ -5,7 +5,7 @@ Subject: [PATCH] Don't change output directories of original jars
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index a7539afb01e35d0925ec0a368cb56dab97d8c859..b9f28a9e53a8206009c4049988b421a0dbb07afd 100644
+index 0da6a9edbcbc6e5c354816af0e0a84b6b55ac3b3..50af8cc2d11f8b185b387b98d511e6d0ae1d8ec5 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 @@ -101,7 +101,7 @@ public abstract class RemapTaskConfiguration implements Runnable {
