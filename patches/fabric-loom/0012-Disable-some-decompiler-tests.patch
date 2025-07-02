@@ -5,7 +5,7 @@ Subject: [PATCH] Disable some decompiler tests
 
 
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
-index 52824211dd024f93721d1a03f9f39d1a4c10314b..0193b18e03b7ef1342c4217ddef9b0d45c0e74b8 100644
+index 8d8dd44445aff5ffe4ba238baa26e381e3a876ae..942ccdf700ca94599f2cabe8a7faf7aedda8c33b 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
 @@ -24,6 +24,8 @@
@@ -26,7 +26,7 @@ index 52824211dd024f93721d1a03f9f39d1a4c10314b..0193b18e03b7ef1342c4217ddef9b0d4
  	static final String MAPPINGS = "1.20.1-net.fabricmc.yarn.1_20_1.1.20.1+build.1-v2"
  	static final Map<String, Integer> BREAKPOINTS = [
 @@ -57,6 +60,14 @@ class DebugLineNumbersTest extends Specification implements GradleProjectTestTra
- 		"net.minecraft.registry.RegistryOps": 67
+ 		"net.minecraft.registry.RegistryOps": 44
  	]
  
 +	boolean disabled() {

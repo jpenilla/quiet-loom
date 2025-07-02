@@ -6,7 +6,7 @@ Subject: [PATCH] Changes to include
 Add transitiveInclude configuration
 
 diff --git a/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java b/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
-index acf221ad360bb2b6a78179c8dfb8efe8269cfec2..46e4c2b2475819ff49ba7f3f67e4cc9ee1412c95 100644
+index 48da25b4b4367a04573f38b37dda4f86c292f418..bb66d67aa7f8db54d2870067bee9283ff7f07911 100644
 --- a/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
 +++ b/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
 @@ -34,6 +34,7 @@ import java.util.List;
@@ -17,7 +17,7 @@ index acf221ad360bb2b6a78179c8dfb8efe8269cfec2..46e4c2b2475819ff49ba7f3f67e4cc9e
  import java.util.regex.Matcher;
  import java.util.regex.Pattern;
  
-@@ -44,6 +45,7 @@ import org.gradle.api.artifacts.ArtifactView;
+@@ -43,6 +44,7 @@ import org.gradle.api.artifacts.ArtifactView;
  import org.gradle.api.artifacts.Configuration;
  import org.gradle.api.artifacts.component.ComponentIdentifier;
  import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
@@ -45,7 +45,7 @@ index acf221ad360bb2b6a78179c8dfb8efe8269cfec2..46e4c2b2475819ff49ba7f3f67e4cc9e
  
  	// Generates a barebones mod for a dependency
 diff --git a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
-index 21a7ae7ecab24809190c0b1eb38c50f729032847..9fb03d600b52a2582b25db40d01f4de2adf927f8 100644
+index f774c9e70ad06d15106fe8911581863d562abd6b..f45376b6bcb6a78e5be0be99605a8b1842c6ad37 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
 @@ -94,6 +94,7 @@ public abstract class LoomConfigurations implements Runnable {
@@ -72,7 +72,7 @@ index cbc9ec22ce691b309846e9401269a96f9da54956..2450929bd6c6461fb4e0e6c02442d119
  		});
  
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index 8a7a9c08506f02015c4007a84ec55aa8b9836e00..4f44ad378a204506b3738f2f55fdf5da8e2ecd93 100644
+index c0abfce9988ccffd2d55c6da06f459173865382d..6a2698be91196978f6251a0fea540408d7142dc1 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
 @@ -48,6 +48,7 @@ public class Constants {

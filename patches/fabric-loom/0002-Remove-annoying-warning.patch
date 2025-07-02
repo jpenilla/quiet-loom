@@ -5,18 +5,18 @@ Subject: [PATCH] Remove annoying warning
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
-index cd37bc01b039f018aefa292cf4be7d2a9c2a053f..2aafc5c9b149bebf1a3d5d1cc3a2b8a1c26dd9b7 100644
+index ffe586c81796e32cf70700c7a408724d40a47812..84f9ec6388066f041b6e28b4d54199c8f6ef4611 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
-@@ -48,7 +48,6 @@ public record MojangMappingLayer(Path clientMappings, Path serverMappings, boole
+@@ -51,7 +51,6 @@ public record MojangMappingLayer(Path clientMappings, Path serverMappings, boole
  
  	@Override
  	public void visit(MappingVisitor mappingVisitor) throws IOException {
 -		printMappingsLicense(clientMappings);
  
- 		// Filter out field names matching the pattern
- 		DstNameFilterMappingVisitor nameFilter = new DstNameFilterMappingVisitor(mappingVisitor, SYNTHETIC_NAME_PATTERN);
-@@ -63,24 +62,6 @@ public record MojangMappingLayer(Path clientMappings, Path serverMappings, boole
+ 		if (!dropNoneIntermediaryRoots) {
+ 			logger().debug("Not attempting to drop none intermediary roots");
+@@ -95,24 +94,6 @@ public record MojangMappingLayer(Path clientMappings, Path serverMappings, boole
  		}
  	}
  
