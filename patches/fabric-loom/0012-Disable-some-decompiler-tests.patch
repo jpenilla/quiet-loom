@@ -41,7 +41,7 @@ index 8d8dd44445aff5ffe4ba238baa26e381e3a876ae..942ccdf700ca94599f2cabe8a7faf7ae
  		setup:
  		def gradle = gradleProject(project: "minimalBase", version: PRE_RELEASE_GRADLE)
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
-index 120d9e73b50bde3e5ce3775ae9f0df1f18fadbdd..2de757546fbfdf29eb88e5039dd9c2f8e9f29f96 100644
+index 57b2d32fef64c00491460a563d3edd25c2173d6b..da078e4eb9f82c2c1395ec63dcf9d1d81581c395 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
 @@ -46,11 +46,12 @@ class DecompileTest extends Specification implements GradleProjectTestTrait {

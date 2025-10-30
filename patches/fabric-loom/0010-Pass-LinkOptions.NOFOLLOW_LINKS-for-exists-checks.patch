@@ -77,7 +77,7 @@ index 9d73a4c24bc02d075165bf1a6f59fb85d6c05ce2..2de4439cbc652ecff6a6873f710b8456
  			throw new UncheckedIOException("Failed to check file from zip", e);
  		}
 diff --git a/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java b/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java
-index 0cfec9c6fdb6cba02c524d5c575c8c76a7bdafe3..be87ed857230c0484c8615d60e4142581cd58af5 100644
+index bb0d2a31a88ec1a6369c5f79a1f617ce38ecfe71..e3e3d77163f4a3e1514536fbc152e54a3362fbc5 100644
 --- a/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java
 +++ b/src/main/java/net/fabricmc/loom/util/fmj/FabricModJsonFactory.java
 @@ -32,6 +32,7 @@ import java.io.Reader;
@@ -88,7 +88,7 @@ index 0cfec9c6fdb6cba02c524d5c575c8c76a7bdafe3..be87ed857230c0484c8615d60e414258
  import java.nio.file.Path;
  import java.util.Optional;
  
-@@ -142,6 +143,6 @@ public final class FabricModJsonFactory {
+@@ -153,6 +154,6 @@ public final class FabricModJsonFactory {
  	}
  
  	public static boolean containsMod(FileSystemUtil.Delegate fs) {

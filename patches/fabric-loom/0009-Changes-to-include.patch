@@ -6,10 +6,10 @@ Subject: [PATCH] Changes to include
 Add transitiveInclude configuration
 
 diff --git a/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java b/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
-index 48da25b4b4367a04573f38b37dda4f86c292f418..bb66d67aa7f8db54d2870067bee9283ff7f07911 100644
+index bd494b814b7d4de98cd75f5452367c3093f419f6..d9d92c2a7ad4036a64e4aec19da2759cbb9ea8e0 100644
 --- a/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
 +++ b/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
-@@ -34,6 +34,7 @@ import java.util.List;
+@@ -35,6 +35,7 @@ import java.util.List;
  import java.util.Locale;
  import java.util.Map;
  import java.util.Objects;
@@ -25,7 +25,7 @@ index 48da25b4b4367a04573f38b37dda4f86c292f418..bb66d67aa7f8db54d2870067bee9283f
  import org.gradle.api.artifacts.result.ResolvedVariantResult;
  import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
  import org.gradle.api.file.ConfigurableFileCollection;
-@@ -110,7 +112,9 @@ public abstract class NestableJarGenerationTask extends AbstractLoomTask {
+@@ -111,7 +113,9 @@ public abstract class NestableJarGenerationTask extends AbstractLoomTask {
  		});
  		getJars().from(artifacts.getFiles());
  		dependsOn(configuration);
@@ -36,7 +36,7 @@ index 48da25b4b4367a04573f38b37dda4f86c292f418..bb66d67aa7f8db54d2870067bee9283f
  			Map<String, Metadata> map = new HashMap<>();
  			set.forEach(artifact -> {
  				ResolvedVariantResult variant = artifact.getVariant();
-@@ -159,7 +163,6 @@ public abstract class NestableJarGenerationTask extends AbstractLoomTask {
+@@ -160,7 +164,6 @@ public abstract class NestableJarGenerationTask extends AbstractLoomTask {
  				map.put(artifact.getFile().getName(), metadata);
  			});
  			return map;
@@ -45,7 +45,7 @@ index 48da25b4b4367a04573f38b37dda4f86c292f418..bb66d67aa7f8db54d2870067bee9283f
  
  	// Generates a barebones mod for a dependency
 diff --git a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
-index f774c9e70ad06d15106fe8911581863d562abd6b..f45376b6bcb6a78e5be0be99605a8b1842c6ad37 100644
+index 3586d4ce435b6c7ff82ee7485dff6e64c35307b7..ce8509fc7325948052f2f24eef53497a4fbf5352 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
 @@ -94,6 +94,7 @@ public abstract class LoomConfigurations implements Runnable {
@@ -72,10 +72,10 @@ index cbc9ec22ce691b309846e9401269a96f9da54956..2450929bd6c6461fb4e0e6c02442d119
  		});
  
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index c0abfce9988ccffd2d55c6da06f459173865382d..6a2698be91196978f6251a0fea540408d7142dc1 100644
+index c051f3c1baa45191a52fda40d02b360d31ba8ba9..2c9d26a835c91dc25734f7638d16bb6b34624244 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
-@@ -48,6 +48,7 @@ public class Constants {
+@@ -49,6 +49,7 @@ public class Constants {
  		public static final String MOD_COMPILE_CLASSPATH_MAPPED = "modCompileClasspathMapped";
  		public static final String INCLUDE = "include";
  		public static final String INCLUDE_INTERNAL = "includeInternal";
