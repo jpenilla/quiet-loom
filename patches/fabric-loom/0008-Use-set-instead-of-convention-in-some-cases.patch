@@ -5,7 +5,7 @@ Subject: [PATCH] Use set instead of convention in some cases
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index e3f8e2c885852c909cdc05a524e01e9f66683dfc..cbc9ec22ce691b309846e9401269a96f9da54956 100644
+index ab7daf1093086fa82548d970709f9653243e51b1..0b35d3490256a8229aa5baa526c7089205519230 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 @@ -110,7 +110,7 @@ public abstract class RemapTaskConfiguration implements Runnable {

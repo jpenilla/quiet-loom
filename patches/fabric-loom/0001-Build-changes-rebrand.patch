@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index edeb45e228b73f1180538f005f29fb3dbe561777..57cfdf9c96c7c411b806906f989acb4973a32dc9 100644
+index c4f76b13ac2f51566973e2bd1e15970c1aa2a3ba..9bbc647622d43056170fe386dbfc26969c8a54fb 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,10 +5,9 @@ plugins {
@@ -22,7 +22,7 @@ index edeb45e228b73f1180538f005f29fb3dbe561777..57cfdf9c96c7c411b806906f989acb49
  }
  
 @@ -26,12 +25,10 @@ group = 'net.fabricmc'
- def baseVersion = '1.12'
+ def baseVersion = '1.13'
  
  def ENV = System.getenv()
 -if (ENV.BUILD_NUMBER) {
@@ -38,7 +38,7 @@ index edeb45e228b73f1180538f005f29fb3dbe561777..57cfdf9c96c7c411b806906f989acb49
  } else {
  	version = baseVersion + '.local'
  }
-@@ -194,51 +191,16 @@ java {
+@@ -195,51 +192,16 @@ java {
  	targetCompatibility = JavaVersion.VERSION_21
  }
  
@@ -93,7 +93,7 @@ index edeb45e228b73f1180538f005f29fb3dbe561777..57cfdf9c96c7c411b806906f989acb49
  			implementationClass = 'net.fabricmc.loom.LoomCompanionGradlePlugin'
  		}
  	}
-@@ -312,7 +274,7 @@ publishing {
+@@ -313,7 +275,7 @@ publishing {
  						Node groupId = dependency.appendChild(document.createElement('groupId'))
  						groupId.setTextContent('net.fabricmc')
  						Node artifactId = dependency.appendChild(document.createElement('artifactId'))
@@ -102,7 +102,7 @@ index edeb45e228b73f1180538f005f29fb3dbe561777..57cfdf9c96c7c411b806906f989acb49
  						Node version = dependency.appendChild(document.createElement('version'))
  						version.setTextContent(project.version)
  					})
-@@ -322,13 +284,13 @@ publishing {
+@@ -323,13 +285,13 @@ publishing {
  	}
  	repositories {
  		maven {
