@@ -156,7 +156,7 @@ index 6b14589d1bf1551d4376ed710f3fd73e434c4580..ba0694a30a5a47529f65ba0b159c38d0
  dependencyResolutionManagement {
  	versionCatalogs {
 diff --git a/src/main/java/net/fabricmc/loom/LoomCompanionGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomCompanionGradlePlugin.java
-index b3e14661bf3008d3abea20e464552a36eb3633f6..73ad96d02c551e562f222b10a6906ec0c67899e5 100644
+index b3e14661bf3008d3abea20e464552a36eb3633f6..8b785a9845cd01f28a24930db184d2e71f52e33a 100644
 --- a/src/main/java/net/fabricmc/loom/LoomCompanionGradlePlugin.java
 +++ b/src/main/java/net/fabricmc/loom/LoomCompanionGradlePlugin.java
 @@ -32,7 +32,7 @@ import net.fabricmc.loom.task.launch.ExportClasspathTask;
@@ -164,7 +164,7 @@ index b3e14661bf3008d3abea20e464552a36eb3633f6..73ad96d02c551e562f222b10a6906ec0
  
  public class LoomCompanionGradlePlugin implements Plugin<Project> {
 -	public static final String NAME = "net.fabricmc.fabric-loom-companion";
-+	public static final String NAME = "net.fabricmc.quiet-fabric-loom-companion"; // quiet
++	public static final String NAME = "xyz.jpenilla.quiet-fabric-loom-companion"; // quiet
  
  	@Override
  	public void apply(Project project) {
@@ -190,6 +190,32 @@ index 1c416b3066197ac6b5a0c36b096e323faeba1198..0c6504581ddcdaa4eab8720f14e801c3
  
  		LibraryLocationLogger.logLibraryVersions();
  		OneDrive.verify(project);
+diff --git a/src/main/java/net/fabricmc/loom/LoomNoRemapGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomNoRemapGradlePlugin.java
+index 05408bf6ebef3275a3a30346e1a79b047eace97e..3526e15bceb294025dc82cceacf5cf2c7ff11429 100644
+--- a/src/main/java/net/fabricmc/loom/LoomNoRemapGradlePlugin.java
++++ b/src/main/java/net/fabricmc/loom/LoomNoRemapGradlePlugin.java
+@@ -31,7 +31,7 @@ import org.gradle.api.Project;
+  * A marker plugin to indicate to the main loom plugin not to setup for remapping.
+  */
+ public class LoomNoRemapGradlePlugin implements Plugin<Project> {
+-	public static final String NAME = "net.fabricmc.fabric-loom";
++	public static final String NAME = "xyz.jpenilla.quiet-fabric-loom";
+ 
+ 	@Override
+ 	public void apply(Project target) {
+diff --git a/src/main/java/net/fabricmc/loom/LoomRemapGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomRemapGradlePlugin.java
+index ecdf2875b5a7930316f864fb65fa08b80a2b5edd..d7ff2ab070d4a8f9baf41cbd2343706101ab2b17 100644
+--- a/src/main/java/net/fabricmc/loom/LoomRemapGradlePlugin.java
++++ b/src/main/java/net/fabricmc/loom/LoomRemapGradlePlugin.java
+@@ -31,7 +31,7 @@ import org.gradle.api.Project;
+  * An alias for `net.fabricmc.fabric-loom-remap` to `fabric-loom`.
+  */
+ public class LoomRemapGradlePlugin implements Plugin<Project> {
+-	public static final String NAME = "net.fabricmc.fabric-loom-remap";
++	public static final String NAME = "xyz.jpenilla.quiet-fabric-loom-remap";
+ 
+ 	@Override
+ 	public void apply(Project target) {
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 index b45e65e6c1eaabf42363c2e0c44881b8e8fa9a67..f2ad6c18ad3b2f232bb034ac799ec1b9316d8ab6 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
@@ -283,6 +309,17 @@ index 5808e9a528be3a3ec57a506048debee521615bc7..0306243e6faffc53180e0033b9a52c7b
  plugins {
 -	id 'fabric-loom'
 +	id 'quiet-fabric-loom' // quiet
+ }
+ 
+ repositories {
+diff --git a/src/test/resources/projects/includedJarsNoRemap/build.gradle b/src/test/resources/projects/includedJarsNoRemap/build.gradle
+index 8558e5121891b8138acc1cedc67dabc1b2d11e58..68b48f7a14512840e5b208fbfda5db7c1eb48a8f 100644
+--- a/src/test/resources/projects/includedJarsNoRemap/build.gradle
++++ b/src/test/resources/projects/includedJarsNoRemap/build.gradle
+@@ -1,5 +1,5 @@
+ plugins {
+-	id 'net.fabricmc.fabric-loom'
++	id 'xyz.jpenilla.quiet-fabric-loom'
  }
  
  repositories {
@@ -391,6 +428,19 @@ index 35f137b653f4806d09c3f3e7877c801a2c5c2c88..978fe9e13c75012eed4aecdb5d77fce6
  	id 'maven-publish'
  }
  
+diff --git a/src/test/resources/projects/minimalBaseNoRemap/build.gradle b/src/test/resources/projects/minimalBaseNoRemap/build.gradle
+index 0b77eecf00746b88a991f58f2dee80f30ff19aee..715a2304929f4f4078dd93a6b86c7f48a9a8483a 100644
+--- a/src/test/resources/projects/minimalBaseNoRemap/build.gradle
++++ b/src/test/resources/projects/minimalBaseNoRemap/build.gradle
+@@ -1,7 +1,7 @@
+ // This is used by a range of tests that append to this file before running the gradle tasks.
+ // Can be used for tests that require minimal custom setup
+ plugins {
+-	id 'net.fabricmc.fabric-loom'
++	id 'xyz.jpenilla.quiet-fabric-loom'
+ 	id 'maven-publish'
+ }
+ 
 diff --git a/src/test/resources/projects/mixinApAutoRefmap/build.gradle b/src/test/resources/projects/mixinApAutoRefmap/build.gradle
 index 62db666d9c9f8cdfd0d2980cfa1e9e9307c72df0..5dd91c518e9acba2b7c8975abafac587cd4dac78 100644
 --- a/src/test/resources/projects/mixinApAutoRefmap/build.gradle
@@ -477,6 +527,17 @@ index 05237cc9dc6bc5630f3f2073f34ea0dfcbc0a725..a09d1e879a5f872084f614853c85a233
  
  	version = "1.0.0"
  
+diff --git a/src/test/resources/projects/multiproject/javalib/build.gradle b/src/test/resources/projects/multiproject/javalib/build.gradle
+index 1fb413ebcc208d9996eee0f6b49274708241bcd8..7d993733d06bea5b06a68816aa6cb3def0f07226 100644
+--- a/src/test/resources/projects/multiproject/javalib/build.gradle
++++ b/src/test/resources/projects/multiproject/javalib/build.gradle
+@@ -1,4 +1,4 @@
+ plugins {
+ 	id 'java-library'
+-	id 'net.fabricmc.fabric-loom-companion'
++	id 'xyz.jpenilla.quiet-fabric-loom-companion'
+ }
+\ No newline at end of file
 diff --git a/src/test/resources/projects/parchment/build.gradle b/src/test/resources/projects/parchment/build.gradle
 index 5fee81c5d1e07de0dfcf615795ec818a8e4705e2..b2f68f83de8a72fd9be20681c788eb1efc6befb2 100644
 --- a/src/test/resources/projects/parchment/build.gradle
