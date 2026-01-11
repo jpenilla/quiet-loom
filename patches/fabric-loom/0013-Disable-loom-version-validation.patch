@@ -5,10 +5,10 @@ Subject: [PATCH] Disable loom version validation
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
-index b9d38f41b322013e771a861e75c7030e03bf97af..bff25997646f6e2f8a01799579508d3e6787a8b5 100644
+index 3fef8034e3744a87c0a3319585e1d9762eff734b..494e9823f7d1f19d13bdc41928fcbd60463b9ebe 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
-@@ -83,7 +83,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
+@@ -78,7 +78,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
  				}
  
  				if (loomVersion != null && refmapRemapType == MixinRemapType.STATIC) {

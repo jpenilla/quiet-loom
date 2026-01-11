@@ -5,7 +5,7 @@ Subject: [PATCH] Reduce log spam when sources fail to fully remap
 
 
 diff --git a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
-index 6c54bab07f9cbe899dcfc15f4a7e9c7337877377..8f33f851fe4ba9f3bfd2961ccb7fe60ee864fb19 100644
+index 0da65dd135a5428394f2653c52948fb7e13f9a75..b77cbc5ef52cb10eb3b701d72ce3a9155f672584 100644
 --- a/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
 +++ b/src/main/java/net/fabricmc/loom/util/SourceRemapper.java
 @@ -38,6 +38,7 @@ import org.cadixdev.mercury.Mercury;

@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index c4f76b13ac2f51566973e2bd1e15970c1aa2a3ba..9bbc647622d43056170fe386dbfc26969c8a54fb 100644
+index a9e824c9f9abb7d55d1516dfa2e53e218b002fa8..03d225ba6eb7a52be00dfa1ad9674d79cf3d95f7 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,10 +5,9 @@ plugins {
@@ -22,7 +22,7 @@ index c4f76b13ac2f51566973e2bd1e15970c1aa2a3ba..9bbc647622d43056170fe386dbfc2696
  }
  
 @@ -26,12 +25,10 @@ group = 'net.fabricmc'
- def baseVersion = '1.13'
+ def baseVersion = '1.14'
  
  def ENV = System.getenv()
 -if (ENV.BUILD_NUMBER) {
@@ -38,7 +38,7 @@ index c4f76b13ac2f51566973e2bd1e15970c1aa2a3ba..9bbc647622d43056170fe386dbfc2696
  } else {
  	version = baseVersion + '.local'
  }
-@@ -195,51 +192,16 @@ java {
+@@ -195,60 +192,25 @@ java {
  	targetCompatibility = JavaVersion.VERSION_21
  }
  
@@ -83,17 +83,28 @@ index c4f76b13ac2f51566973e2bd1e15970c1aa2a3ba..9bbc647622d43056170fe386dbfc2696
  gradlePlugin {
  	plugins {
  		fabricLoom {
+-			id = 'net.fabricmc.fabric-loom'
++			id = 'xyz.jpenilla.quiet-fabric-loom' // quiet
+ 			implementationClass = 'net.fabricmc.loom.LoomNoRemapGradlePlugin'
+ 		}
+ 		fabricLoomRemap {
+-			id = 'net.fabricmc.fabric-loom-remap'
++			id = 'xyz.jpenilla.quiet-fabric-loom-remap' // quiet
+ 			implementationClass = 'net.fabricmc.loom.LoomRemapGradlePlugin'
+ 		}
+ 		fabricLoomLegacy {
+ 			// Legacy plugin id, remove in 2.0. Use `net.fabricmc.fabric-loom-remap`
 -			id = 'fabric-loom'
 +			id = 'quiet-fabric-loom' // quiet
  			implementationClass = 'net.fabricmc.loom.LoomGradlePlugin'
  		}
  		fabricLoomCompanion {
 -			id = 'net.fabricmc.fabric-loom-companion'
-+			id = 'net.fabricmc.quiet-fabric-loom-companion' // quiet
++			id = 'xyz.jpenilla.quiet-fabric-loom-companion' // quiet
  			implementationClass = 'net.fabricmc.loom.LoomCompanionGradlePlugin'
  		}
  	}
-@@ -313,7 +275,7 @@ publishing {
+@@ -322,7 +284,7 @@ publishing {
  						Node groupId = dependency.appendChild(document.createElement('groupId'))
  						groupId.setTextContent('net.fabricmc')
  						Node artifactId = dependency.appendChild(document.createElement('artifactId'))
@@ -102,7 +113,7 @@ index c4f76b13ac2f51566973e2bd1e15970c1aa2a3ba..9bbc647622d43056170fe386dbfc2696
  						Node version = dependency.appendChild(document.createElement('version'))
  						version.setTextContent(project.version)
  					})
-@@ -323,13 +285,13 @@ publishing {
+@@ -332,13 +294,13 @@ publishing {
  	}
  	repositories {
  		maven {
@@ -145,10 +156,10 @@ index 6b14589d1bf1551d4376ed710f3fd73e434c4580..ba0694a30a5a47529f65ba0b159c38d0
  dependencyResolutionManagement {
  	versionCatalogs {
 diff --git a/src/main/java/net/fabricmc/loom/LoomCompanionGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomCompanionGradlePlugin.java
-index 18a6ca99e4ea80540372527fcbe0a13ab25deecd..71a9bc77fe4331862e82dda31fceb221925fb38f 100644
+index b3e14661bf3008d3abea20e464552a36eb3633f6..73ad96d02c551e562f222b10a6906ec0c67899e5 100644
 --- a/src/main/java/net/fabricmc/loom/LoomCompanionGradlePlugin.java
 +++ b/src/main/java/net/fabricmc/loom/LoomCompanionGradlePlugin.java
-@@ -33,7 +33,7 @@ import net.fabricmc.loom.task.launch.ExportClasspathTask;
+@@ -32,7 +32,7 @@ import net.fabricmc.loom.task.launch.ExportClasspathTask;
  import net.fabricmc.loom.util.Constants;
  
  public class LoomCompanionGradlePlugin implements Plugin<Project> {
@@ -156,7 +167,7 @@ index 18a6ca99e4ea80540372527fcbe0a13ab25deecd..71a9bc77fe4331862e82dda31fceb221
 +	public static final String NAME = "net.fabricmc.quiet-fabric-loom-companion"; // quiet
  
  	@Override
- 	public void apply(@NotNull Project project) {
+ 	public void apply(Project project) {
 diff --git a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java b/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
 index 1c416b3066197ac6b5a0c36b096e323faeba1198..0c6504581ddcdaa4eab8720f14e801c3c9453d79 100644
 --- a/src/main/java/net/fabricmc/loom/LoomGradlePlugin.java
@@ -300,15 +311,15 @@ index 018aeb560dad93d12ab7646fb1cd86c14cbc866d..0e26c2c957ff24bd7c2164a19fbcab01
  }
  
 diff --git a/src/test/resources/projects/kotlin/build.gradle.kts b/src/test/resources/projects/kotlin/build.gradle.kts
-index ba84eef48e5f0b6277deac5ac47ae22423fc0f76..12a677902d0886479fc78370ad0f359bbd87a5d1 100644
+index e52da2c34fe295ac97d5c4a879f85eafd3526db6..26f88d2960f9125fad34230c91063bff22040c93 100644
 --- a/src/test/resources/projects/kotlin/build.gradle.kts
 +++ b/src/test/resources/projects/kotlin/build.gradle.kts
 @@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
  plugins {
- 	kotlin("jvm") version "2.0.21"
- 	kotlin("plugin.serialization") version "2.0.21"
+ 	kotlin("jvm") version "2.2.21"
+ 	kotlin("plugin.serialization") version "2.2.21"
 -	id("fabric-loom")
-+	id("quiet-fabric-loom") // quiet
++    id("quiet-fabric-loom") // quiet
  	`maven-publish`
  }
  
@@ -368,15 +379,15 @@ index 5d641ff17f290ceb9dc09e34be7dbe4a2c393399..473611ac751870adb4571aeff07db3d8
  }
  
 diff --git a/src/test/resources/projects/minimalBase/build.gradle b/src/test/resources/projects/minimalBase/build.gradle
-index f3dc73941bc7331e8292466b924f4a769ae55a01..8fdbe5cd5ba9db93ba06dfd2ffe4f5df86cadd29 100644
+index 35f137b653f4806d09c3f3e7877c801a2c5c2c88..978fe9e13c75012eed4aecdb5d77fce6dc462759 100644
 --- a/src/test/resources/projects/minimalBase/build.gradle
 +++ b/src/test/resources/projects/minimalBase/build.gradle
 @@ -1,7 +1,7 @@
  // This is used by a range of tests that append to this file before running the gradle tasks.
  // Can be used for tests that require minimal custom setup
  plugins {
--	id 'fabric-loom'
-+	id 'quiet-fabric-loom' // quiet
+-	id 'net.fabricmc.fabric-loom-remap'
++	id 'xyz.jpenilla.quiet-fabric-loom-remap' // quiet
  	id 'maven-publish'
  }
  

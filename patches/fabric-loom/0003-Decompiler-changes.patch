@@ -5,15 +5,15 @@ Subject: [PATCH] Decompiler changes
 
 
 diff --git a/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java b/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java
-index ad865d735bab1094a77d172e6e96c5107ded8904..bf54a2e250369fde15c8ee32dd07ddf0aa177d79 100644
+index 40f14d417772357f36fde8b66c4c557faf19a656..a256dad84ec491a0a5d2aeaaa3f423ae7cdb6380 100644
 --- a/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java
 +++ b/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java
 @@ -48,7 +48,7 @@ public final class VineflowerDecompiler implements LoomInternalDecompiler {
  					IFernflowerPreferences.REMOVE_SYNTHETIC, "1",
  					IFernflowerPreferences.LOG_LEVEL, "trace",
  					IFernflowerPreferences.THREADS, String.valueOf(context.numberOfThreads()),
--					IFernflowerPreferences.INDENT_STRING, "\t",
-+					IFernflowerPreferences.INDENT_STRING, "  ", // quiet
- 					IFabricJavadocProvider.PROPERTY_NAME, new TinyJavadocProvider(context.javaDocs().toFile())
+-					IFernflowerPreferences.INDENT_STRING, "\t"
++					IFernflowerPreferences.INDENT_STRING, "  " // quiet
  				)
  		);
+ 

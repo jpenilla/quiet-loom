@@ -6,7 +6,7 @@ Subject: [PATCH] Changes to include
 Add transitiveInclude configuration
 
 diff --git a/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java b/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
-index bd494b814b7d4de98cd75f5452367c3093f419f6..d9d92c2a7ad4036a64e4aec19da2759cbb9ea8e0 100644
+index 0b59ee19854d49e028948906f1daded325b8c15a..58d27650c566462803b68b8b682135b4b7e6b515 100644
 --- a/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
 +++ b/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
 @@ -35,6 +35,7 @@ import java.util.List;
@@ -45,7 +45,7 @@ index bd494b814b7d4de98cd75f5452367c3093f419f6..d9d92c2a7ad4036a64e4aec19da2759c
  
  	// Generates a barebones mod for a dependency
 diff --git a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
-index fad2cb1abfb8b430cfd54a83d875831760294bf4..e677e2fdb37838518483a8428fd86515674cc0f1 100644
+index 92b166e02a5f70dcf1c6cd273fec1fbba26e2024..b221ece9632a649d02ea706822d5eacab12ca101 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
 @@ -94,6 +94,7 @@ public abstract class LoomConfigurations implements Runnable {
@@ -57,25 +57,25 @@ index fad2cb1abfb8b430cfd54a83d875831760294bf4..e677e2fdb37838518483a8428fd86515
  			configuration.getDependencies().addAllLater(getProject().provider(() -> {
  				List<Dependency> dependencies = new ArrayList<>();
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 0b35d3490256a8229aa5baa526c7089205519230..3ceb5b6258f934e42ff4fc829446160a9da943b6 100644
+index 40900fa41360aa4d5685499905fa13661961e760..e29f7c49276a20a296ce7ef4f12c6562bceef30d 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -73,8 +73,10 @@ public abstract class RemapTaskConfiguration implements Runnable {
- 		}
+@@ -68,8 +68,10 @@ public abstract class RemapTaskConfiguration implements Runnable {
+ 		SyncTaskBuildService.register(getProject());
  
  		Configuration includeConfiguration = getProject().getConfigurations().getByName(Constants.Configurations.INCLUDE_INTERNAL);
 +		Configuration transitiveIncludeConfiguration = getProject().getConfigurations().getByName(Constants.Configurations.TRANSITIVE_INCLUDE);
- 		getTasks().register(Constants.Task.PROCESS_INCLUDE_JARS, NestableJarGenerationTask.class, task -> {
+ 		TaskProvider<NestableJarGenerationTask> processIncludeJarsTask = getTasks().register(Constants.Task.PROCESS_INCLUDE_JARS, NestableJarGenerationTask.class, task -> {
  			task.from(includeConfiguration);
 +			task.from(transitiveIncludeConfiguration);
  			task.getOutputDirectory().set(getProject().getLayout().getBuildDirectory().dir(task.getName()));
  		});
  
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index 8565c59fe9df5654e3cc5a653397a8cfcc12bed4..6d509f418fcf190e84d144c470f7f4a52625774b 100644
+index 27c5cf504cc61e433c57b733ac9d124a5b0391cc..91fce0a095c3095b6446a5c2bbdfd97de5cd0620 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
-@@ -49,6 +49,7 @@ public class Constants {
+@@ -50,6 +50,7 @@ public class Constants {
  		public static final String MOD_COMPILE_CLASSPATH_MAPPED = "modCompileClasspathMapped";
  		public static final String INCLUDE = "include";
  		public static final String INCLUDE_INTERNAL = "includeInternal";
