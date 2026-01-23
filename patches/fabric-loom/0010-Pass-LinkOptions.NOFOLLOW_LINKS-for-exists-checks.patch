@@ -5,7 +5,7 @@ Subject: [PATCH] Pass LinkOptions.NOFOLLOW_LINKS for exists checks
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
-index b13cf33d38a4b7463d4858a69c9b8a08ec965592..3fef8034e3744a87c0a3319585e1d9762eff734b 100644
+index 13c1914691746bec6d87690364b08026b76fe255..e49b65e218f9159ec02da2180452af8141de1215 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
 @@ -27,6 +27,7 @@ package net.fabricmc.loom.configuration.mods;
@@ -56,7 +56,7 @@ index 3d457766becaba709a1adc0401bf26e177d723c1..860ce0e9a0ce64681bf776d690c61c64
  			} else {
  				throw new NoSuchFileException(fsPath.toString());
 diff --git a/src/main/java/net/fabricmc/loom/util/ZipUtils.java b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
-index 29884c8b3e67535e22e00b377aa817676fc22153..533904baeb126e8ad738fc6d4b1635ea4d9ff7e4 100644
+index 6c57a8dc0c320d558de5335d8d1e601789223e41..7bb3579fca1677e6cc4e6ea712f76ba5a070434a 100644
 --- a/src/main/java/net/fabricmc/loom/util/ZipUtils.java
 +++ b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
 @@ -31,6 +31,7 @@ import java.io.InputStreamReader;
@@ -67,7 +67,7 @@ index 29884c8b3e67535e22e00b377aa817676fc22153..533904baeb126e8ad738fc6d4b1635ea
  import java.nio.file.NoSuchFileException;
  import java.nio.file.Path;
  import java.nio.file.StandardCopyOption;
-@@ -71,7 +72,7 @@ public class ZipUtils {
+@@ -75,7 +76,7 @@ public class ZipUtils {
  		try (FileSystemUtil.Delegate fs = FileSystemUtil.getJarFileSystem(zip, false)) {
  			Path fsPath = fs.get().getPath(path);
  

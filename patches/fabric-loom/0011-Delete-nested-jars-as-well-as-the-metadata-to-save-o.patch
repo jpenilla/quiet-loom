@@ -6,7 +6,7 @@ Subject: [PATCH] Delete nested jars as well as the metadata to save on disk
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java b/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
-index 28385f8b98df47926c48fafe19bf0233c8224035..eb45ebe9cc0b199d9d3bf61b00efe6ad3a4603a7 100644
+index d6c9a247353f07779004aa208986fa99a717849f..a9d6ead139ea1498fa1c9f581de23f01cd2a5ace 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
 @@ -130,6 +130,7 @@ public class ModProcessor {
@@ -18,10 +18,10 @@ index 28385f8b98df47926c48fafe19bf0233c8224035..eb45ebe9cc0b199d9d3bf61b00efe6ad
  			throw new UncheckedIOException("Failed to strip nested jars from %s".formatted(path), e);
  		}
 diff --git a/src/main/java/net/fabricmc/loom/util/ZipUtils.java b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
-index 533904baeb126e8ad738fc6d4b1635ea4d9ff7e4..6e8d64676a5919b4ed26ddcf91e979100575a027 100644
+index 7bb3579fca1677e6cc4e6ea712f76ba5a070434a..85c142ece05b7e2e99e96fb1f62302abef26a06c 100644
 --- a/src/main/java/net/fabricmc/loom/util/ZipUtils.java
 +++ b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
-@@ -185,6 +185,14 @@ public class ZipUtils {
+@@ -189,6 +189,14 @@ public class ZipUtils {
  		}
  	}
  

@@ -5,7 +5,7 @@ Subject: [PATCH] Remove annoying warning
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
-index efcdbff4adf32f3de16854fa82e47572a879a38b..85760cb656f585323c566c06b2244bd1e7557daf 100644
+index cb9dedf260e5bbb2689f076912333b697dabb723..42a582098ba4c05fc3f8438c772ba4e11fe4dfa2 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/providers/mappings/mojmap/MojangMappingLayer.java
 @@ -51,7 +51,6 @@ public record MojangMappingLayer(Path clientMappings, Path serverMappings, boole

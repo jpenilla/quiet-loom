@@ -41,16 +41,14 @@ index 8d8dd44445aff5ffe4ba238baa26e381e3a876ae..942ccdf700ca94599f2cabe8a7faf7ae
  		setup:
  		def gradle = gradleProject(project: "minimalBase", version: PRE_RELEASE_GRADLE)
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
-index 57b2d32fef64c00491460a563d3edd25c2173d6b..da078e4eb9f82c2c1395ec63dcf9d1d81581c395 100644
+index bb084f5cc771151aefaddf49f129207d8a343138..fdb369b7f220cc05e4becd2d6bb22614f9815f26 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/DecompileTest.groovy
-@@ -46,11 +46,12 @@ class DecompileTest extends Specification implements GradleProjectTestTrait {
+@@ -46,10 +46,11 @@ class DecompileTest extends Specification implements GradleProjectTestTrait {
  
  		where:
  		decompiler 		| task								| version
--		'fernflower'	| "genSourcesWithFernFlower"		| PRE_RELEASE_GRADLE
 -		'cfr' 			| "genSourcesWithCfr"				| PRE_RELEASE_GRADLE
-+		//'fernflower'	| "genSourcesWithFernFlower"		| PRE_RELEASE_GRADLE
 +		//'cfr' 			| "genSourcesWithCfr"				| PRE_RELEASE_GRADLE
  		'vineflower' 	| "genSourcesWithVineflower"		| PRE_RELEASE_GRADLE
  	}
@@ -59,7 +57,7 @@ index 57b2d32fef64c00491460a563d3edd25c2173d6b..da078e4eb9f82c2c1395ec63dcf9d1d8
  	@Unroll
  	def "custom decompiler (gradle #version)"() {
  		setup:
-@@ -74,6 +75,7 @@ class DecompileTest extends Specification implements GradleProjectTestTrait {
+@@ -73,6 +74,7 @@ class DecompileTest extends Specification implements GradleProjectTestTrait {
  		where:
  		version << STANDARD_TEST_VERSIONS
  	}

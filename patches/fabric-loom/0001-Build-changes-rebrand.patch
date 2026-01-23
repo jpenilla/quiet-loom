@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index a9e824c9f9abb7d55d1516dfa2e53e218b002fa8..03d225ba6eb7a52be00dfa1ad9674d79cf3d95f7 100644
+index 4d69e8bc5d092e6e092cbc719895e0459be67795..8a10a560c8af1771ecf300fc2394303e58688093 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,10 +5,9 @@ plugins {
@@ -22,7 +22,7 @@ index a9e824c9f9abb7d55d1516dfa2e53e218b002fa8..03d225ba6eb7a52be00dfa1ad9674d79
  }
  
 @@ -26,12 +25,10 @@ group = 'net.fabricmc'
- def baseVersion = '1.14'
+ def baseVersion = '1.15'
  
  def ENV = System.getenv()
 -if (ENV.BUILD_NUMBER) {
@@ -38,7 +38,7 @@ index a9e824c9f9abb7d55d1516dfa2e53e218b002fa8..03d225ba6eb7a52be00dfa1ad9674d79
  } else {
  	version = baseVersion + '.local'
  }
-@@ -195,60 +192,25 @@ java {
+@@ -185,60 +182,25 @@ java {
  	targetCompatibility = JavaVersion.VERSION_21
  }
  
@@ -104,7 +104,7 @@ index a9e824c9f9abb7d55d1516dfa2e53e218b002fa8..03d225ba6eb7a52be00dfa1ad9674d79
  			implementationClass = 'net.fabricmc.loom.LoomCompanionGradlePlugin'
  		}
  	}
-@@ -322,7 +284,7 @@ publishing {
+@@ -312,7 +274,7 @@ publishing {
  						Node groupId = dependency.appendChild(document.createElement('groupId'))
  						groupId.setTextContent('net.fabricmc')
  						Node artifactId = dependency.appendChild(document.createElement('artifactId'))
@@ -113,7 +113,7 @@ index a9e824c9f9abb7d55d1516dfa2e53e218b002fa8..03d225ba6eb7a52be00dfa1ad9674d79
  						Node version = dependency.appendChild(document.createElement('version'))
  						version.setTextContent(project.version)
  					})
-@@ -332,13 +294,13 @@ publishing {
+@@ -322,13 +284,13 @@ publishing {
  	}
  	repositories {
  		maven {
@@ -251,7 +251,7 @@ index 0fd841a28d00ae3b665f7f27c7ec44000addee8b..0f0890cd2d2211ed785664a4ba35d350
  
  repositories {
 diff --git a/src/test/resources/projects/decompile/build.gradle b/src/test/resources/projects/decompile/build.gradle
-index 993ac667071e4e3e2b1a8301121e817950663d61..b38fc44fb5f10c691e2d01b6d1b1e97575ec5f38 100644
+index 1eab13aecec0e0f637290d3e2f84ec8a855e475c..8ac9daadb81ca6ab56b0ae4ba57723bbe5e20cc6 100644
 --- a/src/test/resources/projects/decompile/build.gradle
 +++ b/src/test/resources/projects/decompile/build.gradle
 @@ -1,5 +1,5 @@
