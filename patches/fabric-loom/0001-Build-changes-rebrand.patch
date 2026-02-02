@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index 4d69e8bc5d092e6e092cbc719895e0459be67795..8a10a560c8af1771ecf300fc2394303e58688093 100644
+index 9e6d70d39ef0c8fc732ac4c5cbc372d573ffa62a..7e18853ffacbab3f15124d0966084f9caed36782 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,10 +5,9 @@ plugins {
@@ -38,7 +38,7 @@ index 4d69e8bc5d092e6e092cbc719895e0459be67795..8a10a560c8af1771ecf300fc2394303e
  } else {
  	version = baseVersion + '.local'
  }
-@@ -185,60 +182,25 @@ java {
+@@ -185,64 +182,29 @@ java {
  	targetCompatibility = JavaVersion.VERSION_21
  }
  
@@ -103,8 +103,13 @@ index 4d69e8bc5d092e6e092cbc719895e0459be67795..8a10a560c8af1771ecf300fc2394303e
 +			id = 'xyz.jpenilla.quiet-fabric-loom-companion' // quiet
  			implementationClass = 'net.fabricmc.loom.LoomCompanionGradlePlugin'
  		}
+ 		fabricLoomRepositories {
+-			id = 'net.fabricmc.fabric-loom-repositories'
++			id = 'xyz.jpenilla.quiet-fabric-loom-repositories' // quiet
+ 			implementationClass = 'net.fabricmc.loom.LoomRepositoryPlugin'
+ 		}
  	}
-@@ -312,7 +274,7 @@ publishing {
+@@ -316,7 +278,7 @@ publishing {
  						Node groupId = dependency.appendChild(document.createElement('groupId'))
  						groupId.setTextContent('net.fabricmc')
  						Node artifactId = dependency.appendChild(document.createElement('artifactId'))
@@ -113,7 +118,7 @@ index 4d69e8bc5d092e6e092cbc719895e0459be67795..8a10a560c8af1771ecf300fc2394303e
  						Node version = dependency.appendChild(document.createElement('version'))
  						version.setTextContent(project.version)
  					})
-@@ -322,13 +284,13 @@ publishing {
+@@ -326,13 +288,13 @@ publishing {
  	}
  	repositories {
  		maven {
@@ -284,20 +289,20 @@ index 2fce4f13518958bb90d91589377bfdcdd8b1344e..b5c315a176edd31db45b5b7ba717436a
  }
  
 diff --git a/src/test/resources/projects/dependencyResolutionManagement/settings.gradle b/src/test/resources/projects/dependencyResolutionManagement/settings.gradle
-index 2c075f03ad35f9065fc5d9e501a236ede735a016..0218448da07934bccc350f4af49af6bd9f476945 100644
+index 9b57b5d7749af6af908672f4c3048aef196f4caa..30c553163360031ff32ec425be1cdd287ec4230a 100644
 --- a/src/test/resources/projects/dependencyResolutionManagement/settings.gradle
 +++ b/src/test/resources/projects/dependencyResolutionManagement/settings.gradle
 @@ -1,11 +1,11 @@
  pluginManagement {
  	plugins {
--		id 'fabric-loom'
-+		id 'quiet-fabric-loom' // quiet
+-		id 'net.fabricmc.fabric-loom-repositories'
++		id 'xyz.jpenilla.quiet-fabric-loom-repositories'
  	}
  }
  
  plugins {
--	id 'fabric-loom'
-+	id 'quiet-fabric-loom' // quiet
+-	id 'net.fabricmc.fabric-loom-repositories'
++	id 'xyz.jpenilla.quiet-fabric-loom-repositories'
  }
  
  dependencyResolutionManagement {
