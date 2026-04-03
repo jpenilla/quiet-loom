@@ -18,10 +18,10 @@ index d6c9a247353f07779004aa208986fa99a717849f..a9d6ead139ea1498fa1c9f581de23f01
  			throw new UncheckedIOException("Failed to strip nested jars from %s".formatted(path), e);
  		}
 diff --git a/src/main/java/net/fabricmc/loom/util/ZipUtils.java b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
-index 7bb3579fca1677e6cc4e6ea712f76ba5a070434a..85c142ece05b7e2e99e96fb1f62302abef26a06c 100644
+index f48d1f01a75f53daf439f11507305f31d7859241..4b3eea5758368a8574420b43c51a6d1e7ea12676 100644
 --- a/src/main/java/net/fabricmc/loom/util/ZipUtils.java
 +++ b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
-@@ -189,6 +189,14 @@ public class ZipUtils {
+@@ -191,6 +191,14 @@ public class ZipUtils {
  		}
  	}
  

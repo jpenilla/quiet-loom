@@ -56,7 +56,7 @@ index 3d457766becaba709a1adc0401bf26e177d723c1..860ce0e9a0ce64681bf776d690c61c64
  			} else {
  				throw new NoSuchFileException(fsPath.toString());
 diff --git a/src/main/java/net/fabricmc/loom/util/ZipUtils.java b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
-index 6c57a8dc0c320d558de5335d8d1e601789223e41..7bb3579fca1677e6cc4e6ea712f76ba5a070434a 100644
+index 61f37a5d74bceedb0199b6fd9bc8648886ebf5a7..f48d1f01a75f53daf439f11507305f31d7859241 100644
 --- a/src/main/java/net/fabricmc/loom/util/ZipUtils.java
 +++ b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
 @@ -31,6 +31,7 @@ import java.io.InputStreamReader;
@@ -67,7 +67,7 @@ index 6c57a8dc0c320d558de5335d8d1e601789223e41..7bb3579fca1677e6cc4e6ea712f76ba5
  import java.nio.file.NoSuchFileException;
  import java.nio.file.Path;
  import java.nio.file.StandardCopyOption;
-@@ -75,7 +76,7 @@ public class ZipUtils {
+@@ -77,7 +78,7 @@ public class ZipUtils {
  		try (FileSystemUtil.Delegate fs = FileSystemUtil.getJarFileSystem(zip, false)) {
  			Path fsPath = fs.get().getPath(path);
  
