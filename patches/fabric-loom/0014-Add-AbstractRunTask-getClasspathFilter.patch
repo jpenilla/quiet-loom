@@ -5,7 +5,7 @@ Subject: [PATCH] Add AbstractRunTask#getClasspathFilter
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
-index 3f734ab5c9f0529b3c057753466bb52c7594ec99..67a00b0704de75c8bc61e01a870c1a5f406b0b90 100644
+index 854b379d6324d23cf3c0ed41f69351d4f9d4bd2c..62fb0725865cc2d684c17892b33901f7954a3022 100644
 --- a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
 @@ -35,6 +35,7 @@ import java.nio.file.Paths;
@@ -16,8 +16,8 @@ index 3f734ab5c9f0529b3c057753466bb52c7594ec99..67a00b0704de75c8bc61e01a870c1a5f
  import java.util.stream.Collectors;
  
  import javax.inject.Inject;
-@@ -107,6 +108,10 @@ public abstract class AbstractRunTask extends JavaExec {
- 	@InputFiles
+@@ -109,6 +110,10 @@ public abstract class AbstractRunTask extends JavaExec {
+ 	@Classpath
  	protected abstract ConfigurableFileCollection getInternalClasspath();
  
 +	@Input
@@ -27,7 +27,7 @@ index 3f734ab5c9f0529b3c057753466bb52c7594ec99..67a00b0704de75c8bc61e01a870c1a5f
  	public AbstractRunTask(Function<Project, RunConfig> configProvider) {
  		super();
  		setGroup(Constants.TaskGroup.FABRIC);
-@@ -253,6 +258,12 @@ public abstract class AbstractRunTask extends JavaExec {
+@@ -255,6 +260,12 @@ public abstract class AbstractRunTask extends JavaExec {
  
  		if (getUseArgFile().get()) {
  			final String content = "-classpath\n" + this.getInternalClasspath().getFiles().stream()

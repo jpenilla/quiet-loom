@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index 9e6d70d39ef0c8fc732ac4c5cbc372d573ffa62a..7e18853ffacbab3f15124d0966084f9caed36782 100644
+index e8ac5030b22c70202be7e08e1a832484933c4470..b5f5c884b0b2731d05137778006d13efb4f23410 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,10 +5,9 @@ plugins {
@@ -22,7 +22,7 @@ index 9e6d70d39ef0c8fc732ac4c5cbc372d573ffa62a..7e18853ffacbab3f15124d0966084f9c
  }
  
 @@ -26,12 +25,10 @@ group = 'net.fabricmc'
- def baseVersion = '1.15'
+ def baseVersion = '1.16'
  
  def ENV = System.getenv()
 -if (ENV.BUILD_NUMBER) {

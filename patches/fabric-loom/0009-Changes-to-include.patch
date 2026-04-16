@@ -6,7 +6,7 @@ Subject: [PATCH] Changes to include
 Add transitiveInclude configuration
 
 diff --git a/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java b/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
-index 0b59ee19854d49e028948906f1daded325b8c15a..58d27650c566462803b68b8b682135b4b7e6b515 100644
+index b379f8f5b4b305975595898ea346e01868a939e8..4a005769b7ca78e0c43f68f24f6d19a535736e88 100644
 --- a/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
 +++ b/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
 @@ -35,6 +35,7 @@ import java.util.List;
@@ -25,7 +25,7 @@ index 0b59ee19854d49e028948906f1daded325b8c15a..58d27650c566462803b68b8b682135b4
  import org.gradle.api.artifacts.result.ResolvedVariantResult;
  import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
  import org.gradle.api.file.ConfigurableFileCollection;
-@@ -111,7 +113,9 @@ public abstract class NestableJarGenerationTask extends AbstractLoomTask {
+@@ -118,7 +120,9 @@ public abstract class NestableJarGenerationTask extends AbstractLoomTask {
  		});
  		getJars().from(artifacts.getFiles());
  		dependsOn(configuration);
@@ -36,7 +36,7 @@ index 0b59ee19854d49e028948906f1daded325b8c15a..58d27650c566462803b68b8b682135b4
  			Map<String, Metadata> map = new HashMap<>();
  			set.forEach(artifact -> {
  				ResolvedVariantResult variant = artifact.getVariant();
-@@ -160,7 +164,6 @@ public abstract class NestableJarGenerationTask extends AbstractLoomTask {
+@@ -167,7 +171,6 @@ public abstract class NestableJarGenerationTask extends AbstractLoomTask {
  				map.put(artifact.getFile().getName(), metadata);
  			});
  			return map;
@@ -57,7 +57,7 @@ index 92b166e02a5f70dcf1c6cd273fec1fbba26e2024..b221ece9632a649d02ea706822d5eaca
  			configuration.getDependencies().addAllLater(getProject().provider(() -> {
  				List<Dependency> dependencies = new ArrayList<>();
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 40900fa41360aa4d5685499905fa13661961e760..e29f7c49276a20a296ce7ef4f12c6562bceef30d 100644
+index fdfd8dcfc1b441ff9251f58fafa165060eb5a6b0..4918bee002a404dd5a7eb1f6abfe86d931a079c5 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 @@ -68,8 +68,10 @@ public abstract class RemapTaskConfiguration implements Runnable {
@@ -69,8 +69,8 @@ index 40900fa41360aa4d5685499905fa13661961e760..e29f7c49276a20a296ce7ef4f12c6562
  			task.from(includeConfiguration);
 +			task.from(transitiveIncludeConfiguration);
  			task.getOutputDirectory().set(getProject().getLayout().getBuildDirectory().dir(task.getName()));
+ 			task.getUncompressNestedJars().set(extension.getUncompressNestedJars());
  		});
- 
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
 index 53fcb19c6d87eb2fc2fdabc6f47568f974682017..361e020c1017fc947e1e8b89b6a925ee1b3d4a24 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java

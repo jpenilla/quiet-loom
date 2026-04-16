@@ -5,7 +5,7 @@ Subject: [PATCH] Decompiler changes
 
 
 diff --git a/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java b/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java
-index 40f14d417772357f36fde8b66c4c557faf19a656..a256dad84ec491a0a5d2aeaaa3f423ae7cdb6380 100644
+index 7dc56620188df00aa1cf8c92471b2a214bd1a82a..33ba87c1cbd0e1c1986f120db6857b8e55d190e9 100644
 --- a/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java
 +++ b/src/decompilers/vineflower/net/fabricmc/loom/decompilers/vineflower/VineflowerDecompiler.java
 @@ -48,7 +48,7 @@ public final class VineflowerDecompiler implements LoomInternalDecompiler {
