@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Sun, 19 Apr 2026 16:25:52 -0700
+Subject: [PATCH] Make assemble depend on shadowJar when present in non-remap
+
+
+diff --git a/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java
+index a28752d747b9c6f8eb1d95865585901e42d497ab..53a8966e1836539e19e50bfffa9495cd213335f0 100644
+--- a/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java
++++ b/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java
+@@ -30,6 +30,7 @@ import java.util.Collections;
+ import java.util.List;
+ 
+ import org.gradle.api.Project;
++import org.gradle.api.plugins.BasePlugin;
+ import org.gradle.api.plugins.JavaPlugin;
+ import org.gradle.api.provider.Provider;
+ import org.gradle.api.tasks.SourceSet;
+@@ -81,6 +82,13 @@ public class NonRemappedJarTaskConfiguration {
+ 
+ 			task.usesService(manifestServiceProvider);
+ 		});
++		project.afterEvaluate(p -> {
++			if (p.getTasks().getNames().contains("shadowJar")) {
++				p.getTasks().named(BasePlugin.ASSEMBLE_TASK_NAME).configure(t -> {
++					t.dependsOn(p.getTasks().named("shadowJar"));
++				});
++			}
++		});
+ 
+ 		extension.getUnmappedModCollection().from(project.getTasks().named(JavaPlugin.JAR_TASK_NAME));
+ 	}
