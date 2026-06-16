@@ -1,0 +1,164 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Tue, 28 Feb 2023 12:12:48 -0700
+Subject: [PATCH] Changes to include
+
+Add transitiveInclude configuration
+
+diff --git a/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java b/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
+index b379f8f5b4b305975595898ea346e01868a939e8..4a005769b7ca78e0c43f68f24f6d19a535736e88 100644
+--- a/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
++++ b/src/main/java/net/fabricmc/loom/build/nesting/NestableJarGenerationTask.java
+@@ -35,6 +35,7 @@ import java.util.List;
+ import java.util.Locale;
+ import java.util.Map;
+ import java.util.Objects;
++import java.util.Set;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+ 
+@@ -43,6 +44,7 @@ import org.gradle.api.artifacts.ArtifactView;
+ import org.gradle.api.artifacts.Configuration;
+ import org.gradle.api.artifacts.component.ComponentIdentifier;
+ import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
++import org.gradle.api.artifacts.result.ResolvedArtifactResult;
+ import org.gradle.api.artifacts.result.ResolvedVariantResult;
+ import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
+ import org.gradle.api.file.ConfigurableFileCollection;
+@@ -118,7 +120,9 @@ public abstract class NestableJarGenerationTask extends AbstractLoomTask {
+ 		});
+ 		getJars().from(artifacts.getFiles());
+ 		dependsOn(configuration);
+-		getJarIds().set(artifacts.getArtifacts().getResolvedArtifacts().map(set -> {
++		getJarIds().putAll(artifacts.getArtifacts().getResolvedArtifacts().map(this::getIds));
++	}
++	private Map<String, Metadata> getIds(final Set<ResolvedArtifactResult> set) {
+ 			Map<String, Metadata> map = new HashMap<>();
+ 			set.forEach(artifact -> {
+ 				ResolvedVariantResult variant = artifact.getVariant();
+@@ -167,7 +171,6 @@ public abstract class NestableJarGenerationTask extends AbstractLoomTask {
+ 				map.put(artifact.getFile().getName(), metadata);
+ 			});
+ 			return map;
+-		}));
+ 	}
+ 
+ 	// Generates a barebones mod for a dependency
+diff --git a/src/main/java/net/fabricmc/loom/configuration/IncludeConfigurations.java b/src/main/java/net/fabricmc/loom/configuration/IncludeConfigurations.java
+index 22ca854319e3789e2950b22b5846248da5457f21..5c9879f05c72db5a81487e1a3fc94a2398c62378 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/IncludeConfigurations.java
++++ b/src/main/java/net/fabricmc/loom/configuration/IncludeConfigurations.java
+@@ -27,6 +27,7 @@ package net.fabricmc.loom.configuration;
+ import java.util.ArrayList;
+ import java.util.List;
+ 
++import org.gradle.api.Action;
+ import org.gradle.api.NamedDomainObjectProvider;
+ import org.gradle.api.Project;
+ import org.gradle.api.artifacts.Configuration;
+@@ -46,6 +47,7 @@ import net.fabricmc.loom.LoomGradleExtension;
+ import net.fabricmc.loom.build.nesting.NestableJarGenerationTask;
+ import net.fabricmc.loom.task.NestJarsAction;
+ import net.fabricmc.loom.task.RemapJarTask;
++import net.fabricmc.loom.util.Constants;
+ import net.fabricmc.loom.util.Strings;
+ 
+ /**
+@@ -71,6 +73,15 @@ public final class IncludeConfigurations {
+ 
+ 	public static void nestJars(Project project, TaskProvider<? extends Jar> jarTask, Provider<? extends Configuration> configuration, String taskName) {
+ 		TaskProvider<NestableJarGenerationTask> processTask = createProcessTask(project, configuration, taskName);
++		nestJars(project, jarTask, processTask);
++	}
++
++	public static void nestDefaultJars(Project project, TaskProvider<? extends Jar> jarTask, String taskName) {
++		TaskProvider<NestableJarGenerationTask> processTask = createDefaultProcessTask(project, taskName);
++		nestJars(project, jarTask, processTask);
++	}
++
++	private static void nestJars(Project project, TaskProvider<? extends Jar> jarTask, TaskProvider<NestableJarGenerationTask> processTask) {
+ 		FileCollection outputJars = getOutputJars(project, processTask);
+ 
+ 		jarTask.configure(task -> {
+@@ -87,10 +98,24 @@ public final class IncludeConfigurations {
+ 
+ 	private static TaskProvider<NestableJarGenerationTask> createProcessTask(Project project, Provider<? extends Configuration> configuration, String taskName) {
+ 		Configuration internalConfiguration = createInternalConfiguration(project, configuration);
++		return createProcessTask(project, taskName, task -> task.from(internalConfiguration));
++	}
++
++	private static TaskProvider<NestableJarGenerationTask> createDefaultProcessTask(Project project, String taskName) {
++		Configuration includeInternal = createInternalConfiguration(project, project.getConfigurations().named(Constants.Configurations.INCLUDE));
++		Provider<? extends Configuration> transitiveInclude = project.getConfigurations().named(Constants.Configurations.TRANSITIVE_INCLUDE);
++
++		return createProcessTask(project, taskName, task -> {
++			task.from(includeInternal);
++			task.from(transitiveInclude.get());
++		});
++	}
++
++	private static TaskProvider<NestableJarGenerationTask> createProcessTask(Project project, String taskName, Action<NestableJarGenerationTask> configure) {
+ 		LoomGradleExtension extension = LoomGradleExtension.get(project);
+ 
+ 		return project.getTasks().register(taskName, NestableJarGenerationTask.class, task -> {
+-			task.from(internalConfiguration);
++			configure.execute(task);
+ 			task.getOutputDirectory().set(project.getLayout().getBuildDirectory().dir(task.getName()));
+ 			task.getUncompressNestedJars().set(extension.getUncompressNestedJars());
+ 		});
+diff --git a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
+index 2fd18124246bf6a10b64fc42d6a09f0e3228f1fa..c427169bfebdab4d3b799d99024426a2bf1731f4 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
++++ b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
+@@ -83,6 +83,7 @@ public abstract class LoomConfigurations implements Runnable {
+ 		registerNonTransitive(Constants.Configurations.MINECRAFT, Role.NONE);
+ 
+ 		register(Constants.Configurations.INCLUDE, Role.NONE);
++		register(Constants.Configurations.TRANSITIVE_INCLUDE, Role.RESOLVABLE);
+ 
+ 		if (!extension.disableObfuscation()) {
+ 			registerNonTransitive(Constants.Configurations.MAPPING_CONSTANTS, Role.RESOLVABLE);
+diff --git a/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java
+index e0dcc804324a6d113b5ea2cb52ba172b9c95e60b..5ec80b30aa087da1ebe08d8a99222c76e87994f2 100644
+--- a/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java
++++ b/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java
+@@ -71,10 +71,9 @@ public class NonRemappedJarTaskConfiguration {
+ 			task.usesService(manifestServiceProvider);
+ 		});
+ 
+-		IncludeConfigurations.nestJars(
++		IncludeConfigurations.nestDefaultJars(
+ 				project,
+ 				project.getTasks().named(JavaPlugin.JAR_TASK_NAME, Jar.class),
+-				project.getConfigurations().named(Constants.Configurations.INCLUDE),
+ 				Constants.Task.PROCESS_INCLUDE_JARS
+ 		);
+ 
+diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+index 3ee56e39cf5640a5d6563a6e29d2e1c4e9b56309..eba78adf23b892352d812694f2e893ff478dc9d1 100644
+--- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
++++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+@@ -92,10 +92,9 @@ public abstract class RemapTaskConfiguration implements Runnable {
+ 		// must not be lazy to ensure that the prepare tasks get setup for other projects to depend on.
+ 		// Being lazy also breaks maven publishing, see: https://github.com/FabricMC/fabric-loom/issues/1023
+ 		getTasks().create(REMAP_JAR_TASK_NAME, RemapJarTask.class, remapJarTaskAction);
+-		IncludeConfigurations.nestJars(
++		IncludeConfigurations.nestDefaultJars(
+ 				getProject(),
+ 				getTasks().named(REMAP_JAR_TASK_NAME, RemapJarTask.class),
+-				getConfigurations().named(Constants.Configurations.INCLUDE),
+ 				Constants.Task.PROCESS_INCLUDE_JARS
+ 		);
+ 
+diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
+index 75da6f5457e8a2a17dbfb9be494e8029b092499f..f746325f1266ce09dd39c5ad1f145e99af8db9ec 100644
+--- a/src/main/java/net/fabricmc/loom/util/Constants.java
++++ b/src/main/java/net/fabricmc/loom/util/Constants.java
+@@ -50,6 +50,7 @@ public class Constants {
+ 		public static final String MOD_COMPILE_CLASSPATH = "modCompileClasspath";
+ 		public static final String MOD_COMPILE_CLASSPATH_MAPPED = "modCompileClasspathMapped";
+ 		public static final String INCLUDE = "include";
++		public static final String TRANSITIVE_INCLUDE = "transitiveInclude";
+ 		public static final String MINECRAFT = "minecraft";
+ 
+ 		public static final String MINECRAFT_COMPILE_LIBRARIES = "minecraftLibraries";

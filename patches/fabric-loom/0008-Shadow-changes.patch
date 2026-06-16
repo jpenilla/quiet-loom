@@ -1,0 +1,200 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Tue, 25 Jan 2022 22:47:45 -0700
+Subject: [PATCH] Shadow changes
+
+
+diff --git a/src/main/java/net/fabricmc/loom/configuration/IncludeConfigurations.java b/src/main/java/net/fabricmc/loom/configuration/IncludeConfigurations.java
+index 5c9879f05c72db5a81487e1a3fc94a2398c62378..7a59594982db1257f0349f50ef4a59138a3c888d 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/IncludeConfigurations.java
++++ b/src/main/java/net/fabricmc/loom/configuration/IncludeConfigurations.java
+@@ -41,6 +41,7 @@ import org.gradle.api.attributes.Usage;
+ import org.gradle.api.file.FileCollection;
+ import org.gradle.api.provider.Provider;
+ import org.gradle.api.tasks.TaskProvider;
++import org.gradle.api.tasks.bundling.AbstractArchiveTask;
+ import org.gradle.jvm.tasks.Jar;
+ 
+ import net.fabricmc.loom.LoomGradleExtension;
+@@ -76,12 +77,12 @@ public final class IncludeConfigurations {
+ 		nestJars(project, jarTask, processTask);
+ 	}
+ 
+-	public static void nestDefaultJars(Project project, TaskProvider<? extends Jar> jarTask, String taskName) {
++	public static void nestDefaultJars(Project project, TaskProvider<? extends AbstractArchiveTask> jarTask, String taskName) {
+ 		TaskProvider<NestableJarGenerationTask> processTask = createDefaultProcessTask(project, taskName);
+ 		nestJars(project, jarTask, processTask);
+ 	}
+ 
+-	private static void nestJars(Project project, TaskProvider<? extends Jar> jarTask, TaskProvider<NestableJarGenerationTask> processTask) {
++	private static void nestJars(Project project, TaskProvider<? extends AbstractArchiveTask> jarTask, TaskProvider<NestableJarGenerationTask> processTask) {
+ 		FileCollection outputJars = getOutputJars(project, processTask);
+ 
+ 		jarTask.configure(task -> {
+diff --git a/src/main/java/net/fabricmc/loom/task/NestJarsAction.java b/src/main/java/net/fabricmc/loom/task/NestJarsAction.java
+index 0b4c82604cf030342fa9394400a3aa1ab128239d..81ef5df1ce6a8feb874c7492bfe00012a634f7f4 100644
+--- a/src/main/java/net/fabricmc/loom/task/NestJarsAction.java
++++ b/src/main/java/net/fabricmc/loom/task/NestJarsAction.java
+@@ -36,6 +36,7 @@ import org.gradle.api.file.ConfigurableFileCollection;
+ import org.gradle.api.file.FileCollection;
+ import org.gradle.api.file.RegularFileProperty;
+ import org.gradle.api.tasks.InputFiles;
++import org.gradle.api.tasks.bundling.AbstractArchiveTask;
+ import org.gradle.jvm.tasks.Jar;
+ import org.gradle.workers.WorkAction;
+ import org.gradle.workers.WorkParameters;
+@@ -58,7 +59,7 @@ public abstract class NestJarsAction implements Action<Task>, Serializable {
+ 	@Inject
+ 	protected abstract WorkerExecutor getWorkerExecutor();
+ 
+-	public static void addToTask(Jar task, FileCollection jars) {
++	public static void addToTask(AbstractArchiveTask task, FileCollection jars) {
+ 		NestJarsAction nestJarsAction = task.getProject().getObjects().newInstance(NestJarsAction.class);
+ 		nestJarsAction.getJars().from(jars);
+ 		task.getInputs().files(nestJarsAction.getJars()); // I don't think @InputFiles works, so to be sure add the jars to the task input anyway.
+diff --git a/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java
+index 5ec80b30aa087da1ebe08d8a99222c76e87994f2..b6e80b3abf22aabffc9787fce18a4602dcaa98e6 100644
+--- a/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java
++++ b/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java
+@@ -30,9 +30,11 @@ import java.util.Collections;
+ import java.util.List;
+ 
+ import org.gradle.api.Project;
++import org.gradle.api.plugins.BasePlugin;
+ import org.gradle.api.plugins.JavaPlugin;
+ import org.gradle.api.provider.Provider;
+ import org.gradle.api.tasks.SourceSet;
++import org.gradle.api.tasks.bundling.AbstractArchiveTask;
+ import org.gradle.jvm.tasks.Jar;
+ 
+ import net.fabricmc.loom.LoomGradleExtension;
+@@ -60,16 +62,7 @@ public class NonRemappedJarTaskConfiguration {
+ 	public void configure() {
+ 		final Provider<JarManifestService> manifestServiceProvider = JarManifestService.get(project);
+ 
+-		project.getTasks().named(JavaPlugin.JAR_TASK_NAME, Jar.class).configure(task -> {
+-			task.doLast(new ManifestModificationAction(
+-					manifestServiceProvider,
+-					"official",
+-					project.provider(extension::areEnvironmentSourceSetsSplit),
+-					project.provider(this::getClientOnlyEntries)
+-			));
+-
+-			task.usesService(manifestServiceProvider);
+-		});
++		project.getTasks().named(JavaPlugin.JAR_TASK_NAME, Jar.class).configure(task -> configureManifestModification(task, manifestServiceProvider));
+ 
+ 		IncludeConfigurations.nestDefaultJars(
+ 				project,
+@@ -77,9 +70,28 @@ public class NonRemappedJarTaskConfiguration {
+ 				Constants.Task.PROCESS_INCLUDE_JARS
+ 		);
+ 
++		// quiet start
++		ShadowPluginSupport.withShadowJar(project, shadowJar -> {
++			shadowJar.configure(task -> configureManifestModification(task, manifestServiceProvider));
++			IncludeConfigurations.nestDefaultJars(project, shadowJar, "processShadowJarIncludeJars");
++			project.getTasks().named(BasePlugin.ASSEMBLE_TASK_NAME).configure(task -> task.dependsOn(shadowJar));
++		});
++		// quiet end
++
+ 		extension.getUnmappedModCollection().from(project.getTasks().named(JavaPlugin.JAR_TASK_NAME));
+ 	}
+ 
++	private void configureManifestModification(AbstractArchiveTask task, Provider<JarManifestService> manifestServiceProvider) {
++		task.doLast(new ManifestModificationAction(
++				manifestServiceProvider,
++				"official",
++				project.provider(extension::areEnvironmentSourceSetsSplit),
++				project.provider(this::getClientOnlyEntries)
++		));
++
++		task.usesService(manifestServiceProvider);
++	}
++
+ 	private List<String> getClientOnlyEntries() {
+ 		if (!extension.areEnvironmentSourceSetsSplit()) {
+ 			return Collections.emptyList();
+diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+index eba78adf23b892352d812694f2e893ff478dc9d1..e05d60586182b0e1eb7dc4d4388e09bf48f0be6d 100644
+--- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
++++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
+@@ -97,6 +97,14 @@ public abstract class RemapTaskConfiguration implements Runnable {
+ 				getTasks().named(REMAP_JAR_TASK_NAME, RemapJarTask.class),
+ 				Constants.Task.PROCESS_INCLUDE_JARS
+ 		);
++		// quiet start
++		ShadowPluginSupport.withShadowJar(getProject(), shadowJar -> {
++			shadowJar.configure(task -> task.getArchiveClassifier().set("dev-all"));
++			getTasks().named(REMAP_JAR_TASK_NAME, RemapJarTask.class).configure(task -> {
++				task.getInputFile().convention(shadowJar.flatMap(AbstractArchiveTask::getArchiveFile));
++			});
++		});
++		// quiet end
+ 
+ 		// Configure the default jar task
+ 		getTasks().named(JavaPlugin.JAR_TASK_NAME, AbstractArchiveTask.class).configure(task -> {
+diff --git a/src/main/java/net/fabricmc/loom/task/ShadowPluginSupport.java b/src/main/java/net/fabricmc/loom/task/ShadowPluginSupport.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5ba37b709a54703bee1b118dd967ff6f812061f0
+--- /dev/null
++++ b/src/main/java/net/fabricmc/loom/task/ShadowPluginSupport.java
+@@ -0,0 +1,58 @@
++/*
++ * This file is part of fabric-loom, licensed under the MIT License (MIT).
++ *
++ * Copyright (c) 2026 FabricMC
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in all
++ * copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++ * SOFTWARE.
++ */
++
++package net.fabricmc.loom.task;
++
++import java.util.List;
++import java.util.concurrent.atomic.AtomicBoolean;
++
++import org.gradle.api.Action;
++import org.gradle.api.Project;
++import org.gradle.api.tasks.TaskProvider;
++import org.gradle.api.tasks.bundling.AbstractArchiveTask;
++
++final class ShadowPluginSupport {
++	static final String SHADOW_JAR_TASK_NAME = "shadowJar";
++
++	private static final List<String> SHADOW_PLUGIN_IDS = List.of(
++			"com.github.johnrengelman.shadow",
++			"io.github.goooler.shadow",
++			"com.gradleup.shadow"
++	);
++
++	private ShadowPluginSupport() {
++	}
++
++	static void withShadowJar(Project project, Action<TaskProvider<AbstractArchiveTask>> action) {
++		AtomicBoolean configured = new AtomicBoolean();
++
++		for (String pluginId : SHADOW_PLUGIN_IDS) {
++			project.getPlugins().withId(pluginId, plugin -> {
++				if (configured.compareAndSet(false, true)) {
++					action.execute(project.getTasks().named(SHADOW_JAR_TASK_NAME, AbstractArchiveTask.class));
++				}
++			});
++		}
++	}
++}

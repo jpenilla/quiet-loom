@@ -5,7 +5,7 @@ Subject: [PATCH] Disable some decompiler tests
 
 
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
-index 8d8dd44445aff5ffe4ba238baa26e381e3a876ae..942ccdf700ca94599f2cabe8a7faf7aedda8c33b 100644
+index 4d893ea63c160d3e46e08d76d4263a134fed097a..ca3d6b31260d881c6df24328888512dc88c25f5a 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/DebugLineNumbersTest.groovy
 @@ -24,6 +24,8 @@
@@ -17,7 +17,7 @@ index 8d8dd44445aff5ffe4ba238baa26e381e3a876ae..942ccdf700ca94599f2cabe8a7faf7ae
  import java.nio.charset.StandardCharsets
  import java.util.concurrent.CompletableFuture
  import java.util.concurrent.CompletionStage
-@@ -49,6 +51,7 @@ import static net.fabricmc.loom.test.LoomTestConstants.PRE_RELEASE_GRADLE
+@@ -50,6 +52,7 @@ import static net.fabricmc.loom.test.LoomTestConstants.PRE_RELEASE_GRADLE
  import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
  
  @Timeout(value = 30, unit = TimeUnit.MINUTES)
@@ -25,7 +25,7 @@ index 8d8dd44445aff5ffe4ba238baa26e381e3a876ae..942ccdf700ca94599f2cabe8a7faf7ae
  class DebugLineNumbersTest extends Specification implements GradleProjectTestTrait {
  	static final String MAPPINGS = "1.20.1-net.fabricmc.yarn.1_20_1.1.20.1+build.1-v2"
  	static final Map<String, Integer> BREAKPOINTS = [
-@@ -57,6 +60,14 @@ class DebugLineNumbersTest extends Specification implements GradleProjectTestTra
+@@ -58,6 +61,14 @@ class DebugLineNumbersTest extends Specification implements GradleProjectTestTra
  		"net.minecraft.registry.RegistryOps": 44
  	]
  

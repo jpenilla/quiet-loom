@@ -6,10 +6,10 @@ Subject: [PATCH] Delete nested jars as well as the metadata to save on disk
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java b/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
-index 64ce44d8b405f495e1d1f2e58cccb4a5f234b941..4bdf86c2762034c6b60f613c57f057be8b435d1c 100644
+index d1cdb01184ef92469236f2f661c221447307f19d..16d98bd32e8215bf630b28be0d15f1d5db3ce85e 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/mods/ModProcessor.java
-@@ -130,6 +130,7 @@ public class ModProcessor {
+@@ -131,6 +131,7 @@ public class ModProcessor {
  				json.remove("jars");
  				return json;
  			}));

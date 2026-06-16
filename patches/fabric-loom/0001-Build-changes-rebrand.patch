@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index e8ac5030b22c70202be7e08e1a832484933c4470..b5f5c884b0b2731d05137778006d13efb4f23410 100644
+index f1c3f01b5769bf7b1bf66a5234828020ce071f8a..b20b83c4a44eaf9d90058b6be3030b1ac8aad6b5 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,10 +5,9 @@ plugins {
@@ -21,8 +21,13 @@ index e8ac5030b22c70202be7e08e1a832484933c4470..b5f5c884b0b2731d05137778006d13ef
  	alias(libs.plugins.retry)
  }
  
-@@ -26,12 +25,10 @@ group = 'net.fabricmc'
- def baseVersion = '1.16'
+@@ -22,16 +21,14 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+ 	}
+ }
+ 
+-group = 'net.fabricmc'
++group = 'xyz.jpenilla' // quiet
+ def baseVersion = '1.17'
  
  def ENV = System.getenv()
 -if (ENV.BUILD_NUMBER) {
@@ -109,16 +114,19 @@ index e8ac5030b22c70202be7e08e1a832484933c4470..b5f5c884b0b2731d05137778006d13ef
  			implementationClass = 'net.fabricmc.loom.LoomRepositoryPlugin'
  		}
  	}
-@@ -316,7 +278,7 @@ publishing {
+@@ -321,9 +283,9 @@ publishing {
+ 						Node dependencies = root.appendChild(document.createElement('dependencies'))
+ 						Node dependency = dependencies.appendChild(document.createElement('dependency'))
  						Node groupId = dependency.appendChild(document.createElement('groupId'))
- 						groupId.setTextContent('net.fabricmc')
+-						groupId.setTextContent('net.fabricmc')
++						groupId.setTextContent('xyz.jpenilla') // quiet
  						Node artifactId = dependency.appendChild(document.createElement('artifactId'))
 -						artifactId.setTextContent('fabric-loom')
 +						artifactId.setTextContent('quiet-fabric-loom') // quiet
  						Node version = dependency.appendChild(document.createElement('version'))
- 						version.setTextContent(project.version)
+ 						version.setTextContent(markerDependencyVersion)
  					})
-@@ -326,13 +288,13 @@ publishing {
+@@ -333,13 +295,13 @@ publishing {
  	}
  	repositories {
  		maven {
@@ -222,10 +230,10 @@ index ecdf2875b5a7930316f864fb65fa08b80a2b5edd..d7ff2ab070d4a8f9baf41cbd23437061
  	@Override
  	public void apply(Project target) {
 diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-index b45e65e6c1eaabf42363c2e0c44881b8e8fa9a67..f2ad6c18ad3b2f232bb034ac799ec1b9316d8ab6 100644
+index 5fc358c4fb27d842fc3a6960a0ac7fe4feeed6d1..bc02d6e478d33b072ed329c38b11067084e09f5d 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/integration/FabricAPITest.groovy
-@@ -61,6 +61,7 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
+@@ -62,6 +62,7 @@ class FabricAPITest extends Specification implements GradleProjectTestTrait {
  		def minecraftVersion = "1.21.6-pre3"
  		def server = ServerRunner.create(gradle.projectDir, minecraftVersion)
  				.withMod(gradle.getOutputFile("fabric-api-999.0.0.jar"))
@@ -566,7 +574,7 @@ index d7f4a7943512e178350292921bffaa0af6eeed26..5d20f3e204647f5195a9752458272c06
  }
  
 diff --git a/src/test/resources/projects/runconfigs/build.gradle b/src/test/resources/projects/runconfigs/build.gradle
-index bc59e2d4ea635c2cddcc43d66a97fb0396ac3728..c13920990b176dd5dcaff43a1be8ca0e2fa1d29b 100644
+index 130f265a70ba8ea029a666ee69466e0cdd6c464a..812b89b76b63fad4c661556b8fb196551cc4d832 100644
 --- a/src/test/resources/projects/runconfigs/build.gradle
 +++ b/src/test/resources/projects/runconfigs/build.gradle
 @@ -1,5 +1,5 @@
