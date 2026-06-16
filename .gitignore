@@ -3,4 +3,4 @@
 /.gradle
 build
 .DS_Store
-/quiet-*-loom
+/quiet-fabric-loom
