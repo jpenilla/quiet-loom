@@ -5,10 +5,10 @@ Subject: [PATCH] Shadow changes
 
 
 diff --git a/src/main/java/net/fabricmc/loom/configuration/IncludeConfigurations.java b/src/main/java/net/fabricmc/loom/configuration/IncludeConfigurations.java
-index 5c9879f05c72db5a81487e1a3fc94a2398c62378..7a59594982db1257f0349f50ef4a59138a3c888d 100644
+index 56080e12995a715e0c3aa7b923fbcfd28c78f557..6c5bdfb21c4831b1c6dfd22c7d7bd43027303981 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/IncludeConfigurations.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/IncludeConfigurations.java
-@@ -41,6 +41,7 @@ import org.gradle.api.attributes.Usage;
+@@ -40,6 +40,7 @@ import org.gradle.api.attributes.Usage;
  import org.gradle.api.file.FileCollection;
  import org.gradle.api.provider.Provider;
  import org.gradle.api.tasks.TaskProvider;
@@ -16,13 +16,22 @@ index 5c9879f05c72db5a81487e1a3fc94a2398c62378..7a59594982db1257f0349f50ef4a5913
  import org.gradle.jvm.tasks.Jar;
  
  import net.fabricmc.loom.LoomGradleExtension;
-@@ -76,12 +77,12 @@ public final class IncludeConfigurations {
+@@ -77,12 +78,12 @@ public final class IncludeConfigurations {
  		nestJars(project, jarTask, processTask);
  	}
  
 -	public static void nestDefaultJars(Project project, TaskProvider<? extends Jar> jarTask, String taskName) {
 +	public static void nestDefaultJars(Project project, TaskProvider<? extends AbstractArchiveTask> jarTask, String taskName) {
- 		TaskProvider<NestableJarGenerationTask> processTask = createDefaultProcessTask(project, taskName);
+ 		String configName = getUniqueConfigName(project, getResolvedIncludeJarsConfigName(jarTask.getName(), Constants.Configurations.INCLUDE));
+ 		nestDefaultJars(project, jarTask, taskName, configName);
+ 	}
+ 
+-	public static void nestDefaultJars(Project project, TaskProvider<? extends Jar> jarTask, String taskName, String configName) {
++	public static void nestDefaultJars(Project project, TaskProvider<? extends AbstractArchiveTask> jarTask, String taskName, String configName) {
+ 		TaskProvider<NestableJarGenerationTask> processTask = createProcessTask(
+ 				project,
+ 				project.getConfigurations().named(Constants.Configurations.INCLUDE),
+@@ -93,7 +94,7 @@ public final class IncludeConfigurations {
  		nestJars(project, jarTask, processTask);
  	}
  
@@ -53,7 +62,7 @@ index 0b4c82604cf030342fa9394400a3aa1ab128239d..81ef5df1ce6a8feb874c7492bfe00012
  		nestJarsAction.getJars().from(jars);
  		task.getInputs().files(nestJarsAction.getJars()); // I don't think @InputFiles works, so to be sure add the jars to the task input anyway.
 diff --git a/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java
-index 5ec80b30aa087da1ebe08d8a99222c76e87994f2..b6e80b3abf22aabffc9787fce18a4602dcaa98e6 100644
+index 91ca3d727af42d287088a7042b257f43854de396..a51aaecdf6df4c208fc7f93296c83ebfc6b2d865 100644
 --- a/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java
 @@ -30,9 +30,11 @@ import java.util.Collections;
@@ -86,8 +95,8 @@ index 5ec80b30aa087da1ebe08d8a99222c76e87994f2..b6e80b3abf22aabffc9787fce18a4602
  
  		IncludeConfigurations.nestDefaultJars(
  				project,
-@@ -77,9 +70,28 @@ public class NonRemappedJarTaskConfiguration {
- 				Constants.Task.PROCESS_INCLUDE_JARS
+@@ -78,9 +71,28 @@ public class NonRemappedJarTaskConfiguration {
+ 				Constants.Configurations.INCLUDE_INTERNAL
  		);
  
 +		// quiet start
@@ -116,12 +125,12 @@ index 5ec80b30aa087da1ebe08d8a99222c76e87994f2..b6e80b3abf22aabffc9787fce18a4602
  		if (!extension.areEnvironmentSourceSetsSplit()) {
  			return Collections.emptyList();
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 725d360962568bf22017251a680eac7642ac4022..30b1ccbed3c914ddc1a29b8683a26f642796a131 100644
+index fce80678806441484c0887278c0f8e903828d752..24fb0b81b923c559a6f1b7eed3bb5ebeda5af0ce 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -97,6 +97,14 @@ public abstract class RemapTaskConfiguration implements Runnable {
- 				getTasks().named(REMAP_JAR_TASK_NAME, RemapJarTask.class),
- 				Constants.Task.PROCESS_INCLUDE_JARS
+@@ -98,6 +98,14 @@ public abstract class RemapTaskConfiguration implements Runnable {
+ 				Constants.Task.PROCESS_INCLUDE_JARS,
+ 				Constants.Configurations.INCLUDE_INTERNAL
  		);
 +		// quiet start
 +		ShadowPluginSupport.withShadowJar(getProject(), shadowJar -> {
