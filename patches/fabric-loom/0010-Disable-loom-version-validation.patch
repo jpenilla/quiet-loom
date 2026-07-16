@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Tue, 22 Oct 2024 21:39:29 -0700
+Subject: [PATCH] Disable loom version validation
+
+
+diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
+index 13c1914691746bec6d87690364b08026b76fe255..8e7c2f8fc9254512551bd83431d78237df6f8568 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
++++ b/src/main/java/net/fabricmc/loom/configuration/mods/ArtifactMetadata.java
+@@ -77,7 +77,7 @@ public record ArtifactMetadata(boolean isFabricMod, RemapRequirements remapRequi
+ 				}
+ 
+ 				if (loomVersion != null && refmapRemapType == MixinRemapType.STATIC) {
+-					validateLoomVersion(loomVersion, currentLoomVersion);
++					// validateLoomVersion(loomVersion, currentLoomVersion);
+ 				}
+ 
+ 				if (knownIndyBsmsValue != null) {
+diff --git a/src/test/groovy/net/fabricmc/loom/test/unit/ArtifactMetadataTest.groovy b/src/test/groovy/net/fabricmc/loom/test/unit/ArtifactMetadataTest.groovy
+index 50b9932096e674d32af27cb7dbffb9a5b9babbe8..a46c23f766cc3c1a3408e4b6718434aed40c57cb 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/unit/ArtifactMetadataTest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/unit/ArtifactMetadataTest.groovy
+@@ -142,15 +142,13 @@ class ArtifactMetadataTest extends Specification {
+ 		"2.0"       | "1.4.99"
+ 	}
+ 
+-	// Test that a mod with the same or older version of loom can be read
+-	def "Invalid loom version"() {
++	def "Accepts mods built with newer Loom versions"() {
+ 		given:
+ 		def zip = createModWithRemapType(modLoomVersion, "static")
+ 		when:
+ 		def metadata = createMetadata(zip, loomVersion)
+ 		then:
+-		def e = thrown(IllegalStateException)
+-		e.message == "Mod was built with a newer version of Loom ($modLoomVersion), you are using Loom ($loomVersion)"
++		metadata != null
+ 		where:
+ 		loomVersion | modLoomVersion
+ 		"1.4"       | "1.5"

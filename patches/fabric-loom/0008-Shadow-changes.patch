@@ -116,7 +116,7 @@ index 5ec80b30aa087da1ebe08d8a99222c76e87994f2..b6e80b3abf22aabffc9787fce18a4602
  		if (!extension.areEnvironmentSourceSetsSplit()) {
  			return Collections.emptyList();
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index eba78adf23b892352d812694f2e893ff478dc9d1..e05d60586182b0e1eb7dc4d4388e09bf48f0be6d 100644
+index 725d360962568bf22017251a680eac7642ac4022..30b1ccbed3c914ddc1a29b8683a26f642796a131 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 @@ -97,6 +97,14 @@ public abstract class RemapTaskConfiguration implements Runnable {
@@ -196,5 +196,70 @@ index 0000000000000000000000000000000000000000..5ba37b709a54703bee1b118dd967ff6f
 +				}
 +			});
 +		}
++	}
++}
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/ShadowIntegrationTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/ShadowIntegrationTest.groovy
+new file mode 100644
+index 0000000000000000000000000000000000000000..11f58231b956f318fb4b1bf10e9bd6f231fa16d8
+--- /dev/null
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/ShadowIntegrationTest.groovy
+@@ -0,0 +1,59 @@
++package net.fabricmc.loom.test.integration
++
++import spock.lang.Specification
++
++import net.fabricmc.loom.test.util.GradleProjectTestTrait
++
++import static net.fabricmc.loom.test.LoomTestConstants.DEFAULT_GRADLE
++import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
++
++class ShadowIntegrationTest extends Specification implements GradleProjectTestTrait {
++	private static final String SHADOW_PLUGIN = "id 'com.gradleup.shadow' version '9.5.1'"
++	private static final String SHADED_DEPENDENCY = "shadowTest 'org.apache.commons:commons-lang3:3.14.0'"
++
++	def "remaps the shadow jar"() {
++		given:
++		def gradle = gradleProject(project: "includedJars", version: DEFAULT_GRADLE)
++		addShadow(gradle)
++
++		when:
++		def result = gradle.run(tasks: ["assemble"])
++
++		then:
++		result.task(":shadowJar").outcome == SUCCESS
++		result.task(":remapJar").outcome == SUCCESS
++		gradle.hasOutputZipEntry("includedJars.jar", "org/apache/commons/lang3/StringUtils.class")
++		gradle.hasOutputZipEntry("includedJars.jar", "META-INF/jars/log4j-core-2.22.0.jar")
++		gradle.hasOutputZipEntry("includedJars.jar", "META-INF/jars/jackson-core-2.16.1.jar")
++	}
++
++	def "builds the shadow jar without remapping"() {
++		given:
++		def gradle = gradleProject(project: "includedJarsNoRemap", version: DEFAULT_GRADLE)
++		addShadow(gradle)
++
++		when:
++		def result = gradle.run(tasks: ["assemble"])
++
++		then:
++		result.task(":shadowJar").outcome == SUCCESS
++		gradle.hasOutputZipEntry("includedJars-all.jar", "org/apache/commons/lang3/StringUtils.class")
++		gradle.hasOutputZipEntry("includedJars-all.jar", "META-INF/jars/log4j-core-2.22.0.jar")
++		gradle.hasOutputZipEntry("includedJars-all.jar", "META-INF/jars/jackson-core-2.16.1.jar")
++		gradle.getOutputZipEntry("includedJars-all.jar", "META-INF/MANIFEST.MF")
++				.contains("Fabric-Mapping-Namespace: official")
++	}
++
++	private static void addShadow(GradleProjectTestTrait.GradleProject gradle) {
++		gradle.buildGradle.text = gradle.buildGradle.text
++				.replaceFirst(/plugins \{/, "plugins {\n\t${SHADOW_PLUGIN}")
++				.replaceFirst(/repositories \{/, "configurations { shadowTest }\n\nrepositories {")
++				.replaceFirst(/dependencies \{/, "dependencies {\n\t${SHADED_DEPENDENCY}")
++		gradle.buildGradle << '''
++
++shadowJar {
++	configurations = [project.configurations.shadowTest]
++}
++'''
 +	}
 +}

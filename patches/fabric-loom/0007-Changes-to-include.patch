@@ -96,7 +96,7 @@ index e0dcc804324a6d113b5ea2cb52ba172b9c95e60b..5ec80b30aa087da1ebe08d8a99222c76
  		);
  
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 3ee56e39cf5640a5d6563a6e29d2e1c4e9b56309..eba78adf23b892352d812694f2e893ff478dc9d1 100644
+index 2c6532ec47bbb948380962912f6dd63198865eb4..725d360962568bf22017251a680eac7642ac4022 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 @@ -92,10 +92,9 @@ public abstract class RemapTaskConfiguration implements Runnable {
@@ -123,3 +123,111 @@ index 75da6f5457e8a2a17dbfb9be494e8029b092499f..f746325f1266ce09dd39c5ad1f145e99
  		public static final String MINECRAFT = "minecraft";
  
  		public static final String MINECRAFT_COMPILE_LIBRARIES = "minecraftLibraries";
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/IncludeConfigurationOverlapTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/IncludeConfigurationOverlapTest.groovy
+new file mode 100644
+index 0000000000000000000000000000000000000000..5198e1875d15da865e9fdf956d19888de643d0a3
+--- /dev/null
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/IncludeConfigurationOverlapTest.groovy
+@@ -0,0 +1,48 @@
++package net.fabricmc.loom.test.integration
++
++import java.util.zip.ZipFile
++
++import groovy.json.JsonSlurper
++import spock.lang.Specification
++import spock.lang.Unroll
++
++import net.fabricmc.loom.test.util.GradleProjectTestTrait
++
++import static net.fabricmc.loom.test.LoomTestConstants.DEFAULT_GRADLE
++import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
++
++class IncludeConfigurationOverlapTest extends Specification implements GradleProjectTestTrait {
++	@Unroll
++	def "de-duplicates dependencies shared by include configurations for #project"() {
++		given:
++		def gradle = gradleProject(project: project, version: DEFAULT_GRADLE)
++		gradle.buildGradle << '''
++
++dependencies {
++	// Also resolved transitively through jackson-databind.
++	include 'com.fasterxml.jackson.core:jackson-core:2.16.1'
++}
++'''
++
++		when:
++		def result = gradle.run(tasks: [task])
++
++		then:
++		result.task(":$task").outcome == SUCCESS
++		def nestedPath = "META-INF/jars/jackson-core-2.16.1.jar"
++		zipEntryCount(gradle.getOutputFile("includedJars.jar"), nestedPath) == 1
++		def fabricModJson = new JsonSlurper().parseText(gradle.getOutputZipEntry("includedJars.jar", "fabric.mod.json"))
++		fabricModJson.jars.count { it.file == nestedPath } == 1
++
++		where:
++		project                 | task
++		"includedJars"          | "remapJar"
++		"includedJarsNoRemap"   | "jar"
++	}
++
++	private static long zipEntryCount(File file, String name) {
++		return new ZipFile(file).withCloseable { zip ->
++			zip.stream().filter { entry -> entry.name == name }.count()
++		}
++	}
++}
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/IncludedJarsTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/IncludedJarsTest.groovy
+index e92b518548082c94621095ab48d692056091c899..4f44a1c4394d1ff06eac26f6379785e983ce418d 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/integration/IncludedJarsTest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/IncludedJarsTest.groovy
+@@ -52,6 +52,11 @@ class IncludedJarsTest extends Specification implements GradleProjectTestTrait {
+ 		!gradle.hasOutputZipEntry("includedJars.jar", "META-INF/jars/log4j-api-2.22.0.jar")
+ 		!gradle.hasOutputZipEntry("includedJars.jar", "META-INF/jars/adventure-api-4.14.0.jar")
+ 
++		// Assert transitively included dependencies and their transitives are present.
++		gradle.hasOutputZipEntry("includedJars.jar", "META-INF/jars/jackson-databind-2.16.1.jar")
++		gradle.hasOutputZipEntry("includedJars.jar", "META-INF/jars/jackson-annotations-2.16.1.jar")
++		gradle.hasOutputZipEntry("includedJars.jar", "META-INF/jars/jackson-core-2.16.1.jar")
++
+ 		where:
+ 		version << STANDARD_TEST_VERSIONS
+ 	}
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/noRemap/IncludedJarsNoRemapTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/noRemap/IncludedJarsNoRemapTest.groovy
+index e3c4512a209f240487fad8e00d3669763eef1c0f..f8e71674396a51a3c3b17bff698be44c0e095446 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/integration/noRemap/IncludedJarsNoRemapTest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/noRemap/IncludedJarsNoRemapTest.groovy
+@@ -54,6 +54,11 @@ class IncludedJarsNoRemapTest extends Specification implements GradleProjectTest
+ 		!gradle.hasOutputZipEntry("includedJars.jar", "META-INF/jars/log4j-api-2.22.0.jar")
+ 		!gradle.hasOutputZipEntry("includedJars.jar", "META-INF/jars/adventure-api-4.14.0.jar")
+ 
++		// Assert transitively included dependencies and their transitives are present.
++		gradle.hasOutputZipEntry("includedJars.jar", "META-INF/jars/jackson-databind-2.16.1.jar")
++		gradle.hasOutputZipEntry("includedJars.jar", "META-INF/jars/jackson-annotations-2.16.1.jar")
++		gradle.hasOutputZipEntry("includedJars.jar", "META-INF/jars/jackson-core-2.16.1.jar")
++
+ 		// Verify manifest attributes
+ 		def manifestContent = gradle.getOutputZipEntry("includedJars.jar", "META-INF/MANIFEST.MF")
+ 		def manifest = new Manifest(new ByteArrayInputStream(manifestContent.bytes))
+diff --git a/src/test/resources/projects/includedJars/build.gradle b/src/test/resources/projects/includedJars/build.gradle
+index 0306243e6faffc53180e0033b9a52c7b592cbc0d..7a88b8920bd4779dd43badee6fe1870c9e762167 100644
+--- a/src/test/resources/projects/includedJars/build.gradle
++++ b/src/test/resources/projects/includedJars/build.gradle
+@@ -18,4 +18,6 @@ dependencies {
+ 
+ 	// bom provides version
+ 	include 'net.kyori:adventure-text-serializer-gson'
++
++	transitiveInclude 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
+ }
+diff --git a/src/test/resources/projects/includedJarsNoRemap/build.gradle b/src/test/resources/projects/includedJarsNoRemap/build.gradle
+index 68b48f7a14512840e5b208fbfda5db7c1eb48a8f..6c8965bdb3aa7bf0b815fb948809bfa93b996c0b 100644
+--- a/src/test/resources/projects/includedJarsNoRemap/build.gradle
++++ b/src/test/resources/projects/includedJarsNoRemap/build.gradle
+@@ -16,4 +16,6 @@ dependencies {
+ 
+ 	// bom provides version
+ 	include 'net.kyori:adventure-text-serializer-gson'
++
++	transitiveInclude 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
+ }

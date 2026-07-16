@@ -18,10 +18,10 @@ index d1cdb01184ef92469236f2f661c221447307f19d..16d98bd32e8215bf630b28be0d15f1d5
  			throw new UncheckedIOException("Failed to strip nested jars from %s".formatted(path), e);
  		}
 diff --git a/src/main/java/net/fabricmc/loom/util/ZipUtils.java b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
-index f48d1f01a75f53daf439f11507305f31d7859241..4b3eea5758368a8574420b43c51a6d1e7ea12676 100644
+index 61f37a5d74bceedb0199b6fd9bc8648886ebf5a7..645d028a88da46baf9b9ebf688a5d177b7753cdc 100644
 --- a/src/main/java/net/fabricmc/loom/util/ZipUtils.java
 +++ b/src/main/java/net/fabricmc/loom/util/ZipUtils.java
-@@ -191,6 +191,14 @@ public class ZipUtils {
+@@ -190,6 +190,14 @@ public class ZipUtils {
  		}
  	}
  
@@ -36,3 +36,34 @@ index f48d1f01a75f53daf439f11507305f31d7859241..4b3eea5758368a8574420b43c51a6d1e
  	public static int transformString(Path zip, Collection<Pair<String, UnsafeUnaryOperator<String>>> transforms) throws IOException {
  		return transformString(zip, transforms.stream());
  	}
+diff --git a/src/test/groovy/net/fabricmc/loom/test/unit/ZipUtilsTest.groovy b/src/test/groovy/net/fabricmc/loom/test/unit/ZipUtilsTest.groovy
+index 480d668d7d1e2e508d4e663c3f2842d959bd022f..3ec848bca8ba29c84dc94dbaa8a694bc1bf35097 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/unit/ZipUtilsTest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/unit/ZipUtilsTest.groovy
+@@ -55,6 +55,26 @@ class ZipUtilsTest extends Specification {
+ 		new String( ZipUtils.unpack(zip, "test.txt"), StandardCharsets.UTF_8) == "This is a test of packing"
+ 	}
+ 
++	def "delete recursively if present"() {
++		given:
++		def dir = File.createTempDir()
++		def zip = File.createTempFile("loom-zip-test", ".zip").toPath()
++		new File(dir, "META-INF/jars/nested.jar").with {
++			parentFile.mkdirs()
++			text = "nested"
++		}
++		new File(dir, "META-INF/kept.txt").text = "kept"
++		ZipUtils.pack(dir.toPath(), zip)
++
++		when:
++		ZipUtils.deleteRecursiveIfExists(zip, "META-INF/jars")
++		ZipUtils.deleteRecursiveIfExists(zip, "META-INF/missing")
++
++		then:
++		!ZipUtils.contains(zip, "META-INF/jars/nested.jar")
++		ZipUtils.contains(zip, "META-INF/kept.txt")
++	}
++
+ 	def "transform string"() {
+ 		given:
+ 		def dir = File.createTempDir()

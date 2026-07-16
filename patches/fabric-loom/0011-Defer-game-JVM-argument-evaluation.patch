@@ -1,0 +1,88 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Thu, 16 Jul 2026 12:08:45 -0700
+Subject: [PATCH] Defer game JVM argument evaluation
+
+
+diff --git a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
+index 72c622b1232add96e4526735c3b4640b08af859b..264fd8f1b6ced9d7218f8e0e49acda20a9691463 100644
+--- a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
++++ b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
+@@ -147,7 +147,7 @@ public abstract class AbstractRunTask extends JavaExec {
+ 			}
+ 		});
+ 		getMainClass().set(config.flatMap(RunConfiguration::getDevLaunchMainClass));
+-		getJvmArguments().addAll(getProject().provider(this::getGameJvmArgs));
++		getJvmArgumentProviders().add(this::getGameJvmArgs);
+ 
+ 		getInternalRunDir().set(config.flatMap(RunConfiguration::getRunDirectory));
+ 		getInternalEnvironmentVars().set(config.flatMap(RunConfiguration::getEnvironmentVars));
+@@ -245,7 +245,7 @@ public abstract class AbstractRunTask extends JavaExec {
+ 		commandLine.add(XVFBExistsValueSource.XVFB);
+ 		commandLine.add("--auto-servernum");
+ 		commandLine.add(javaExec);
+-		commandLine.addAll(getJvmArguments().get());
++		commandLine.addAll(getAllJvmArgs());
+ 		commandLine.add(getMainClass().get());
+ 		commandLine.addAll(getArgs());
+ 
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/DeferredRunArgumentsTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/DeferredRunArgumentsTest.groovy
+new file mode 100644
+index 0000000000000000000000000000000000000000..a3014729c59e2bd9f0398be6e9baf6bba88651b0
+--- /dev/null
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/DeferredRunArgumentsTest.groovy
+@@ -0,0 +1,54 @@
++/*
++ * This file is part of fabric-loom, licensed under the MIT License (MIT).
++ *
++ * Copyright (c) 2026 FabricMC
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in all
++ * copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++ * SOFTWARE.
++ */
++
++package net.fabricmc.loom.test.integration
++
++import spock.lang.IgnoreIf
++import spock.lang.Specification
++
++import net.fabricmc.loom.test.util.GradleProjectTestTrait
++
++import static net.fabricmc.loom.test.LoomTestConstants.DEFAULT_GRADLE
++import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
++
++class DeferredRunArgumentsTest extends Specification implements GradleProjectTestTrait {
++	@IgnoreIf({ !os.linux }) // XVFB is installed on the CI for this test
++	def "passes deferred JVM arguments to XVFB"() {
++		given:
++		def gradle = gradleProject(project: "runconfigs", version: DEFAULT_GRADLE)
++		gradle.buildGradle << '''
++
++tasks.named('runCustomMain') {
++	useXvfb.set(true)
++}
++'''
++
++		when:
++		def result = gradle.run(tasks: ["runCustomMain"])
++
++		then:
++		result.task(":runCustomMain").outcome == SUCCESS
++		result.output.contains("This contains a space")
++	}
++}

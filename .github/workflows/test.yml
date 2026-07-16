@@ -13,8 +13,7 @@ jobs:
         java: [ "21" ]
         os: [ "ubuntu-latest" ]
     # Only run on PRs if the source branch is on someone else's repo
-    #if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
-    if: ${{ false }}
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
     runs-on: "${{ matrix.os }}"
     steps:
       - name: "checkout repository"
@@ -30,8 +29,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: "apply patches"
         run: "git submodule update --init && ./gradlew applyPatches"
-      - name: "build and test"
-        run: "cd ${{ matrix.buildDir }} && ./gradlew build"
+      - name: "run tests for custom patches"
+        run: "./scripts/test-quiet.sh"
       - name: "archive test results"
         uses: actions/upload-artifact@v4
         if: ${{ always() }}

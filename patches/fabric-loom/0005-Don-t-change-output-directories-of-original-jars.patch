@@ -39,3 +39,38 @@ index ed0aaa9b29c3c8eee94757318f71340a4a165ea2..8d596334dea63ec9457ccdca131a5054
  		main.getEntry("main-refmap0000.json") != null
  		def mixin = new JarFile(gradle.getOutputFile("fabric-example-mod-1.0.0-mixin.jar").absoluteFile)
  		mixin.getEntry("default-refmap0000.json") != null
+diff --git a/src/test/groovy/net/fabricmc/loom/test/integration/RemapOutputConfigurationTest.groovy b/src/test/groovy/net/fabricmc/loom/test/integration/RemapOutputConfigurationTest.groovy
+new file mode 100644
+index 0000000000000000000000000000000000000000..2236d38b8b7c4f1703ff30bcf683b29d11ecc2f7
+--- /dev/null
++++ b/src/test/groovy/net/fabricmc/loom/test/integration/RemapOutputConfigurationTest.groovy
+@@ -0,0 +1,29 @@
++package net.fabricmc.loom.test.integration
++
++import spock.lang.Specification
++
++import net.fabricmc.loom.test.util.GradleProjectTestTrait
++
++import static net.fabricmc.loom.test.LoomTestConstants.DEFAULT_GRADLE
++import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
++
++class RemapOutputConfigurationTest extends Specification implements GradleProjectTestTrait {
++	def "original jars stay in the libs directory"() {
++		given:
++		def gradle = gradleProject(project: "includedJars", version: DEFAULT_GRADLE)
++		gradle.buildGradle << '''
++
++java {
++	withSourcesJar()
++}
++'''
++
++		when:
++		def result = gradle.run(tasks: ["jar", "sourcesJar"])
++
++		then:
++		result.task(":jar").outcome == SUCCESS
++		result.task(":sourcesJar").outcome == SUCCESS
++		gradle.getOutputFile("includedJars-dev.jar").exists()
++	}
++}
