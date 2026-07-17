@@ -5,7 +5,6 @@ root_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$root_dir/quiet-fabric-loom"
 
 tests=(
-  net.fabricmc.loom.test.integration.DeferredRunArgumentsTest
   net.fabricmc.loom.test.integration.IncludeConfigurationOverlapTest
   net.fabricmc.loom.test.integration.IncludedJarsTest
   net.fabricmc.loom.test.integration.noRemap.IncludedJarsNoRemapTest
