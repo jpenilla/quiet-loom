@@ -5,7 +5,7 @@ Subject: [PATCH] Add AbstractRunTask#getClasspathFilter
 
 
 diff --git a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
-index 264fd8f1b6ced9d7218f8e0e49acda20a9691463..e774c41cdbb8ced41b1a383b8d156565b10461f7 100644
+index 9a7d07b09e4feb9da9c0b5977239a21c5dbfcd09..801003d708d47c1ec64c93f1f143de983dc2a06f 100644
 --- a/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
 +++ b/src/main/java/net/fabricmc/loom/task/AbstractRunTask.java
 @@ -35,6 +35,7 @@ import java.nio.file.Paths;
@@ -16,7 +16,7 @@ index 264fd8f1b6ced9d7218f8e0e49acda20a9691463..e774c41cdbb8ced41b1a383b8d156565
  import java.util.stream.Collectors;
  
  import javax.inject.Inject;
-@@ -118,6 +119,10 @@ public abstract class AbstractRunTask extends JavaExec {
+@@ -136,6 +137,10 @@ public abstract class AbstractRunTask extends JavaExec {
  	@Classpath
  	protected abstract ConfigurableFileCollection getInternalClasspath();
  
@@ -27,7 +27,7 @@ index 264fd8f1b6ced9d7218f8e0e49acda20a9691463..e774c41cdbb8ced41b1a383b8d156565
  	public AbstractRunTask(Function<Project, RunConfiguration> configProvider) {
  		super();
  		setGroup(Constants.TaskGroup.FABRIC);
-@@ -194,8 +199,8 @@ public abstract class AbstractRunTask extends JavaExec {
+@@ -221,8 +226,8 @@ public abstract class AbstractRunTask extends JavaExec {
  			super.setClasspath(getObjectFactory().fileCollection());
  		} else {
  			LOGGER.debug("Using bare classpath for {}", getName());
@@ -38,16 +38,16 @@ index 264fd8f1b6ced9d7218f8e0e49acda20a9691463..e774c41cdbb8ced41b1a383b8d156565
  		}
  
  		setWorkingDir(getInternalRunDir());
-@@ -276,6 +281,7 @@ public abstract class AbstractRunTask extends JavaExec {
+@@ -331,6 +336,7 @@ public abstract class AbstractRunTask extends JavaExec {
  
- 		if (getUseArgFile().get()) {
- 			final String content = "-classpath\n" + this.getInternalClasspath().getFiles().stream()
-+					.filter(this::includeClasspathEntry)
- 					.map(File::getAbsolutePath)
- 					.map(AbstractRunTask::quoteArg)
- 					.collect(Collectors.joining(File.pathSeparator));
-@@ -294,6 +300,10 @@ public abstract class AbstractRunTask extends JavaExec {
- 		return args;
+ 	private void writeArgFile() {
+ 		final String content = "-classpath\n" + this.getInternalClasspath().getFiles().stream()
++				.filter(this::includeClasspathEntry)
+ 				.map(File::getAbsolutePath)
+ 				.map(AbstractRunTask::quoteArg)
+ 				.collect(Collectors.joining(File.pathSeparator));
+@@ -344,6 +350,10 @@ public abstract class AbstractRunTask extends JavaExec {
+ 		}
  	}
  
 +	private boolean includeClasspathEntry(File file) {

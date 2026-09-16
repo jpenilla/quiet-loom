@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index f1c3f01b5769bf7b1bf66a5234828020ce071f8a..b20b83c4a44eaf9d90058b6be3030b1ac8aad6b5 100644
+index b0b4260c4f4dcc4f9b2d2fb54df9555b2ed8c8c7..4ce18d0b6198a170fa121285f0bc6576d5950c6d 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,10 +5,9 @@ plugins {
@@ -27,7 +27,7 @@ index f1c3f01b5769bf7b1bf66a5234828020ce071f8a..b20b83c4a44eaf9d90058b6be3030b1a
  
 -group = 'net.fabricmc'
 +group = 'xyz.jpenilla' // quiet
- def baseVersion = '1.17'
+ def baseVersion = '1.18'
  
  def ENV = System.getenv()
 -if (ENV.BUILD_NUMBER) {
@@ -43,8 +43,8 @@ index f1c3f01b5769bf7b1bf66a5234828020ce071f8a..b20b83c4a44eaf9d90058b6be3030b1a
  } else {
  	version = baseVersion + '.local'
  }
-@@ -185,64 +182,29 @@ java {
- 	targetCompatibility = JavaVersion.VERSION_21
+@@ -185,68 +182,29 @@ java {
+ 	targetCompatibility = JavaVersion.VERSION_25
  }
  
 -spotless {
@@ -82,6 +82,10 @@ index f1c3f01b5769bf7b1bf66a5234828020ce071f8a..b20b83c4a44eaf9d90058b6be3030b1a
 -codenarc {
 -	toolVersion = libs.versions.codenarc.get()
 -	configFile = file("codenarc.groovy")
+-
+-	if (ENV.CI) {
+-		reportFormat = 'xml'
+-	}
 -}
 +// quiet - remove checkstyle
  
@@ -114,7 +118,7 @@ index f1c3f01b5769bf7b1bf66a5234828020ce071f8a..b20b83c4a44eaf9d90058b6be3030b1a
  			implementationClass = 'net.fabricmc.loom.LoomRepositoryPlugin'
  		}
  	}
-@@ -321,9 +283,9 @@ publishing {
+@@ -326,9 +284,9 @@ publishing {
  						Node dependencies = root.appendChild(document.createElement('dependencies'))
  						Node dependency = dependencies.appendChild(document.createElement('dependency'))
  						Node groupId = dependency.appendChild(document.createElement('groupId'))
@@ -126,7 +130,7 @@ index f1c3f01b5769bf7b1bf66a5234828020ce071f8a..b20b83c4a44eaf9d90058b6be3030b1a
  						Node version = dependency.appendChild(document.createElement('version'))
  						version.setTextContent(markerDependencyVersion)
  					})
-@@ -333,13 +295,13 @@ publishing {
+@@ -338,13 +296,13 @@ publishing {
  	}
  	repositories {
  		maven {

@@ -45,7 +45,7 @@ index 3f748b582358796c9b394ce29aa548bab63a4e4d..56080e12995a715e0c3aa7b923fbcfd2
  
  		jarTask.configure(task -> {
 diff --git a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
-index 2fd18124246bf6a10b64fc42d6a09f0e3228f1fa..c427169bfebdab4d3b799d99024426a2bf1731f4 100644
+index e693b8fba5a0329217783fe08b8a878ef900a357..0594e55d0b7720571667b96afebd42d5faf59f9e 100644
 --- a/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
 +++ b/src/main/java/net/fabricmc/loom/configuration/LoomConfigurations.java
 @@ -83,6 +83,7 @@ public abstract class LoomConfigurations implements Runnable {
@@ -53,9 +53,9 @@ index 2fd18124246bf6a10b64fc42d6a09f0e3228f1fa..c427169bfebdab4d3b799d99024426a2
  
  		register(Constants.Configurations.INCLUDE, Role.NONE);
 +		register(Constants.Configurations.TRANSITIVE_INCLUDE, Role.RESOLVABLE);
+ 		registerNonTransitive(Constants.Configurations.MAPPING_CONSTANTS, Role.RESOLVABLE);
+ 		extendsFrom(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME, Constants.Configurations.MAPPING_CONSTANTS);
  
- 		if (!extension.disableObfuscation()) {
- 			registerNonTransitive(Constants.Configurations.MAPPING_CONSTANTS, Role.RESOLVABLE);
 diff --git a/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java
 index a78fce50d4fdd79ff807b13e1256c318902d9b9c..91ca3d727af42d287088a7042b257f43854de396 100644
 --- a/src/main/java/net/fabricmc/loom/task/NonRemappedJarTaskConfiguration.java
@@ -73,7 +73,7 @@ index a78fce50d4fdd79ff807b13e1256c318902d9b9c..91ca3d727af42d287088a7042b257f43
  				Constants.Configurations.INCLUDE_INTERNAL
  		);
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index f5a0bdd29c82197bcc7b0998ba615004813c7b15..fce80678806441484c0887278c0f8e903828d752 100644
+index c2bbfb178fb1016ec892f6a41312f480d8356518..7a11e46cbdc043ec72cad79b1ce3c28faffbdd6b 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 @@ -92,10 +92,9 @@ public abstract class RemapTaskConfiguration implements Runnable {
@@ -89,10 +89,10 @@ index f5a0bdd29c82197bcc7b0998ba615004813c7b15..fce80678806441484c0887278c0f8e90
  				Constants.Configurations.INCLUDE_INTERNAL
  		);
 diff --git a/src/main/java/net/fabricmc/loom/util/Constants.java b/src/main/java/net/fabricmc/loom/util/Constants.java
-index 00d07d5d86c1637a6169375fe98df96e299aca70..612ebc85fd0ac242266d480764c53a8df6325f4b 100644
+index 2ad189e8ee4b8d2e759012dd17b89d9cf8c78505..5e4ad895647f6f618dfabbd8d3c2f1b6d1b92546 100644
 --- a/src/main/java/net/fabricmc/loom/util/Constants.java
 +++ b/src/main/java/net/fabricmc/loom/util/Constants.java
-@@ -51,6 +51,7 @@ public class Constants {
+@@ -52,6 +52,7 @@ public class Constants {
  		public static final String MOD_COMPILE_CLASSPATH_MAPPED = "modCompileClasspathMapped";
  		public static final String INCLUDE = "include";
  		public static final String INCLUDE_INTERNAL = "includeInternal";
