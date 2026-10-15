@@ -73,10 +73,10 @@ index a78fce50d4fdd79ff807b13e1256c318902d9b9c..91ca3d727af42d287088a7042b257f43
  				Constants.Configurations.INCLUDE_INTERNAL
  		);
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index c2bbfb178fb1016ec892f6a41312f480d8356518..7a11e46cbdc043ec72cad79b1ce3c28faffbdd6b 100644
+index 7723e3986bd721c6ac2f64a202e55bf2690d8efe..e1445efbbc88c1d31f92591b040d0b99ac61c669 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -92,10 +92,9 @@ public abstract class RemapTaskConfiguration implements Runnable {
+@@ -95,10 +95,9 @@ public abstract class RemapTaskConfiguration implements Runnable {
  		// must not be lazy to ensure that the prepare tasks get setup for other projects to depend on.
  		// Being lazy also breaks maven publishing, see: https://github.com/FabricMC/fabric-loom/issues/1023
  		getTasks().create(REMAP_JAR_TASK_NAME, RemapJarTask.class, remapJarTaskAction);

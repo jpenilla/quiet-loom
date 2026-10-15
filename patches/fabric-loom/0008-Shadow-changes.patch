@@ -125,10 +125,10 @@ index 91ca3d727af42d287088a7042b257f43854de396..a51aaecdf6df4c208fc7f93296c83ebf
  		if (!extension.areEnvironmentSourceSetsSplit()) {
  			return Collections.emptyList();
 diff --git a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-index 7a11e46cbdc043ec72cad79b1ce3c28faffbdd6b..0893d33f6180e51778a0c9af5b32bda286cc5e59 100644
+index e1445efbbc88c1d31f92591b040d0b99ac61c669..71cf2bc684fe235d15fb3c0850e4029cd7294203 100644
 --- a/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
 +++ b/src/main/java/net/fabricmc/loom/task/RemapTaskConfiguration.java
-@@ -98,6 +98,14 @@ public abstract class RemapTaskConfiguration implements Runnable {
+@@ -101,6 +101,14 @@ public abstract class RemapTaskConfiguration implements Runnable {
  				Constants.Task.PROCESS_INCLUDE_JARS,
  				Constants.Configurations.INCLUDE_INTERNAL
  		);

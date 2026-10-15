@@ -37,11 +37,11 @@ index 61f37a5d74bceedb0199b6fd9bc8648886ebf5a7..645d028a88da46baf9b9ebf688a5d177
  		return transformString(zip, transforms.stream());
  	}
 diff --git a/src/test/groovy/net/fabricmc/loom/test/unit/ZipUtilsTest.groovy b/src/test/groovy/net/fabricmc/loom/test/unit/ZipUtilsTest.groovy
-index 480d668d7d1e2e508d4e663c3f2842d959bd022f..3ec848bca8ba29c84dc94dbaa8a694bc1bf35097 100644
+index 79c5761c66dc65da7acc5bb51752ff8561166edd..c46e484d0f2b0e7b495ac4791336ec1d3ea0c509 100644
 --- a/src/test/groovy/net/fabricmc/loom/test/unit/ZipUtilsTest.groovy
 +++ b/src/test/groovy/net/fabricmc/loom/test/unit/ZipUtilsTest.groovy
 @@ -55,6 +55,26 @@ class ZipUtilsTest extends Specification {
- 		new String( ZipUtils.unpack(zip, "test.txt"), StandardCharsets.UTF_8) == "This is a test of packing"
+ 		new String(ZipUtils.unpack(zip, "test.txt"), StandardCharsets.UTF_8) == "This is a test of packing"
  	}
  
 +	def "delete recursively if present"() {
