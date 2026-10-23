@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Penilla <11360596+jpenilla@users.noreply.github.com>
+Date: Fri, 23 Oct 2026 10:32:54 -0700
+Subject: [PATCH] Include Minecraft jars in remapped mod cache key
+
+
+diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java b/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java
+index 825f3c49e6f512afcd873dba230bedc870f9ad3f..f0370df5e2e798233ddb87d3c0e57000fa2bbf18 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java
++++ b/src/main/java/net/fabricmc/loom/configuration/mods/ModConfigurationRemapper.java
+@@ -148,6 +148,9 @@ public class ModConfigurationRemapper {
+ 		final ModDependencyOptions modDependencyOptions = ModDependencyOptions.create(project, ModDependencyOptions.class, options -> {
+ 			options.getMappings().set(mappingsSuffix);
+ 			options.getInlineRefmap().set(extension.getMixin().getInlineDependencyRefmaps());
++			options.getMinecraftJars().set(extension.getMinecraftJars(extension.getProductionNamespaceEnum().get()).stream()
++					.map(path -> path.getFileName().toString())
++					.toList());
+ 		});
+ 
+ 		if (LOGGER.isInfoEnabled()) {
+diff --git a/src/main/java/net/fabricmc/loom/configuration/mods/dependency/ModDependencyOptions.java b/src/main/java/net/fabricmc/loom/configuration/mods/dependency/ModDependencyOptions.java
+index c963971673eae73bb41fe7f00c79b87dfa29cfdb..653a7d8065371627939ed5fd1ea15e57cba771e2 100644
+--- a/src/main/java/net/fabricmc/loom/configuration/mods/dependency/ModDependencyOptions.java
++++ b/src/main/java/net/fabricmc/loom/configuration/mods/dependency/ModDependencyOptions.java
+@@ -24,6 +24,7 @@
+ 
+ package net.fabricmc.loom.configuration.mods.dependency;
+ 
++import org.gradle.api.provider.ListProperty;
+ import org.gradle.api.provider.Property;
+ 
+ import net.fabricmc.loom.util.CacheKey;
+@@ -35,4 +36,10 @@ public abstract class ModDependencyOptions extends CacheKey {
+ 	public abstract Property<String> getMappings();
+ 
+ 	public abstract Property<Boolean> getInlineRefmap();
++
++	/**
++	 * The file names of the Minecraft jars on the remap classpath. These differ between jar setups (merged, split, server/client only),
++	 * which affect the remapped output, for example when remapping static mixins whose targets are only present in some setups.
++	 */
++	public abstract ListProperty<String> getMinecraftJars();
+ }
+diff --git a/src/test/groovy/net/fabricmc/loom/test/unit/ModDependencyOptionsTest.groovy b/src/test/groovy/net/fabricmc/loom/test/unit/ModDependencyOptionsTest.groovy
+index 954897e381612175bac58e89c8a120d0fa71ffa0..8a1c2b98f5e056a508839c256d711433b551177d 100644
+--- a/src/test/groovy/net/fabricmc/loom/test/unit/ModDependencyOptionsTest.groovy
++++ b/src/test/groovy/net/fabricmc/loom/test/unit/ModDependencyOptionsTest.groovy
+@@ -37,6 +37,7 @@ class ModDependencyOptionsTest extends Specification {
+ 		def modDependencyOptions = CacheKey.create(project, ModDependencyOptions) {
+ 			it.getMappings().set("testMappings")
+ 			it.getInlineRefmap().set(false)
++			it.getMinecraftJars().set(["minecraft-merged-intermediary-1.21.11-testMappings.jar"])
+ 		}
+ 
+ 		when:
+@@ -44,7 +45,7 @@ class ModDependencyOptionsTest extends Specification {
+ 		def cacheKey = modDependencyOptions.getCacheKey()
+ 
+ 		then:
+-		json == '{"__inlineRefmap__":false,"__mappings__":"testMappings"}'
+-		cacheKey == "1b04231e"
++		json == '{"__inlineRefmap__":false,"__mappings__":"testMappings","__minecraftJars__":["minecraft-merged-intermediary-1.21.11-testMappings.jar"]}'
++		cacheKey == "b95619b5"
+ 	}
+ }
