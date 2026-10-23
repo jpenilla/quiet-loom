@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes & rebrand
 
 
 diff --git a/build.gradle b/build.gradle
-index 2c85e131e95a8474f33d31000347c130ea05ff91..233d2b92c8300e00069ba35a41213eb4d7573f42 100644
+index f8bcba94745b2889183155c9a743254463cf6e74..233d2b92c8300e00069ba35a41213eb4d7573f42 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -5,10 +5,9 @@ plugins {
@@ -58,12 +58,12 @@ index 2c85e131e95a8474f33d31000347c130ea05ff91..233d2b92c8300e00069ba35a41213eb4
 -	groovy {
 -		importOrder('java', 'javax', '', 'net.fabricmc', '\\#')
 -		licenseHeaderFile(rootProject.file("HEADER")).yearSeparator("-")
--		greclipse()
+-		// greclipse()
 -	}
 -
 -	groovyGradle {
 -		target 'src/**/*.gradle', '*.gradle'
--		greclipse()
+-		// greclipse()
 -	}
 -
 -	kotlin {
